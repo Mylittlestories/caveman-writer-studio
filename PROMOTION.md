@@ -16,7 +16,7 @@ Everything you need to publish and promote the repo. Copy-paste ready.
 | Deploy-status badge | ✅ done | live in README |
 | Repo hygiene (CONTRIBUTING / CoC / SUPPORT / SECURITY) | ✅ done | pushed |
 | Announcement issue (#1, pinned) | ✅ done | github.com/Mylittlestories/caveman-writer-studio/issues/1 |
-| GitHub Discussion announcement | ⏳ manual | create categories first: repo → **Discussions → Get started** (UI), then paste copy in §7 |
+| GitHub Discussion announcement | ✅ done | [discussions/2](https://github.com/Mylittlestories/caveman-writer-studio/discussions/2) — Announcements, live |
 | Profile README (featured card) | ✅ done | github.com/Mylittlestories (appended, animation preserved) |
 | Social preview image | ⚠️ manual | Repo → Settings → Social preview → `assets/og-image.jpg` |
 | Pin / feature repo | ⚠️ manual | Repo → About → pin, or profile featured repos |
