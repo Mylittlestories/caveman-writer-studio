@@ -15,6 +15,7 @@
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square" alt="Zero dependencies">
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml/badge.svg" alt="Pages deploy"></a>
   <img src="https://img.shields.io/badge/build-single%20HTML-27ae60?style=flat-square" alt="Single HTML">
   <img src="https://img.shields.io/badge/languages-EN%20%E2%80%A2%20%CE%95%CE%9B-e8b46a?style=flat-square" alt="Bilingual">
 </p>

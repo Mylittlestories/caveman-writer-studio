@@ -4,6 +4,24 @@ Everything you need to publish and promote the repo. Copy-paste ready.
 
 ---
 
+## 0 · Campaign dashboard — current status
+
+| Channel | Status | Notes |
+|---|---|---|
+| Repo live | ✅ done | github.com/Mylittlestories/caveman-writer-studio |
+| GitHub Pages site | ✅ live | mylittlestories.github.io/caveman-writer-studio (deploy workflow success) |
+| Release v1.0.0 + asset | ✅ done | `index.html` attached (293 KB) |
+| Topics (17) + description + homepage | ✅ done | set via API |
+| SEO/OG meta on site | ✅ done | og:image, twitter card — shares show the banner |
+| Deploy-status badge | ✅ done | live in README |
+| Repo hygiene (CONTRIBUTING / CoC / SUPPORT / SECURITY) | ✅ done | pushed |
+| GitHub Discussion announcement | ⏳ see step 7 | needs Discussions enabled (UI) if not done yet |
+| Social preview image | ⚠️ manual | Repo → Settings → Social preview → `assets/og-image.jpg` |
+| Pin / feature repo | ⚠️ manual | Repo → About → pin, or profile featured repos |
+| External posts (X / LinkedIn / Reddit) | ⏳ manual | copy in section 3 |
+
+---
+
 ## 1 · GitHub repository settings (set once)
 
 **Description** (short):
@@ -102,3 +120,24 @@ git push -u origin main
 ```
 
 (Replace `Mylittlestories` with your GitHub username.)
+
+
+---
+
+## 7 · GitHub Discussion announcement (copy-paste)
+
+> **🎉 Caveman Writer Studio v14.0 is live — a single-file writing studio for authors who write with AI**
+>
+> I've been building this for months while writing my own books, and it's finally public. One HTML file, no install, works offline, bilingual EN/ΕΛ.
+>
+> **What it does:**
+> - Turns a spark (or an unfinished story) into a **complete novel brief** — novels, novellas, serials
+> - **19 master techniques** (King, Kazantzakis, Tolkien, Lovecraft, Christie, Dostoevsky, García Márquez, Hemingway, Orwell, Murakami, Le Guin, Woolf, G.R.R. Martin, Austen, Camus, le Carré, Vizyinos, Papadiamantis, Herbert)
+> - 🧠 Author profile that matches **your** voice + **Greek language guard** (flawless orthography/tonics) + proofreading gate
+> - 📚 Manuscript tab: chapters, live word counts, weekly rhythm, cost tracking
+> - ⚡ The **caveman protocol** — ~65% fewer tokens in AI commentary, full substance kept
+>
+> Live demo: https://mylittlestories.github.io/caveman-writer-studio/
+> Repo: https://github.com/Mylittlestories/caveman-writer-studio
+>
+> Feedback, ideas, and feature requests very welcome. What's your writing workflow missing?
