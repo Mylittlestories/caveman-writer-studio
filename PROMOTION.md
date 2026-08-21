@@ -18,7 +18,7 @@ writer-tool, claude, chatgpt, prompt-engineering, writing-assistant, single-file
 offline-first, fiction, storytelling, manuscript, serialized-fiction
 ```
 
-**Website**: enable **GitHub Pages** (Settings → Pages → Source: *GitHub Actions*) — the included workflow deploys automatically. Live URL: `https://georgederventlis.github.io/caveman-writer-studio/`
+**Website**: enable **GitHub Pages** (Settings → Pages → Source: *GitHub Actions*) — the included workflow deploys automatically. Live URL: `https://Mylittlestories.github.io/caveman-writer-studio/`
 
 **Social preview**: Settings → Social preview → upload `assets/og-image.jpg` (shows on shares).
 
@@ -97,8 +97,8 @@ offline-first, fiction, storytelling, manuscript, serialized-fiction
 
 ```bash
 cd caveman-writer-studio
-git remote add origin https://github.com/georgederventlis/caveman-writer-studio.git
+git remote add origin https://github.com/Mylittlestories/caveman-writer-studio.git
 git push -u origin main
 ```
 
-(Replace `georgederventlis` with your GitHub username.)
+(Replace `Mylittlestories` with your GitHub username.)

@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/georgederventlis/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v14.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v14.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
-  <a href="https://github.com/georgederventlis/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/georgederventlis/caveman-writer-studio?style=flat-square" alt="Stars"></a>
-  <a href="https://github.com/georgederventlis/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/georgederventlis/caveman-writer-studio?style=flat-square" alt="Issues"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square" alt="Zero dependencies">
   <img src="https://img.shields.io/badge/build-single%20HTML-27ae60?style=flat-square" alt="Single HTML">
   <img src="https://img.shields.io/badge/languages-EN%20%E2%80%A2%20%CE%95%CE%9B-e8b46a?style=flat-square" alt="Bilingual">
