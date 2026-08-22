@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v18.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v19.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -78,6 +78,8 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - ☁️ **Full-book backup** — 💾 Save book (.json) exports brief + chapters + memory; 📂 Load book restores
 - 🎤 **Dictation** — speak your chapter (Chrome/Edge), Greek or English
 - 👥 **Co-author mode** — two narrators, alternating every N chapters, with distinct voices
+- 🔍 **Author search** — find any of the 19 masters by name or technique; live count + clear
+- 🌍 **Deliverable language** — write the book in **Greek or English** (independent of the UI language); guards & notes adapt
 - 🎯 **Per-chapter word goal** — set a goal per chapter (default from format); chart & stats use it
 - 🔍 **Chapter search** — filter the chapter list instantly
 - 🔁 **Re-brief** — one click: a full-context prompt (bible + glossary + character + story state + all chapters) for a mid-book re-focus

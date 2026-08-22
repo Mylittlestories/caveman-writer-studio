@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v18.0</title>
+<title>Caveman Writer Studio — v19.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -375,7 +375,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v18.0</span>
+    <span class="pill" id="pillVer">v19.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -463,6 +463,13 @@
         <button type="button" class="chip" id="btnPreset" style="margin-left:auto">🧠 My profile</button></h2>
       <p class="hint" id="h2" style="margin-bottom:10px">Pick one or more. Their techniques are baked into the prompt.</p>
       <p class="hint" style="margin-bottom:10px;color:var(--accent-soft)" id="h2rec">💡 Not sure? Start with 🧠 My profile (your own voice) — then add a master or two for flavor.</p>
+      <div class="field" style="margin-bottom:8px">
+        <input type="text" id="inAuthorSearch">
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+        <span class="hint" id="authCount"></span>
+        <button type="button" class="chip" id="btnAuthClear" style="display:none">✕ Clear all</button>
+      </div>
       <div class="authors" id="authorGrid"></div>
     </div>
 
@@ -618,6 +625,11 @@
         <label class="lbl" id="lblDensity" for="inDensity">Brief density</label>
         <select id="inDensity"></select>
         <div class="hint" id="densityHint">Light = compact brief for small/local models · Standard = full detail</div>
+      </div>
+      <div class="field">
+        <label class="lbl" id="lblDeliver" for="inDeliver">Deliverable language</label>
+        <select id="inDeliver"></select>
+        <div class="hint" id="deliverHint">The book is written in this language (Greek or English). The AI's comments follow the UI language.</div>
       </div>
       <div class="outbar">
         <button class="btn" id="btnCopy">⧉ Copy prompt</button>
@@ -865,6 +877,20 @@
      ============================================================ */
   var S = { lang:"en" };
   function pick(el,en){ return S.lang === "en" ? en : el; }
+  /* deliverable language helpers */
+  function dlEn(){ return S.deliverLang === "en"; }
+  function dlName(){
+    if(dlEn()){ return S.lang==="en" ? "English" : "αγγλική"; }
+    return S.lang==="en" ? "Modern Greek" : "ελληνικά";
+  }
+  function dlLit(){
+    if(dlEn()){ return S.lang==="en" ? "in polished, literary English" : "σε άρτια, λογοτεχνικά αγγλικά"; }
+    return S.lang==="en" ? "in polished, literary Modern Greek (demotic Greek with a high register where the genre demands)" : "σε άρτια, λογοτεχνικά ελληνικά (δημοτική με υψηλό ύφος όπου το απαιτεί το είδος)";
+  }
+  function dlFullLit(){
+    if(dlEn()){ return S.lang==="en" ? "full literary English" : "πλήρη λογοτεχνικά αγγλικά"; }
+    return S.lang==="en" ? "full literary Modern Greek" : "πλήρη, λογοτεχνικά ελληνικά";
+  }
 
   /* ============================================================
      CAVEMAN SKILL — DATA (faithful rendering of SKILL.md elements)
@@ -1688,6 +1714,8 @@
     btnBible:["📚 Εξαγωγή book bible (.md)","📚 Export book bible (.md)"],
     btnRevSave:["📖 Αποθήκευση ως κεφάλαιο","📖 Save as chapter"],
     lblDensity:["Πυκνότητα brief","Brief density"],
+    lblDeliver:["Γλώσσα του έργου (deliverable)","Deliverable language"],
+    deliverHint:["Το βιβλίο γράφεται σε αυτή τη γλώσσα (ελληνικά ή αγγλικά). Τα σχόλια του ΑΙ ακολουθούν τη γλώσσα του UI.","The book is written in this language (Greek or English). The AI's comments follow the UI language."],
     densityHint:["Light = συμπαγές brief για μικρά/τοπικά μοντέλα · Standard = πλήρης λεπτομέρεια","Light = compact brief for small/local models · Standard = full detail"],
     ckIndRevTxt:["Ανεξάρτητος διορθωτής","Independent reviewer persona"],
     ckIndRevSub:["κριτική σαν να μην έγραψες εσύ το κείμενο — πιάνει τα τυφλά σημεία· κλείνει με λίστα ελέγχου για τον άνθρωπο","review as if you did NOT write this draft — catches self-blind spots; ends with a human checklist"],
@@ -1728,6 +1756,7 @@
     inState:["π.χ. Ο Δημήτρης βρήκε το Αρχείο· ο δήμαρχος έμαθε τα πάντα· η γέφυρα ψιθύρισε τρεις φορές…","e.g. Dimitris found the Archive; the mayor learned everything; the bridge whispered three times…"],
     inChTitle:["π.χ. Η πόρτα","e.g. The Door"],
     inChSearch:["αναζήτηση κεφαλαίων…","search chapters…"],
+    inAuthorSearch:["αναζήτηση δασκάλων (όνομα / τεχνική)…","search masters (name / technique)…"],
     inChText:["γράψτε ή επικολλήστε εδώ το κεφάλαιο…","write or paste the chapter here…"],
     inBunny:["μια σπίθα ιδέας που θέλετε να κρατήσετε για αργότερα…","a spark of an idea you want to keep for later…"],
     inContSummary:["π.χ. «ήρωας βρήκε την πόρτα· κάτι κινήθηκε μέσα»","e.g. “hero found the door; something moved inside”"],
@@ -2225,7 +2254,7 @@
     renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings();
     renderTenses(); renderModes(); renderCoPovs(); renderThemes(); renderTitleSug(); renderStorySug();
     renderCharSug(); renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg();
-    renderDensity(); renderModel(); renderRhythm(); renderPreview(); usageText();
+    renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText();
     renderTabs(); renderBunnyList(); renderManuscript(); renderBooks(); renderLayoutSeg(); applyCompact();
     applyFocus(); renderQuote(); render();
   }
@@ -2672,14 +2701,14 @@
         renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings(); renderThemes(); renderTenses(); renderModes();
         renderTitleSug(); renderStorySug(); renderCharSug();
         renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg(); render();
-        renderDensity(); renderModel(); renderRhythm(); usageText();
+        renderDensity(); renderModel(); renderDeliver(); renderRhythm(); usageText();
         applyTheme(); renderThemeSeg(); renderQuote();
         saveLS();
       };
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v18.0";
+    $("pillVer").textContent = "v19.0";
   }
 
   function applyStatic(){
@@ -2798,10 +2827,33 @@
     return "";
   }
 
+  function renderDeliver(){
+    var sel = $("inDeliver"); if(!sel) return;
+    sel.innerHTML = "";
+    [["el","Ελληνικά","Greek"],["en","English","English"]].forEach(function(d){
+      var o = document.createElement("option"); o.value = d[0]; o.textContent = S.lang==="en"?d[2]:d[1]; sel.appendChild(o);
+    });
+    sel.value = S.deliverLang || "el";
+  }
+  function authMatches(a, q){
+    if(!q) return true;
+    q = q.toLowerCase();
+    return (a.name||"").toLowerCase().indexOf(q) !== -1
+      || (a.nameEn||"").toLowerCase().indexOf(q) !== -1
+      || (a.tag||"").toLowerCase().indexOf(q) !== -1
+      || (a.tagEn||"").toLowerCase().indexOf(q) !== -1
+      || (a.desc||"").toLowerCase().indexOf(q) !== -1
+      || (a.descEn||"").toLowerCase().indexOf(q) !== -1;
+  }
   function renderAuthors(){
     var grid = $("authorGrid"); grid.innerHTML = "";
+    var q = (S.authorSearch||"").trim().toLowerCase();
+    var shown = 0, sel = 0;
     Object.keys(AUTHORS).forEach(function(k){
       var a = AUTHORS[k];
+      if(!authMatches(a, q)) return;
+      shown++;
+      if(S.authors.indexOf(k) > -1) sel++;
       var nm = S.lang==="en"?a.nameEn:a.name;
       var tg = S.lang==="en"?a.tagEn:a.tag;
       var b = document.createElement("button");
@@ -2816,6 +2868,14 @@
       };
       grid.appendChild(b);
     });
+    var cnt = $("authCount");
+    if(cnt){
+      cnt.textContent = shown
+        ? (S.lang==="en" ? shown+" of "+Object.keys(AUTHORS).length+" masters · "+sel+" selected" : shown+" από "+Object.keys(AUTHORS).length+" δασκάλους · "+sel+" επιλεγμένοι")
+        : (S.lang==="en" ? "No masters match \""+(S.authorSearch||"")+"\"" : "Κανένας δάσκαλος δεν ταιριάζει με «"+(S.authorSearch||"")+"»");
+    }
+    var cl = $("btnAuthClear");
+    if(cl){ cl.style.display = S.authors.length ? "" : "none"; }
   }
 
   function renderThemes(){
@@ -2992,8 +3052,8 @@
     /* role */
     P.push(EN ? "## ROLE" : "## ΡΟΛΟΣ");
     P.push(EN
-      ? "You are an accomplished Greek literary author and ghostwriter. You are commissioned to write **"+f.artEn+"** titled "+titleOrFallback()+", "+f.adjEn+" in polished, literary Modern Greek (demotic Greek with a high register where the genre demands). The work must stand beside Greek and world literature — no light reading, no fan fiction, no clichés."
-      : "Είσαι καταξιωμένος Έλληνας λογοτέχνης και ghostwriter. Αναλαμβάνεις τη συγγραφή **"+f.art+"** με τίτλο "+titleOrFallback()+", "+f.adj+" σε άρτια, λογοτεχνικά ελληνικά (δημοτική με υψηλό ύφος όπου το απαιτεί το είδος). Το έργο πρέπει να σταθεί απέναντι στην ελληνική και την παγκόσμια λογοτεχνία — όχι εύπεπτο ανάγνωσμα, όχι fan fiction, όχι κλισέ."
+      ? "You are an accomplished "+(dlEn()?"":"Greek ")+"literary author and ghostwriter. You are commissioned to write **"+f.artEn+"** titled "+titleOrFallback()+", "+f.adjEn+" "+dlLit()+". The work must stand beside "+(dlEn()?"world":"Greek and world")+" literature — no light reading, no fan fiction, no clichés."
+      : "Είσαι καταξιωμένος "+(dlEn()?"":"Έλληνας ")+"λογοτέχνης και ghostwriter. Αναλαμβάνεις τη συγγραφή **"+f.art+"** με τίτλο "+titleOrFallback()+", "+f.adj+" "+dlLit()+". Το έργο πρέπει να σταθεί απέναντι στην "+(dlEn()?"παγκόσμια":"ελληνική και την παγκόσμια")+" λογοτεχνία — όχι εύπεπτο ανάγνωσμα, όχι fan fiction, όχι κλισέ."
     );
     P.push("");
 
@@ -3128,38 +3188,50 @@
     }
     P.push("");
 
-    /* greek language guard */
+    /* language guard — Greek or English per deliverable */
     if(S.greek){
-      P.push(EN ? "## GREEK LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΕΛΛΗΝΙΚΗΣ ΓΛΩΣΣΑΣ");
-      if(S.density === "light"){
+      if(dlEn()){
+        P.push(EN ? "## ENGLISH LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΑΓΓΛΙΚΗΣ ΓΛΩΣΣΑΣ");
         P.push(EN
-          ? "- Flawless Modern Greek: perfect orthography/tonics, natural flow (read-aloud test), no calques, consistent names/spellings, watch ο/ω & ε/αι traps."
-          : "- Άψογα ελληνικά: τέλεια ορθογραφία/τονικά, φυσική ροή (δοκιμή ανάγνωσης), χωρίς δάνεια, σταθερά ονόματα/ορθογραφίες, πρόσεξε ο/ω & ε/αι.");
-        P.push(EN ? "- Dialogue = natural spoken Greek for the character's region/class/era." : "- Διάλογος = φυσικός προφορικός λόγος της περιοχής/τάξης/εποχής του χαρακτήρα.");
+          ? "- Flawless English: correct spelling, grammar, punctuation and natural flow (read-aloud test). No awkward constructions, no clichés."
+          : "- Άψογα αγγλικά: σωστή ορθογραφία, γραμματική, στίξη και φυσική ροή (δοκιμή ανάγνωσης). Χωρίς άκομψες κατασκευές, χωρίς κλισέ.");
+        P.push(EN
+          ? "- Consistency: keep a private glossary of names, places and terms; use the identical spelling every time; keep tense, person and POV consistent within each scene; never contradict earlier chapters or the plot plan."
+          : "- Συνέπεια: κράτα ιδιωτικό γλωσσάρι με ονόματα, τόπους και όρους· χρησιμοποίησε πάντα την ίδια ορθογραφία· κράτα σταθερό χρόνο, πρόσωπο και POV μέσα σε κάθε σκηνή· μην αντιφάσκεις ποτέ με προηγούμενα κεφάλαια ή με το σχέδιο πλοκής.");
+        if((S.glossary||"").trim()){ P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησέ τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+"."); }
+        P.push(EN ? "- Dialogue must be natural spoken English for the character's region, class and era." : "- Ο διάλογος πρέπει να είναι φυσικός προφορικός λόγος της περιοχής, της τάξης και της εποχής του χαρακτήρα.");
       } else {
+        P.push(EN ? "## GREEK LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΕΛΛΗΝΙΚΗΣ ΓΛΩΣΣΑΣ");
+        if(S.density === "light"){
+          P.push(EN
+            ? "- Flawless Modern Greek: perfect orthography/tonics, natural flow (read-aloud test), no calques, consistent names/spellings, watch ο/ω & ε/αι traps."
+            : "- Άψογα ελληνικά: τέλεια ορθογραφία/τονικά, φυσική ροή (δοκιμή ανάγνωσης), χωρίς δάνεια, σταθερά ονόματα/ορθογραφίες, πρόσεξε ο/ω & ε/αι.");
+          P.push(EN ? "- Dialogue = natural spoken Greek for the character's region/class/era." : "- Διάλογος = φυσικός προφορικός λόγος της περιοχής/τάξης/εποχής του χαρακτήρα.");
+        } else {
+          P.push(EN
+            ? "- Write flawless Modern Greek: perfect orthography and tonics (every accent mark), correct grammar and syntax, impeccable punctuation."
+          : "- Γράψε άψογα ελληνικά: τέλεια ορθογραφία και τονικά (κάθε τόνος στη θέση του), σωστή γραμματική και σύνταξη, άψογη στίξη.");
         P.push(EN
-          ? "- Write flawless Modern Greek: perfect orthography and tonics (every accent mark), correct grammar and syntax, impeccable punctuation."
-        : "- Γράψε άψογα ελληνικά: τέλεια ορθογραφία και τονικά (κάθε τόνος στη θέση του), σωστή γραμματική και σύνταξη, άψογη στίξη.");
-      P.push(EN
-        ? "- Read-aloud test: every sentence must flow naturally in Greek — no English sentence patterns, no awkward calques, no translated idioms."
-        : "- Δοκιμή ανάγνωσης: κάθε πρόταση πρέπει να ρέει φυσικά στα ελληνικά — χωρίς αγγλικούς συντακτικούς σχηματισμούς, χωρίς άκομψους δανεισμούς, χωρίς μεταφρασμένα ιδιώματα.");
-      P.push(EN
-        ? "- When unsure of a rare or difficult word, prefer the simpler correct form — never invent spellings or word forms."
-        : "- Όταν αμφιβάλλεις για μια δύσκολη ή σπάνια λέξη, προτίμησε την απλούστερη σωστή μορφή — ποτέ μην εφευρίσκεις ορθογραφίες ή τύπους.");
-      P.push(EN
-        ? "- Watch the classic traps: ο/ω, ε/αι, plural agreement, noun/adjective agreement (masculine/feminine/neuter), η/ει/οι, correct accent shift in declension, and enclitic pronouns (μου/σου/του) placed after imperatives and gerunds."
-        : "- Πρόσεξε τα κλασικά λάθη: ο/ω, ε/αι, συμφωνία πληθυντικού, συμφωνία επιθέτου-ουσιαστικού (αρσ./θηλ./ουδ.), η/ει/οι, ορθή μετατόπιση τόνου στην κλίση, και εγκλιτικά (μου/σου/του) μετά από προστακτική και γερούνδιο.");
-      P.push(EN
-        ? "- Consistency: keep a private glossary of names, places and terms; use the identical spelling every time; keep tense, person and POV consistent within each scene; never contradict earlier chapters or the plot plan."
-        : "- Συνέπεια: κράτα ιδιωτικό γλωσσάρι με ονόματα, τόπους και όρους· χρησιμοποίησε πάντα την ίδια ορθογραφία· κράτα σταθερό χρόνο, πρόσωπο και POV μέσα σε κάθε σκηνή· μην αντιφάσκεις ποτέ με προηγούμενα κεφάλαια ή με το σχέδιο πλοκής.");
-      if((S.glossary||"").trim()){
-        P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησέ τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+".");
+          ? "- Read-aloud test: every sentence must flow naturally in Greek — no English sentence patterns, no awkward calques, no translated idioms."
+          : "- Δοκιμή ανάγνωσης: κάθε πρόταση πρέπει να ρέει φυσικά στα ελληνικά — χωρίς αγγλικούς συντακτικούς σχηματισμούς, χωρίς άκομψους δανεισμούς, χωρίς μεταφρασμένα ιδιώματα.");
+        P.push(EN
+          ? "- When unsure of a rare or difficult word, prefer the simpler correct form — never invent spellings or word forms."
+          : "- Όταν αμφιβάλλεις για μια δύσκολη ή σπάνια λέξη, προτίμησε την απλούστερη σωστή μορφή — ποτέ μην εφευρίσκεις ορθογραφίες ή τύπους.");
+        P.push(EN
+          ? "- Watch the classic traps: ο/ω, ε/αι, plural agreement, noun/adjective agreement (masculine/feminine/neuter), η/ει/οι, correct accent shift in declension, and enclitic pronouns (μου/σου/του) placed after imperatives and gerunds."
+          : "- Πρόσεξε τα κλασικά λάθη: ο/ω, ε/αι, συμφωνία πληθυντικού, συμφωνία επιθέτου-ουσιαστικού (αρσ./θηλ./ουδ.), η/ει/οι, ορθή μετατόπιση τόνου στην κλίση, και εγκλιτικά (μου/σου/του) μετά από προστακτική και γερούνδιο.");
+        P.push(EN
+          ? "- Consistency: keep a private glossary of names, places and terms; use the identical spelling every time; keep tense, person and POV consistent within each scene; never contradict earlier chapters or the plot plan."
+          : "- Συνέπεια: κράτα ιδιωτικό γλωσσάρι με ονόματα, τόπους και όρους· χρησιμοποίησε πάντα την ίδια ορθογραφία· κράτα σταθερό χρόνο, πρόσωπο και POV μέσα σε κάθε σκηνή· μην αντιφάσκεις ποτέ με προηγούμενα κεφάλαια ή με το σχέδιο πλοκής.");
+        if((S.glossary||"").trim()){
+          P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησέ τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+".");
+        }
+        P.push(EN
+          ? "- Dialogue must be natural spoken Greek for the character's region, class and era — never bookish translationese."
+          : "- Ο διάλογος πρέπει να είναι φυσικός προφορικός λόγος της περιοχής, της τάξης και της εποχής του χαρακτήρα — ποτέ βιβλιοπρεπής μεταφραστική γλώσσα.");
+        }
+        P.push("");
       }
-      P.push(EN
-        ? "- Dialogue must be natural spoken Greek for the character's region, class and era — never bookish translationese."
-        : "- Ο διάλογος πρέπει να είναι φυσικός προφορικός λόγος της περιοχής, της τάξης και της εποχής του χαρακτήρα — ποτέ βιβλιοπρεπής μεταφραστική γλώσσα.");
-      }
-      P.push("");
     }
 
     /* anti-LLM-isms — intentional language discipline */
@@ -3229,7 +3301,9 @@
     /* deliverable language note — only in English mode */
     if(EN){
       P.push("## LANGUAGE OF THE DELIVERABLE");
-      P.push("The novel/novella itself is written in **Modern Greek** (the author's language). These instructions are in English for clarity; the prose output is always in Greek.");
+      P.push(dlEn()
+        ? "The novel/novella itself is written in **English** (per the author's choice). These instructions are in English; the prose output is in English."
+        : "The novel/novella itself is written in **Modern Greek** (the author's language). These instructions are in English for clarity; the prose output is always in Greek.");
       P.push("");
     }
 
@@ -3254,8 +3328,8 @@
           : "3. **Δείγματα φωνής** — 3–4 γραμμές καθαρού διαλόγου ανά κεντρικό χαρακτήρα, στην απάντησή σου (όχι σε αρχεία), για να κλειδώσουν οι φωνές.");
       }
       P.push(EN
-        ? (S.voices ? "4. `chapters/ch-01.md`" : "3. `chapters/ch-01.md`")+" — Chapter 1 complete, literary Modern Greek, ~"+Math.round(S.words/ch).toLocaleString(loc)+" words."
-        : (S.voices ? "4. `chapters/ch-01.md`" : "3. `chapters/ch-01.md`")+" — Κεφάλαιο 1 πλήρες, λογοτεχνικά ελληνικά, ~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις.");
+        ? (S.voices ? "4. `chapters/ch-01.md`" : "3. `chapters/ch-01.md`")+" — Chapter 1 complete, literary "+dlName()+", ~"+Math.round(S.words/ch).toLocaleString(loc)+" words."
+        : (S.voices ? "4. `chapters/ch-01.md`" : "3. `chapters/ch-01.md`")+" — Κεφάλαιο 1 πλήρες, λογοτεχνικό "+dlName()+", ~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις.");
       P.push("");
       P.push(EN
         ? "Then reply caveman-style: 1-line summary, the file paths you created, what comes next. For each later chapter, read `chapters/ch-0N-1.md` and `plot-plan.md` first, then write `chapters/ch-0N.md`."
@@ -3275,9 +3349,9 @@
         P.push(EN
           ? "3. **Voice samples** — before writing, 3–4 lines of PURE dialogue per main character (no tags, no narration), so each voice locks in. Output: character name, then their lines."
           : "3. **Δείγματα φωνής** — πριν γράψεις, 3–4 γραμμές ΚΑΘΑΡΟΥ διαλόγου ανά κεντρικό χαρακτήρα (χωρίς tags, χωρίς αφήγηση), για να κλειδώσει η φωνή του καθενός. Έξοδος: όνομα χαρακτήρα, μετά οι γραμμές του.");
-        P.push(EN ? "4. **Chapter 1** — complete, literary, in polished Modern Greek, ~"+Math.round(S.words/ch).toLocaleString(loc)+" words, using those voices." : "4. **Κεφάλαιο 1** — πλήρες, λογοτεχνικό, σε άρτια ελληνικά, ~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις, με αυτές τις φωνές.");
+        P.push(EN ? "4. **Chapter 1** — complete, literary, "+dlLit()+", ~"+Math.round(S.words/ch).toLocaleString(loc)+" words, using those voices." : "4. **Κεφάλαιο 1** — πλήρες, λογοτεχνικό, "+dlLit()+", ~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις, με αυτές τις φωνές.");
       } else {
-        P.push(EN ? "3. **Chapter 1** — complete, literary, in polished Modern Greek, ~"+Math.round(S.words/ch).toLocaleString(loc)+" words." : "3. **Κεφάλαιο 1** — πλήρες, λογοτεχνικό, σε άρτια ελληνικά, ~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις.");
+        P.push(EN ? "3. **Chapter 1** — complete, literary, "+dlLit()+", ~"+Math.round(S.words/ch).toLocaleString(loc)+" words." : "3. **Κεφάλαιο 1** — πλήρες, λογοτεχνικό, "+dlLit()+", ~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις.");
       }
       P.push("");
       P.push(EN
@@ -3285,8 +3359,8 @@
         : "Μετά από κάθε κεφάλαιο: 1 γραμμή σπηλαιώδης περίληψη + τι έρχεται στο επόμενο. Στο τέλος κάθε γύρου διορθώσεων περίμενε τις οδηγίες μου.");
     } else {
       P.push(EN
-        ? "Write **Chapter 1** directly, in full literary Modern Greek (~"+Math.round(S.words/ch).toLocaleString(loc)+" words)."
-        : "Γράψε κατευθείαν το **Κεφάλαιο 1** σε πλήρη, λογοτεχνικά ελληνικά (~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις).");
+        ? "Write **Chapter 1** directly, in "+dlFullLit()+" (~"+Math.round(S.words/ch).toLocaleString(loc)+" words)."
+        : "Γράψε κατευθείαν το **Κεφάλαιο 1** σε "+dlFullLit()+" (~"+Math.round(S.words/ch).toLocaleString(loc)+" λέξεις).");
     }
 
     return P.join("\n");
@@ -3309,8 +3383,12 @@
     protocolLines().forEach(function(r){ P.push("- "+r); });
     if(S.greek){
       P.push(EN
-        ? "- Greek guard: flawless orthography & tonics, natural flow, consistent names/spellings, no contradictions with earlier chapters."
-        : "- Φρουρός ελληνικών: άψογη ορθογραφία & τονικά, φυσική ροή, σταθερά ονόματα/ορθογραφίες, καμία αντίφαση με προηγούμενα κεφάλαια.");
+        ? (dlEn()
+          ? "- Language guard: flawless "+(S.lang==="en"?"English":"αγγλικά")+" (spelling, grammar, punctuation, flow), consistent names/spellings, no contradictions with earlier chapters."
+          : "- Greek guard: flawless orthography & tonics, natural flow, consistent names/spellings, no contradictions with earlier chapters.")
+        : (dlEn()
+          ? "- Φρουρός γλώσσας: άψογα αγγλικά (ορθογραφία, γραμματική, στίξη, ροή), σταθερά ονόματα/ορθογραφίες, καμία αντίφαση με προηγούμενα κεφάλαια."
+          : "- Φρουρός ελληνικών: άψογη ορθογραφία & τονικά, φυσική ροή, σταθερά ονόματα/ορθογραφίες, καμία αντίφαση με προηγούμενα κεφάλαια."));
       if((S.glossary||"").trim()){ P.push(EN ? "- Fixed spellings: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες: "+S.glossary.trim()+"."); }
       if((S.bible||"").trim()){ P.push(EN ? "- Story bible (never contradict): "+S.bible.trim() : "- Story bible (μη αντιφάσκεις): "+S.bible.trim()); }
     }
@@ -3328,13 +3406,13 @@
       var prev = n - 1;
       var z = function(x){ return (x < 10 ? "0" : "") + x; };
       P.push(EN
-        ? "Read `plot-plan.md` and `chapters/ch-"+z(prev)+".md` first. Then write `chapters/ch-"+z(n)+".md` — Chapter **"+n+"**, ~"+wpc+" words, full literary Modern Greek."
-        : "Διάβασε πρώτα `plot-plan.md` και `chapters/ch-"+z(prev)+".md`. Μετά γράψε `chapters/ch-"+z(n)+".md` — Κεφάλαιο **"+n+"**, ~"+wpc+" λέξεις, πλήρη λογοτεχνικά ελληνικά.");
+        ? "Read `plot-plan.md` and `chapters/ch-"+z(prev)+".md` first. Then write `chapters/ch-"+z(n)+".md` — Chapter **"+n+"**, ~"+wpc+" words, "+dlFullLit()+"."
+        : "Διάβασε πρώτα `plot-plan.md` και `chapters/ch-"+z(prev)+".md`. Μετά γράψε `chapters/ch-"+z(n)+".md` — Κεφάλαιο **"+n+"**, ~"+wpc+" λέξεις, "+dlFullLit()+".");
       P.push(EN
         ? "If the files are missing, regenerate them from this prompt and the recap — never refuse."
         : "Αν λείπουν τα αρχεία, αναδημιούργησέ τα από αυτό το prompt και την περίληψη — ποτέ μην αρνηθείς.");
     } else {
-      P.push(EN ? "Chapter **"+n+"**, ~"+wpc+" words, in full literary Modern Greek. Tense: "+tenseLabel(S.tense)+"." : "Κεφάλαιο **"+n+"**, ~"+wpc+" λέξεις, σε πλήρη, λογοτεχνικά ελληνικά. Χρόνος: "+tenseLabel(S.tense)+".");
+      P.push(EN ? "Chapter **"+n+"**, ~"+wpc+" words, in "+dlFullLit()+". Tense: "+tenseLabel(S.tense)+"." : "Κεφάλαιο **"+n+"**, ~"+wpc+" λέξεις, σε "+dlFullLit()+". Χρόνος: "+tenseLabel(S.tense)+".");
       P.push(EN
         ? "If the recap is empty, derive continuity from the brief and current story; flag your assumptions in one caveman line — never refuse."
         : "Αν η περίληψη είναι άδεια, συνέχισε από το brief και την τρέχουσα ιστορία· σημείωσε τις παραδοχές σου σε μία σπηλαιώδη γραμμή — ποτέ μην αρνηθείς.");
@@ -3591,8 +3669,8 @@
     P.push("");
     P.push(EN ? "## ROLE" : "## ΡΟΛΟΣ");
     P.push(EN
-      ? "You are an accomplished Greek literary author and ghostwriter. You are to take the unfinished story below (the SEED) and extend it into **"+f.artEn+"** titled "+titleOrFallback()+", written in polished literary Modern Greek, continuing in the SAME voice, style and world as the seed."
-      : "Είσαι καταξιωμένος Έλληνας λογοτέχνης και ghostwriter. Πρέπει να πάρεις το ημιτελές κείμενο παρακάτω (το SEED) και να το επεκτείνεις σε **"+f.art+"** με τίτλο "+titleOrFallback()+", γραμμέν"+(S.format==="novel"?"ου":"ης")+" σε άρτια λογοτεχνικά ελληνικά, συνεχίζοντας με την ΙΔΙΑ φωνή, ύφος και κόσμο με το seed.");
+      ? "You are an accomplished "+(dlEn()?"":"Greek ")+"literary author and ghostwriter. You are to take the unfinished story below (the SEED) and extend it into **"+f.artEn+"** titled "+titleOrFallback()+", written "+dlLit()+", continuing in the SAME voice, style and world as the seed."
+      : "Είσαι καταξιωμένος "+(dlEn()?"":"Έλληνας ")+"λογοτέχνης και ghostwriter. Πρέπει να πάρεις το ημιτελές κείμενο παρακάτω (το SEED) και να το επεκτείνεις σε **"+f.art+"** με τίτλο "+titleOrFallback()+", γραμμέν"+(S.format==="novel"?"ου":"ης")+" "+dlLit()+", συνεχίζοντας με την ΙΔΙΑ φωνή, ύφος και κόσμο με το seed.");
     P.push("");
     P.push(EN
       ? "- Voice precedence: author voice sample > house style > selected masters > genre defaults."
@@ -3672,8 +3750,8 @@
 
     P.push(EN ? "## STEP 3 — CONTINUATION, CHAPTER 1" : "## ΒΗΜΑ 3 — ΣΥΝΕΧΕΙΑ, ΚΕΦΑΛΑΙΟ 1");
     P.push(EN
-      ? "Write Chapter 1 of the continuation (~"+wpc.toLocaleString(loc)+" words, full literary Modern Greek), picking up exactly where the seed ends, matching the seed's voice and the house style."
-      : "Γράψε το Κεφάλαιο 1 της συνέχειας (~"+wpc.toLocaleString(loc)+" λέξεις, πλήρη λογοτεχνικά ελληνικά), αρχίζοντας ακριβώς από εκεί που τελειώνει το seed, ταιριάζοντας τη φωνή του seed και το house style.");
+      ? "Write Chapter 1 of the continuation (~"+wpc.toLocaleString(loc)+" words, "+dlFullLit()+"), picking up exactly where the seed ends, matching the seed's voice and the house style."
+      : "Γράψε το Κεφάλαιο 1 της συνέχειας (~"+wpc.toLocaleString(loc)+" λέξεις, "+dlFullLit()+"), αρχίζοντας ακριβώς από εκεί που τελειώνει το seed, ταιριάζοντας τη φωνή του seed και το house style.");
     if(S.myStyle){ P.push(EN ? "- House style (George Derventlis) applies to the continuation." : "- Το house style (Γιώργος Δερβεντλής) ισχύει στη συνέχεια."); }
     if(S.coAuth){
       P.push(EN
@@ -3685,10 +3763,14 @@
     protocolLines().forEach(function(r){ P.push("- "+r); });
     P.push("");
     if(S.greek){
-      P.push(EN ? "## GREEK LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΕΛΛΗΝΙΚΗΣ ΓΛΩΣΣΑΣ");
+      P.push(dlEn() ? (EN ? "## ENGLISH LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΑΓΓΛΙΚΗΣ ΓΛΩΣΣΑΣ") : (EN ? "## GREEK LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΕΛΛΗΝΙΚΗΣ ΓΛΩΣΣΑΣ"));
       P.push(EN
-        ? "- Flawless Modern Greek: orthography, tonics, grammar, natural flow. Read-aloud test. No AI tells (see Intentional Language Discipline). Consistent names/spellings."
-        : "- Άψογα ελληνικά: ορθογραφία, τονικά, γραμματική, φυσική ροή. Δοκιμή ανάγνωσης. Χωρίς σημάδια ΑΙ (βλ. Σκόπιμη Γλωσσική Πειθαρχία). Σταθερά ονόματα/ορθογραφίες.");
+        ? (dlEn()
+          ? "- Flawless English: spelling, grammar, punctuation, natural flow. Read-aloud test. No AI tells (see Intentional Language Discipline). Consistent names/spellings."
+          : "- Flawless Modern Greek: orthography, tonics, grammar, natural flow. Read-aloud test. No AI tells (see Intentional Language Discipline). Consistent names/spellings.")
+        : (dlEn()
+          ? "- Άψογα αγγλικά: ορθογραφία, γραμματική, στίξη, φυσική ροή. Δοκιμή ανάγνωσης. Χωρίς σημάδια ΑΙ (βλ. Σκόπιμη Γλωσσική Πειθαρχία). Σταθερά ονόματα/ορθογραφίες."
+          : "- Άψογα ελληνικά: ορθογραφία, τονικά, γραμματική, φυσική ροή. Δοκιμή ανάγνωσης. Χωρίς σημάδια ΑΙ (βλ. Σκόπιμη Γλωσσική Πειθαρχία). Σταθερά ονόματα/ορθογραφίες."));
       P.push("");
     }
     if(S.proof){
@@ -3707,7 +3789,9 @@
     }
     if(EN){
       P.push("## LANGUAGE OF THE DELIVERABLE");
-      P.push("The novel itself is written in Modern Greek. These instructions are in English for clarity; the prose output is always in Greek.");
+      P.push(dlEn()
+        ? "The novel itself is written in **English** (per the author's choice)."
+        : "The novel itself is written in **Modern Greek** (the author's language).");
       P.push("");
     }
     P.push(EN ? "## SELF-CONTAINMENT" : "## ΑΥΤΟΔΥΝΑΜΙΑ");
@@ -3968,7 +4052,7 @@
         renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings(); renderThemes(); renderTenses(); renderModes();
         renderTitleSug(); renderStorySug(); renderCharSug();
         renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg(); render();
-        renderDensity(); renderModel(); renderRhythm(); usageText();
+        renderDensity(); renderModel(); renderDeliver(); renderRhythm(); usageText();
         applyTheme(); renderThemeSeg(); renderQuote();
         saveLS();
         toast(S.lang==="en" ? "Brief loaded ✓" : "Το brief φορτώθηκε ✓");
@@ -4074,6 +4158,8 @@
     $("ckCo").checked = S.coAuth === true;
     $("inPovA").value = S.povA || "pov1";
     $("inPovB").value = S.povB || "pov3c";
+    $("inAuthorSearch").value = S.authorSearch || "";
+    $("inDeliver").value = S.deliverLang || "el";
     $("inAltEvery").value = S.altEvery || 1;
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
@@ -4144,6 +4230,9 @@
     $("qsCopy").addEventListener("click", function(){ $("btnCopy").click(); });
     $("qsHide").addEventListener("click", function(){ S.qsHidden = true; applyQS(); saveLS(); });
     $("btnMic").addEventListener("click", toggleDictate);
+    $("inAuthorSearch").addEventListener("input", function(){ S.authorSearch = this.value; renderAuthors(); });
+    $("btnAuthClear").addEventListener("click", function(){ S.authors = []; renderAuthors(); renderAuthorDetail(); render(); saveLS(); });
+    $("inDeliver").addEventListener("change", function(){ S.deliverLang = this.value; render(); saveLS(); });
     $("ckBlog").addEventListener("change", function(){
       S.blogOn = this.checked;
       var b = $("btnBlogGen");
@@ -4435,9 +4524,9 @@
     renderLayoutSeg(); applyCompact();
     wrapCards();
     renderTabs(); renderBunnyList(); renderManuscript();
-    renderDensity(); renderModel(); renderRhythm(); renderPreview(); usageText();
+    renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText();
     var bb = $("btnBlogGen"); if(bb){ bb.disabled = !(S.blogOn === true); }
-    renderBooks(); renderCoPovs(); applyQS();
+    renderBooks(); renderCoPovs(); applyQS(); renderDeliver();
     restoreFromHash();
     applyFocus();
     renderQuote();
