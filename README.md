@@ -149,6 +149,21 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 - **Bulletproof test suite** — `tests/bullet.js` (59 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
 - **CI (GitHub Actions)** — every push runs the suite automatically (see [.github/workflows/ci.yml](.github/workflows/ci.yml)); the badge above shows the latest result.
 
+## 📦 Releases
+| Version | What's new |
+|---|---|
+| v1.8.0 | Build-from-ingredients wizard, imaginative naming, mythos & worldbuilding, lore, character backgrounds |
+| v1.7.0 | (v21) blog-derived names/places/objects, mythos expander, lore field, character background |
+| v1.6.2 | Always start on the main screen |
+| v1.6.1 | Fix: bilingual toggle translates the whole UI |
+| v1.6.0 | UI clarity pass (refined Parchment, selected states, focus rings) |
+| v1.5.0 | Searchable masters, deliverable language (EN/EL) |
+| v1.4.0 | Word goals, reliability hardening, bulletproof tests |
+| v1.3.0 | Book status, re-brief, keyboard & accessibility |
+| v1.2.0 | Cloud sync (link-based), beginner polish |
+| v1.1.0 | Power features: chart, multi-book, backup, dictation, co-author |
+| v1.0.0 | First public release |
+
 ## 🗺 Roadmap
 
 - [x] Full writing loop (idea → chapters → review → memory)

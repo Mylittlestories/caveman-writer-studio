@@ -2254,7 +2254,7 @@
     var plotTxt = (EN ? it.plot[1] : it.plot[0]);
     var extra = (S.intentExtra||"").trim();
     if(extra){ plotTxt += " " + (EN ? "Also include: "+extra : "Επίσης συμπεριλάβε: "+extra); }
-    var logline = (EN ? "A "+S.intentGenre+" story. " : "Μια ιστορία "+S.intentGenre+". ") + (EN ? "Mood: "+mood+". " : "Διάθεση: "+mood+". ") + plotTxt;
+    var logline = (EN ? it.label[1] : it.label[0]) + ". " + (EN ? "Mood: "+mood+". " : "Διάθεση: "+mood+". ") + plotTxt;
     // fill the brief
     S.genre = S.intentGenre;
     S.title = "";

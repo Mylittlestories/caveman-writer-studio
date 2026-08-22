@@ -50,7 +50,7 @@ What's the one thing your writing workflow is missing? I read every comment. �
 | Repo live | ✅ | github.com/Mylittlestories/caveman-writer-studio |
 | Live site (Pages) | ✅ | mylittlestories.github.io/caveman-writer-studio — auto-deploys on push |
 | CI (59-check suite) | ✅ | .github/workflows/ci.yml — runs on every push; badge in README |
-| Releases | ✅ | v1.0.0 → v1.4.0 with `index.html` asset each |
+| Releases | ✅ | v1.0.0 → v1.8.0 with `index.html` asset each |
 | Announcement issue (#1) + Discussion (Announcements) | ✅ | pinned + posted |
 | Profile README card | ✅ | featured on github.com/Mylittlestories |
 | Roadmap issues #3–#8 | ✅ | created (cloud backend, EPUB/PDF, diff, co-author voice, multi-book, chapter map) |
