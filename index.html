@@ -2709,14 +2709,14 @@
       b.onclick = function(){
         if(S.lang === l[0]) return;
         S.lang = l[0];
-        applyStatic();
-        renderLangSeg();
-        renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings(); renderThemes(); renderTenses(); renderModes();
-        renderTitleSug(); renderStorySug(); renderCharSug();
-        renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg(); render();
-        renderDensity(); renderModel(); renderDeliver(); renderRhythm(); usageText();
-        applyTheme(); renderThemeSeg(); renderQuote();
-        saveLS();
+        try{
+          refreshAll();   // full re-render: labels, tabs, manuscript, memory, co-author, books…
+          saveLS();
+        }catch(err){
+          // never let a re-render glitch block the language switch
+          applyStatic(); renderLangSeg(); applyTheme(); renderThemeSeg(); render();
+          try{ saveLS(); }catch(e2){}
+        }
       };
       el.appendChild(b);
     });
