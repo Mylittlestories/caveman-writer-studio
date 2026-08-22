@@ -175,7 +175,10 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 - [x] Co-author (two-POV rotation)
 - [x] Cloud sync (link-based, offline — no server)
 - [x] CI — the 59-check suite auto-runs on every push
+- [x] Build-from-ingredients wizard (v1.8) · blog-derived naming & mythos (v1.7–1.8)
 - [ ] Cloud sync with real backend (optional, opt-in) · [#3](https://github.com/Mylittlestories/caveman-writer-studio/issues/3)
+- [ ] In-app AI chat (optional API key) · [#12](https://github.com/Mylittlestories/caveman-writer-studio/issues/12)
+- [ ] EPUB / PDF export · [#13](https://github.com/Mylittlestories/caveman-writer-studio/issues/13)
 - [ ] Export to EPUB / PDF · [#4](https://github.com/Mylittlestories/caveman-writer-studio/issues/4)
 - [ ] Revision-diff view (old vs corrected) · [#5](https://github.com/Mylittlestories/caveman-writer-studio/issues/5)
 - [ ] Co-author distinct-voice check · [#6](https://github.com/Mylittlestories/caveman-writer-studio/issues/6)
