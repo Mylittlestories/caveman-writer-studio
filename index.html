@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v19.0</title>
+<title>Caveman Writer Studio — v20.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -40,17 +40,21 @@
     --serif:Georgia,"Times New Roman",serif;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     --headerbg:rgba(23,19,16,.9);
+    --fieldbg:#1d1812;
+    --focus:rgba(232,180,106,.45);
   }
   /* ---------- eye-relaxing themes ---------- */
   html[data-theme="parchment"]{
-    --bg:#f2e9d6; --bg2:#ece1c9; --surface:#faf4e6; --surface2:#f1e7d2;
-    --border:#dccba8; --border2:#c3ae85;
-    --accent:#8a6d3b; --accent-soft:#a8874e;
-    --text:#3f3527; --muted:#7d7059;
-    --danger:#b0503f; --ok:#4f7f4f;
-    --outbg:#fffaf0; --outfg:#3a3125;
-    --glow1:rgba(138,109,59,.06); --glow2:rgba(176,80,63,.04);
-    --headerbg:rgba(250,244,230,.9);
+    --bg:#f2e9d6; --bg2:#efe6d0; --surface:#fdf9f0; --surface2:#f4ecd9;
+    --border:#cfba92; --border2:#b3996d;
+    --accent:#7a5f31; --accent-soft:#8f7442;
+    --text:#322a1d; --muted:#66593f;
+    --danger:#a64b3a; --ok:#3f703f;
+    --outbg:#fffdf7; --outfg:#332b1e;
+    --fieldbg:#ffffff;
+    --focus:rgba(122,95,49,.28);
+    --glow1:rgba(122,95,49,.06); --glow2:rgba(166,75,58,.04);
+    --headerbg:rgba(253,249,240,.92);
   }
   html[data-theme="forest"]{
     --bg:#121a14; --bg2:#17231b; --surface:#1c2a21; --surface2:#22332a;
@@ -61,6 +65,8 @@
     --outbg:#0f1611; --outfg:#dde6d6;
     --glow1:rgba(168,198,134,.05); --glow2:rgba(120,160,120,.04);
     --headerbg:rgba(18,26,20,.9);
+    --fieldbg:#17231b;
+    --focus:rgba(168,198,134,.35);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -81,7 +87,7 @@
     position:sticky;top:0;z-index:20;
     background:var(--headerbg);
     backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--border);
+    border-bottom:1px solid var(--border2);
     padding:10px 22px;
     display:flex;align-items:center;gap:14px;
   }
@@ -115,9 +121,9 @@
     padding:20px;box-shadow:0 6px 22px rgba(0,0,0,.14);
   }
   .card h2{
-    font-family:var(--serif);font-size:15px;color:var(--accent);
-    display:flex;align-items:center;gap:8px;margin-bottom:12px;
-    letter-spacing:.3px;
+    font-family:var(--serif);font-size:15.5px;color:var(--accent);
+    display:flex;align-items:center;gap:8px;margin-bottom:14px;
+    letter-spacing:.3px;padding-bottom:10px;border-bottom:1px solid var(--border);
   }
   .card h2 .num{
     display:inline-flex;align-items:center;justify-content:center;
@@ -126,16 +132,17 @@
   }
   .field{margin-bottom:13px}
   .field:last-child{margin-bottom:2px}
-  label.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.3px}
+  label.lbl{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.3px}
   input[type=text],input[type=number],select,textarea{
-    width:100%;background:var(--bg2);color:var(--text);
-    border:1px solid var(--border);border-radius:9px;
+    width:100%;background:var(--fieldbg);color:var(--text);
+    border:1px solid var(--border2);border-radius:9px;
     padding:9px 11px;font-size:13.5px;font-family:var(--sans);
-    transition:border-color .15s;
+    transition:border-color .15s, box-shadow .15s;
   }
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-soft)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)}
   textarea{resize:vertical;min-height:74px}
-  .hint{font-size:11px;color:var(--muted);margin-top:4px}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   /* segmented / radio cards */
   .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .seg.two{grid-template-columns:1fr 1fr}
@@ -147,17 +154,18 @@
   .segbtn b{display:block;font-size:13px}
   .segbtn span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
   .segbtn:hover{border-color:var(--border2)}
-  .segbtn.on{background:rgba(232,180,106,.12);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-  .segbtn.on b{color:var(--accent)}
+  .segbtn.on{background:var(--accent);border-color:var(--accent);color:#1a1208}
+  .segbtn.on b{color:#1a1208}
+  .segbtn.on span{color:rgba(26,18,8,.75)}
   /* chips */
   .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chip{
-    background:var(--bg2);border:1px solid var(--border);color:var(--muted);
-    border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all .12s;
-    font-family:var(--sans);text-align:left;line-height:1.35;
+    background:var(--fieldbg);border:1px solid var(--border2);color:var(--muted);
+    border-radius:999px;padding:6px 13px;font-size:12.5px;cursor:pointer;transition:all .12s;
+    font-family:var(--sans);text-align:left;line-height:1.4;min-height:28px;
   }
-  .chip:hover{border-color:var(--border2);color:var(--text)}
-  .chip.on{background:rgba(232,180,106,.14);border-color:var(--accent);color:var(--accent)}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#1a1208;font-weight:600}
   .suglabel{
     font-size:10.5px;color:var(--accent-soft);letter-spacing:.4px;text-transform:uppercase;
     margin:8px 0 5px;font-weight:700;
@@ -167,21 +175,22 @@
   .rangewrap{display:flex;align-items:center;gap:10px}
   .rangewrap output{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:64px;text-align:right}
   /* checkboxes */
-  .check{display:flex;align-items:flex-start;gap:9px;padding:7px 0;cursor:pointer;font-size:13px}
+  .check{display:flex;align-items:flex-start;gap:9px;padding:8px 0;cursor:pointer;font-size:13px;min-height:28px}
   .check input{width:16px;height:16px;accent-color:var(--accent);margin-top:2px;flex:0 0 auto;cursor:pointer}
   .check b{display:block;font-size:13px;font-weight:500}
   .check small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
   .checktwo{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
   @media (max-width:520px){.checktwo{grid-template-columns:1fr}}
   /* author cards */
-  .authors{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  @media (max-width:560px){.authors{grid-template-columns:1fr 1fr}}
+  .authors{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
   .auth{
     background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;
     cursor:pointer;text-align:left;transition:all .15s;color:var(--text);font-family:var(--sans);
   }
-  .auth:hover{border-color:var(--border2);transform:translateY(-1px)}
-  .auth.on{background:rgba(232,180,106,.1);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .auth:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .auth.on{background:rgba(122,95,49,.12);border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+  .auth.on b{color:var(--accent)}
+  .auth.on .tag{color:var(--muted)}
   .auth .badge{
     width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;
     font-family:var(--serif);font-weight:700;font-size:16px;margin-bottom:8px;color:#1a1208;
@@ -199,7 +208,8 @@
     transition:all .13s;font-family:var(--sans);line-height:1.25;
   }
   .lvl small{display:block;font-weight:400;font-size:9.5px;color:var(--muted);margin-top:2px}
-  .lvl.on{background:rgba(232,180,106,.14);border-color:var(--accent);color:var(--accent)}
+  .lvl.on{background:var(--accent);border-color:var(--accent);color:#1a1208}
+  .lvl.on small{color:rgba(26,18,8,.75)}
   .rulebox{
     margin-top:12px;background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;
     padding:12px 14px;font-size:12.5px;
@@ -216,6 +226,7 @@
     width:100%;background:var(--outbg);color:var(--outfg);
     border:1px solid var(--border2);border-radius:11px;padding:14px;
     font-family:var(--mono);font-size:12.4px;line-height:1.7;white-space:pre-wrap;word-break:break-word;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.06);
   }
   #promptOut{min-height:380px}
   #contOut{min-height:150px;margin-top:10px}
@@ -225,14 +236,15 @@
   .btn{
     background:var(--accent);color:#1a1208;border:none;border-radius:9px;
     padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);
-    transition:filter .12s, transform .08s;display:inline-flex;align-items:center;gap:7px;
+    transition:filter .12s, transform .08s, box-shadow .12s;display:inline-flex;align-items:center;gap:7px;
+    box-shadow:0 1px 3px rgba(0,0,0,.18);
   }
-  .btn:hover{filter:brightness(1.08)}
+  .btn:hover{filter:brightness(1.07)}
   .btn:active{transform:translateY(1px)}
-  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border2)}
+  .btn.ghost{background:var(--fieldbg);color:var(--text);border:1px solid var(--border2);box-shadow:none}
   .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
   .btn.small{padding:6px 12px;font-size:12px}
-  .stat{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+  .stat{font-size:12px;color:var(--muted);font-family:var(--mono)}
   .stat b{color:var(--accent)}
   #toast{
     position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -316,16 +328,17 @@
     border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;
     font-family:var(--sans);transition:all .15s;
   }
-  .tabbtn:hover{border-color:var(--border2);color:var(--text)}
-  .tabbtn.on{background:rgba(232,180,106,.14);border-color:var(--accent);color:var(--accent)}
+  .tabbtn:hover{border-color:var(--accent);color:var(--text)}
+  .tabbtn.on{background:var(--accent);border-color:var(--accent);color:#1a1208}
   .tabpanel{display:none}
   .tabpanel.active{display:block;animation:fadein .18s ease}
   @keyframes fadein{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
   body.compact .tabbar{margin-bottom:8px;padding-bottom:6px;gap:4px}
   body.compact .tabbtn{padding:4px 10px;font-size:11.5px}
   details.adv{margin:10px 0;border:1px dashed var(--border2);border-radius:10px;padding:8px 12px;background:var(--bg2)}
-  details.adv>summary{cursor:pointer;font-size:12px;color:var(--accent-soft);font-weight:600;letter-spacing:.3px}
+  details.adv>summary{cursor:pointer;font-size:12.5px;color:var(--accent);font-weight:600;letter-spacing:.3px}
   details.adv>summary:hover{color:var(--accent)}
+  .card#qsCard{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
   details.adv[open]>summary{margin-bottom:8px}
   body.compact details.adv{padding:6px 9px;margin:7px 0}
   /* ---------- focus / full-screen writing ---------- */
@@ -375,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v19.0</span>
+    <span class="pill" id="pillVer">v20.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -2708,7 +2721,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v19.0";
+    $("pillVer").textContent = "v20.0";
   }
 
   function applyStatic(){

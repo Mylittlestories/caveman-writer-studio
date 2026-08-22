@@ -95,6 +95,12 @@ Two narrators, alternating on a schedule:
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.
 - **Deliverable language** — in the prompt card, choose **Greek or English** for the book itself. This is independent of the UI language: keep the interface in ΕΛ or EN, and the *novel* is written in whichever you pick. The language guard, role, continuation and extender all adapt automatically.
 
+## 🎨 Themes & clarity (v20)
+- **📜 Parchment (default, light)** is tuned for clarity: white input fields on warm paper, deeper text, clearer borders and selected states.
+- **🌙 Night / 🌲 Forest** are dark options for low-light writing.
+- Every selected control (tab, chip, level, author card) now fills with the accent colour so it's obvious what's active; keyboard users get a visible focus ring.
+- Switch anytime from the header — the choice is remembered.
+
 ## 🎨 Comfort settings
 
 - **Theme** — 🌙 Night (dark) · 📜 Parchment (light, default) · 🌲 Forest (muted dark)

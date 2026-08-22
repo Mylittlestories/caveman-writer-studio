@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v19.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v20.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -88,6 +88,7 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 
 ### UX
 - Bilingual EN/ΕΛ, 3 themes (🌙 Night / 📜 Parchment / 🌲 Forest), compact mode, collapsible cards, **⛶ focus writing mode**, autosave with "✓ saved" indicator, export/import `.json`, `🩺 self-check`
+- **Clarity pass (v20):** refined Parchment (default) with stronger contrast, white fields, clearer borders; filled accent states on selected tabs/chips/levels; focus rings; bigger touch targets; wrapping author grid
 
 ---
 
