@@ -98,11 +98,11 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 
 ## 🚀 Quick start
 
-1. **Download** [`index.html`](index.html) and open it in any browser — or run it live:
+1. **Download** [`caveman-writer-studio.html`](caveman-writer-studio.html) and open it in any browser — or run it live:
    ```bash
    # serve locally
    python3 -m http.server 8000
-   # open http://localhost:8000
+   # open http://localhost:8000 — the small index.html entry opens the app file automatically
    ```
 2. **Paste your idea** — or hit 🎲 Spark: it builds a spark prompt for your AI (fresh idea + genre-aware naming), you paste the AI's answer back, and **⤵ Load** fills the brief.
 3. **Pick your voice** — 🧠 My profile, or one/more of the 19 masters.
@@ -142,7 +142,7 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
   <img src="assets/og-image.jpg" alt="Caveman Writer Studio preview" width="640">
 </p>
 
-*(Live app is the best screenshot — open `index.html`.)*
+*(Live app is the best screenshot — open `caveman-writer-studio.html`.)*
 
 ---
 

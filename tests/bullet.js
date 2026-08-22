@@ -8,7 +8,7 @@
 const fs = require('fs'), vm = require('vm'), path = require('path'), cp = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const HTML = fs.readFileSync(path.join(ROOT, 'caveman-writer-studio.html'), 'utf8');
 const JS = (HTML.match(/<script>([\s\S]*?)<\/script>/) || [])[1] || '';
 const out = [];
 let pass = 0, fail = 0;
@@ -76,7 +76,7 @@ function boot(overrides) {
 
 /* ============ ANGLE 1 · SYNTAX ============ */
 {
-  const r = cp.spawnSync('node', ['--check', path.join(ROOT, 'index.html').replace('index.html','/tmp/app_check.js')]);
+  const r = cp.spawnSync('node', ['--check', path.join(ROOT, 'caveman-writer-studio.html').replace('caveman-writer-studio.html','/tmp/app_check.js')]);
   // node --check needs a .js file; write it
   fs.writeFileSync('/tmp/app_check.js', JS);
   const r2 = cp.spawnSync('node', ['--check', '/tmp/app_check.js'], { encoding: 'utf8' });
