@@ -51,6 +51,7 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - **Format**: Novel · Novella · **Serial** (chapter-cliffhanger mode for serialized fiction)
 - **19 inspiring masters** (multi-select, bilingual) + **🧠 My profile** (house style distilled from the author's own writing) + **author voice sample** (the AI matches *your* prose)
 - **🎲 Spark** — one click: random genre, premise, hero, title, themes, pacing, ending
+- **🪶 Blog-style generator** *(opt-in)* — one click: blog-flavored places, scenes, character names & plot seeds (in the spirit of the author's «My little stories») + back-cover pitch generator
 - **🧬 Deep character generator** — coherent protagonist + antagonist: want, fear, wound, arc, voice, secret
 - Genre, POV, narrative tense, register, pacing, ending preference, prologue/epilogue, themes
 - **Inspiration field** (music / art / film) — its mood guides the atmosphere

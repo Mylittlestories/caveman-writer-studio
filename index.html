@@ -525,6 +525,17 @@
           <div class="hint" id="voiceSampleHint">paste a short sample of your own prose — the AI must match this voice</div>
         </div>
       </details>
+      <details class="adv">
+        <summary id="advBlog">🪶 Blog-style generator — places, scenes, names, plots (optional)</summary>
+        <p class="hint" id="blogHint" style="margin-top:6px">Off by default. Turn it on to generate settings, character names and story seeds in the spirit of your blog «My little stories» — then tune them.</p>
+        <label class="check"><input type="checkbox" id="ckBlog">
+          <span><b id="ckBlogTxt">Enable blog-style generator</b><small id="ckBlogSub">a choice — not the standard flow; fill the brief with blog-flavored places/names/plots</small></span></label>
+        <div class="outbar" style="margin-top:8px">
+          <button class="btn ghost" id="btnBlogGen">🧠 Generate like my blog</button>
+          <button class="btn ghost" id="btnBlogCopy">⧉ Copy</button>
+        </div>
+        <div id="blogOut" class="hint" style="white-space:pre-wrap;margin-top:6px;line-height:1.6"></div>
+      </details>
     </div>
 
     <div class="card">
@@ -598,6 +609,7 @@
         <button class="btn ghost" id="btnReaderSim">🎭 Reader-sim</button>
         <button class="btn ghost" id="btnHooks">🪝 Opening hooks</button>
         <button class="btn ghost" id="btnPromises">🔗 Promises/payoffs</button>
+        <button class="btn ghost" id="btnPitch">🏷 Back-cover pitch</button>
         <button class="btn ghost" id="btnToolsCopy">⧉ Copy</button>
         <button class="btn ghost" id="btnAttach">➜ To booster</button>
       </div>
@@ -721,6 +733,7 @@
           <button class="btn" id="btnChCount">&#128202; Count</button>
           <button class="btn ghost" id="btnChPrev2">&#128065; Preview</button>
           <button class="btn ghost" id="btnChMd">&#128196; .md</button>
+          <button class="btn ghost" id="btnMsExport">&#128196;&#128196; Export all</button>
           <button class="btn ghost" id="btnChDone">&#10003; Done &#8594; story state</button>
           <button class="btn ghost" id="btnChDel">&#10005; Delete</button>
           <button class="btn ghost" id="btnFocus">&#10530; Focus</button>
@@ -1575,6 +1588,14 @@
     advChar:["Καρτέλα ήρωα (προαιρετικό)","Character sheet (optional)"],
     advBible:["Story bible (κλειδωμένα γεγονότα)","Story bible (locked facts)"],
     advLang:["Λεπτομέρειες γλώσσας (γλωσσάρι, αντι-LLM, φωνή)","Language details (glossary, anti-LLM, voice sample)"],
+    advBlog:["🪶 Δημιουργός στυλ blog — τόποι, σκηνές, ονόματα, πλοκές (προαιρετικό)","🪶 Blog-style generator — places, scenes, names, plots (optional)"],
+    blogHint:["Απενεργοποιημένο από προεπιλογή. Ενεργοποιήστε το για να γεννάει σκηνικά, ονόματα χαρακτήρων και σπόρους ιστορίας στο πνεύμα του blog σας «My little stories» — και μετά προσαρμόστε τα.","Off by default. Turn it on to generate settings, character names and story seeds in the spirit of your blog «My little stories» — then tune them."],
+    ckBlogTxt:["Ενεργοποίηση δημιουργού στυλ blog","Enable blog-style generator"],
+    ckBlogSub:["επιλογή — όχι ο βασικός δρόμος· γεμίζει το brief με τόπους/ονόματα/πλοκές του blog","a choice — not the standard flow; fill the brief with blog-flavored places/names/plots"],
+    btnBlogGen:["🧠 Δημιουργία στυλ blog","🧠 Generate like my blog"],
+    btnBlogCopy:["⧉ Αντιγραφή","⧉ Copy"],
+    btnMsExport:["📄📄 Εξαγωγή όλων","📄📄 Export all"],
+    btnPitch:["🏷 Οπισθόφυλλο","🏷 Back-cover pitch"],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
     lblChText:["Κείμενο κεφαλαίου","Chapter text"],
     btnAddCh:["+ Κεφάλαιο","+ Chapter"],
@@ -1798,7 +1819,7 @@
     seedStory:"", seedNote:"", act3:true, budget:true,
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
-    weekly:2, chWeek:0, weekStart:"",
+    weekly:2, chWeek:0, weekStart:"", blogOn:false,
     toolChapter:1, toolGoal:"", reviewDraft:"", reviewFull:true, indRev:true, focus:false
   };
   // merge defaults so new fields always exist
@@ -1990,6 +2011,82 @@
     var msg = (S.lang==="en" ? "v14 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
                              : "v14 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
+  }
+
+  /* ============================================================
+     BLOG-STYLE GENERATOR — inspired by "My little stories"
+     ============================================================ */
+  var BLOG_STYLE = {
+    places: [
+      ["Ορεινή ελληνική κωμόπολη· πέτρινη γέφυρα του '30 πάνω από ποτάμι, δάσος που σκεπάζει τον ήχο, βιβλιοθήκη με σκόνη και μυστικά","A Greek mountain town; a 1930s stone bridge over the river, a forest that swallows sound, a library of dust and secrets"],
+      ["Χωριό που ψέλνει ύμνους σε έναν μυαρό θεό· πλατεία με ανίερο άγαλμα, βελανιδιά για τα θύματα","A village that chants hymns to a foul god; a square with a desecrated statue, an oak for the victims"],
+      ["Ημιυπόγειο διαμέρισμα στην οδό Αραχώβης· τσιμεντένιο κουτί με αναμνήσεις που δεν είναι δικές σου","A basement flat on Arachovis street; a concrete box with memories that aren't yours"],
+      ["Αρχιπέλαγος με πέντε βασίλεια, καθένα με καρδιά που δίνει πνοή στο νησί","An archipelago of five kingdoms, each with a heart that gives breath to the island"],
+      ["Νησιώτικος κόσμος με θάλασσα, άνεμο, εκκλησίες και ξόρκια· χειμώνες που θυμούνται","An island world of sea, wind, churches and charms; winters that remember"],
+      ["Πόλη κάτω από τη θάλασσα που ξυπνά κάθε εκατό χρόνια και αλλάζει όσους την ακούν","A city beneath the sea that wakes every hundred years and changes those who hear it"],
+      ["Δυστοπική Αθήνα όπου η ελευθερία είναι στο κλουβί· σφαίρες που εξοστρακίζονται στα πεζοδρόμια","A dystopian Athens where freedom is caged; bullets that ricochet on the pavements"],
+      ["Ερημότοποι: έρημη πόλη με μηχανές που συνεχίζουν τη δουλειά των ανθρώπων","The Wastelands: an empty city of machines still doing the work of people"],
+      ["Κλειδωμένη δημοτική βιβλιοθήκη με αρχείο που κανείς δεν διάβασε ως το τέλος","A locked public library with an archive no one ever read to the end"],
+      ["Πέτρινο σπίτι στις πλαγιές που θυμάται τα πάντα· κάθε δωμάτιο μια εποχή","A stone house on the hillside that remembers everything; each room an era"]
+    ],
+    scenes: [
+      ["Λιτανεία χωρικών με δίκρανα γύρω από θύμα δεμένο σε βελανιδιά· «Ανοίχτε την πινιάτα!»","A procession of villagers with pitchforks around a victim bound to an oak; \"Open the piñata!\""],
+      ["Ιατροδικαστική ανατομή: 16 υποδερμικές βελόνες, συντηρητικά, ένα πράσινο υλικό, όλο το αίμα αποστραγγισμένο","A forensic autopsy: 16 hypodermic needles, preservatives, a green substance, all blood drained"],
+      ["Ψίθυροι στη γέφυρα που ανήκουν στους νεκρούς· το όνομά σου είναι ο επόμενος στη λίστα","Whispers on the bridge that belong to the dead; your name is next on the list"],
+      ["Αντανάκλαση σε τζάμι που δείχνει κάτι άλλο από αυτό που στέκεται μπροστά του","A reflection in a window that shows something other than what stands before it"],
+      ["Μηχάνημα προβολής που αναπαράγει τις αναμνήσεις σου — και τις χρεώνει","A projection machine that replays your memories — and charges for them"],
+      ["Τελευταίο μυστικό δείπνο ρομπότ: καλώδια, πλακέτες και ένας λόγος που πρέπει να είναι τέλειος","A last secret dinner of robots: cables, circuit boards and a speech that must be perfect"],
+      ["Το βιβλίο με τα κλειδωμένα ονόματα στη βιβλιοθήκη· μία σελίδα για κάθε κάτοικο","The book of locked names in the library; one page for every inhabitant"],
+      ["Μια πόρτα/πηγάδι που ανοίγει σε άλλο κόσμο· από την άλλη μεριά σε περιμένουν","A door/well that opens into another world; on the other side something waits for you"],
+      ["Σεισμός σε δύο πράξεις: ο ίδιος τόπος, δύο ματιές, δύο μοίρες","An earthquake in two acts: the same place, two gazes, two fates"],
+      ["Καρφιτσωμένο χειρόγραφο στον τοίχο που συνεχίζει να γράφεται μόνο του","A pinned manuscript on the wall that keeps writing itself"]
+    ],
+    namesF: [["Δημήτρης","Dimitris"],["Ελένη","Eleni"],["Άννα","Anna"],["Μάρκος","Markos"],["Ηλίας","Ilias"],["Φαίδρα","Phaedra"],["Όμηρος","Homer"],["Αβραάμ","Avraam"],["Λευτέρης","Lefteris"],["Καλλιόπη","Kalliopi"],["Θοδωρής","Thodoris"],["Νεφέλη","Nefeli"],["Ορέστης","Orestis"],["Δάφνη","Daphne"],["Κυριάκος","Kyriakos"],["Μελίνα","Melina"],["Ζωή","Zoi"],["Αλεξάνδρα","Alexandra"],["Ρηνιώ","Rinio"],["Σμαρώ","Smaro"]],
+    namesL: [["Σεραφείμ","Serafeim"],["Βράχος","Vrachos"],["Κρανιά","Krania"],["Δελής","Delis"],["Νέγρης","Negris"],["Φωκάς","Fokas"],["Χαλκιάς","Halkias"],["Λεβέντης","Levendis"],["Παπαδήμας","Papadimas"],["Καπνιάς","Kapnias"],["Αρβανίτης","Arvanitis"],["Κοκκίνης","Kokkinis"],["Λαζαρίδης","Lazaridis"],["Αγγέλου","Aggelou"],["Βαμβακάς","Vamvakas"],["Ρούσης","Rousis"],["Μελάς","Melas"],["Ζέρβας","Zervas"],["Καρυώτης","Karyotis"]],
+    jobs: [["βιβλιοθηκάριος","librarian"],["χαρτογράφος","cartographer"],["δάσκαλος","schoolteacher"],["γιατρός","doctor"],["καπετάνιος","ship captain"],["δημοσιογράφος","journalist"],["ντετέκτιβ","detective"],["μηχανικός","engineer"],["φύλακας","guard"],["βάρδος","bard"],["μάγισσα","witch"],["ζωγράφος","painter"]],
+    traits: [["κρατιέται από τη ρουτίνα","clings to routine"],["φοβάται τη σιωπή","is afraid of silence"],["ψεύδεται για να προστατεύει","lies to protect"],["μετρά τις απώλειες σε βάρδιες","counts losses in shifts"],["εμπιστεύεται μόνο χάρτες","trusts only maps"],["μιλά στους ανέμους","speaks to the winds"],["έμαθε την αλήθεια και δεν την είπε","learned the truth and kept it"],["βλέπει όσα οι άλλοι χάνουν","sees what others miss"]],
+    plots: [
+      ["Ένας βιβλιοθηκάριος ακούει ψιθύρους από τη γέφυρα που ανήκουν στους νεκρούς — και τ' όνομά του είναι το επόμενο στη λίστα","A librarian hears whispers from the bridge that belong to the dead — and his name is next on the list"],
+      ["Ένας ξένος γίνεται το θύμα μιας τελετής σε χωριό που λατρεύει έναν μυαρό θεό","A stranger becomes the victim of a rite in a village that worships a foul god"],
+      ["Ένα μηχάνημα προβολής αναπαράγει τις αναμνήσεις σου — με κόστος που δεν φαντάζεσαι","A projection machine replays your memories — at a cost you can't imagine"],
+      ["Μια σειρά αρτίστικων δολοφονιών που μοιάζουν με πίνακες ζωγραφικής","A series of artistic murders that look like paintings"],
+      ["Μια χαμένη διαθήκη ξυπνά μια οικογενειακή κατάρα που έπρεπε να μείνει θαμμένη","A lost will wakes a family curse that should have stayed buried"],
+      ["Σε μια δυστοπική Αθήνα, ένας άνθρωπος ψάχνει την ελευθερία που κάποτε υπήρχε","In a dystopian Athens, a man searches for a freedom that once existed"],
+      ["Τα παιδιά της πόλης βλέπουν όνειρα που αρχίζουν να γίνονται πραγματικότητα","The city's children dream dreams that start coming true"],
+      ["Ένα κατοπτρικό αντίγραφο του ήρωα ζει τη ζωή που εκείνος φοβήθηκε να ζήσει","A mirror double of the hero lives the life he was afraid to live"],
+      ["Μια υπόσχεση από το παρελθόν επιστρέφει για να εισπραχθεί — και το τίμημα είναι υψηλό","A promise from the past returns to be collected — and the price is high"],
+      ["Ένα παλιό τρένο επιστρέφει κάθε αυγουστιάτικη πανσέληνο με επιβάτες που δεν υπάρχουν πια","An old train returns every August full moon with passengers who no longer exist"]
+    ]
+  };
+  function genBlogStyle(){
+    var EN = S.lang === "en";
+    var r = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
+    var pv = function(p){ return EN ? p[1] : p[0]; };
+    var place = pv(r(BLOG_STYLE.places));
+    var scene = pv(r(BLOG_STYLE.scenes));
+    var plot  = pv(r(BLOG_STYLE.plots));
+    var f = r(BLOG_STYLE.namesF), l = r(BLOG_STYLE.namesL);
+    var name = (EN ? l[1] + ", " + f[1] : f[0] + " " + l[0]);
+    var job = pv(r(BLOG_STYLE.jobs));
+    var trait = pv(r(BLOG_STYLE.traits));
+    var age = 24 + Math.floor(Math.random()*40);
+    S.premise = plot;
+    S.world = place + " · Σκηνή: " + scene;
+    S.hero = name + ", " + age + ", " + job + "; " + trait + ".";
+    S.glossary = name + " · " + place.split("·")[0].trim();
+    $("inPremise").value = S.premise;
+    $("inWorld").value = S.world;
+    $("inHero").value = S.hero;
+    $("inGlossary").value = S.glossary;
+    var lines = [
+      (EN ? "🏞 PLACE: " : "🏞 Τόπος: ") + place,
+      (EN ? "🎬 SCENE (Ch 1): " : "🎬 Σκηνή (Κεφ. 1): ") + scene,
+      (EN ? "👤 HERO: " : "👤 Ήρωας: ") + S.hero,
+      (EN ? "📖 PLOT: " : "📖 Πλοκή: ") + plot
+    ];
+    var out = $("blogOut"); if(out){ out.textContent = lines.join("\n"); }
+    render();
+    toast(EN ? "Blog-style bundle generated — tune it, then generate the brief" : "Γεννήθηκε πακέτο στυλ blog — προσαρμόστε το και μετά φτιάξτε το brief");
   }
 
   /* ---------- manuscript ---------- */
@@ -3401,6 +3498,38 @@
     setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 300);
   }
 
+  function exportManuscript(){
+    var EN = S.lang === "en";
+    var chs = S.chapters || [];
+    if(!chs.length){ toast(EN ? "No chapters yet" : "Δεν υπάρχουν ακόμα κεφάλαια"); return; }
+    var loc = EN ? "en-US" : "el-GR";
+    var L = [];
+    L.push("# " + titleOrFallback());
+    L.push("");
+    L.push(EN ? "Total: "+chs.length+" chapters · ~"+ (chs.reduce(function(s2,c){return s2+chWords(c);},0)).toLocaleString(loc)+" words" : "Σύνολο: "+chs.length+" κεφάλαια · ~"+ (chs.reduce(function(s2,c){return s2+chWords(c);},0)).toLocaleString(loc)+" λέξεις");
+    L.push("");
+    chs.forEach(function(ch, idx){
+      L.push((EN ? "## Chapter " : "## Κεφάλαιο ") + (idx+1) + (ch.title ? " — " + ch.title : ""));
+      L.push("");
+      L.push(ch.text || "");
+      L.push("");
+    });
+    var fname = ((S.title||"").trim() || "book").replace(/[^\w\u0370-\u03FF]+/g,"-").replace(/^-+|-+$/g,"") + "-manuscript.md";
+    downloadBlob(L.join("\n"), fname, "text/markdown;charset=utf-8");
+    toast(EN ? "Manuscript exported 📚" : "Το χειρόγραφο εξήχθη 📚");
+  }
+  function buildPitch(){
+    var EN = S.lang === "en";
+    var P = [];
+    P.push(EN
+      ? "Write the back-cover blurb for "+titleOrFallback()+", in Greek: two short paragraphs (~120 words total) that hook without spoiling — the setup, the stakes, one vivid image from the world. Then a one-line tagline in caps. No clichés, no 'in a world where…'."
+      : "Γράψε το οπισθόφυλλο για το "+titleOrFallback()+", στα ελληνικά: δύο σύντομες παράγραφοι (~120 λέξεις συνολικά) που τραβούν χωρίς spoiler — η εγκατάσταση, τα διακυβεύματα, μία ζωντανή εικόνα από τον κόσμο. Μετά μία γραμμή-σλόγκαν με κεφαλαία. Χωρίς κλισέ, χωρίς «σε έναν κόσμο όπου…».");
+    if((S.premise||"").trim()){ P.push(EN ? "Premise: "+S.premise : "Υπόθεση: "+S.premise); }
+    if((S.world||"").trim()){ P.push(EN ? "World: "+S.world : "Κόσμος: "+S.world); }
+    if((S.hero||"").trim()){ P.push(EN ? "Hero: "+S.hero : "Ήρωας: "+S.hero); }
+    return P.join("\n");
+  }
+
   function exportBible(){
     var EN = S.lang === "en";
     var loc = EN ? "en-US" : "el-GR";
@@ -3570,6 +3699,7 @@
     $("ckCritique").checked = S.reviewCritique;
     $("ckIndRev").checked = S.indRev !== false;
     $("inWeekly").value = S.weekly || 2;
+    $("ckBlog").checked = S.blogOn === true;
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
     $("inHero").value = S.hero;
@@ -3625,12 +3755,32 @@
     $("ckAntiLLM").addEventListener("change", function(){ S.antiLLM = this.checked; render(); });
     $("ckCritique").addEventListener("change", function(){ S.reviewCritique = this.checked; });
     $("ckIndRev").addEventListener("change", function(){ S.indRev = this.checked; });
+    $("ckBlog").addEventListener("change", function(){
+      S.blogOn = this.checked;
+      var b = $("btnBlogGen");
+      if(b){ b.disabled = !this.checked; }
+      saveLS();
+    });
+    $("btnBlogGen").addEventListener("click", function(){
+      if(!S.blogOn){ toast(S.lang==="en" ? "Enable the blog-style generator first" : "Ενεργοποιήστε πρώτα τον δημιουργό στυλ blog"); return; }
+      genBlogStyle();
+    });
+    $("btnBlogCopy").addEventListener("click", function(){
+      var t = ($("blogOut").textContent||"").trim();
+      if(!t){ toast(S.lang==="en" ? "Generate first" : "Δημιουργήστε πρώτα"); return; }
+      copyText(t, S.lang==="en" ? "Blog bundle copied" : "Το πακέτο αντιγράφηκε");
+    });
     $("inDensity").addEventListener("change", function(){ S.density = this.value; render(); saveLS(); });
     $("inModel").addEventListener("change", function(){ S.model = this.value; usageText(); saveLS(); });
     $("inWeekly").addEventListener("input", function(){ S.weekly = parseInt(this.value,10)||2; renderRhythm(); saveLS(); });
     $("btnWeekReset").addEventListener("click", function(){ S.chWeek = 0; S.weekStart = weekKey(); renderRhythm(); saveLS(); toast(S.lang==="en"?"Week reset":"Η εβδομάδα επαναφέρθηκε"); });
     $("btnUsageReset").addEventListener("click", function(){ S.usageTokens = 0; usageText(); saveLS(); toast(S.lang==="en"?"Usage reset":"Η χρήση επαναφέρθηκε"); });
     $("btnChPrev2").addEventListener("click", function(){ var p = $("chPreview"); if(!p) return; p.hidden = !p.hidden; renderPreview(); });
+    $("btnMsExport").addEventListener("click", exportManuscript);
+    $("btnPitch").addEventListener("click", function(){
+      $("toolsOut").value = buildPitch();
+      toast(S.lang==="en" ? "Pitch request generated 🏷" : "Αίτημα οπισθοφύλλου δημιουργήθηκε 🏷");
+    });
     $("btnChMd").addEventListener("click", function(){
       var ch = msCur(); if(!ch) return;
       var title = ch.title || ((S.lang==="en"?"Chapter ":"Κεφάλαιο ") + ((S.curCh||0)+1));
@@ -3866,6 +4016,7 @@
     wrapCards();
     renderTabs(); renderBunnyList(); renderManuscript();
     renderDensity(); renderModel(); renderRhythm(); renderPreview(); usageText();
+    var bb = $("btnBlogGen"); if(bb){ bb.disabled = !(S.blogOn === true); }
     applyFocus();
     renderQuote();
     renderFormats(); renderWords(); renderAuthors(); renderThemes(); renderLevels(); renderAuthorDetail();
