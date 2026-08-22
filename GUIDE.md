@@ -78,6 +78,11 @@ Two narrators, alternating on a schedule:
 
 ---
 
+## 🗺 Book status + Re-brief (v17)
+- **Book status mini-map** — under the chapter chips in 📚 Manuscript: each chapter shows ✏ draft / 👁 reviewed / ✓ final. Click a chip to cycle. Pressing **✓ Done → story state** auto-marks the chapter reviewed. Status is saved with the book.
+- **🔁 Re-brief the whole book** — one click builds a full-context prompt: story bible + glossary + character sheet + story state + **every chapter so far**. Paste it into your AI whenever it seems to have "forgotten" the book or you want to resume after a break.
+- **Keyboard** — press **Alt+1…6** to jump between the six tool tabs.
+
 ## 🎨 Comfort settings
 
 - **Theme** — 🌙 Night (dark) · 📜 Parchment (light, default) · 🌲 Forest (muted dark)

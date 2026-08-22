@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v16.0</title>
+<title>Caveman Writer Studio — v17.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -357,6 +357,11 @@
   .chbar-val{flex:0 0 52px;font-size:11px;font-family:var(--mono);color:var(--accent)}
   /* dictation active */
   #btnMic.on{background:var(--danger);color:#fff;border-color:var(--danger)}
+  /* book status chips */
+  .st-draft{color:var(--muted)}
+  .st-reviewed{color:var(--accent)}
+  .st-final{color:var(--ok)}
+  .chips .st-draft.on,.chips .st-reviewed.on,.chips .st-final.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 </style>
 </head>
 <body>
@@ -370,7 +375,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v16.0</span>
+    <span class="pill" id="pillVer">v17.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -435,7 +440,7 @@
         <select id="inEnding"></select>
       </div>
       <details class="adv">
-        <summary id="advCo">👥 Co-author — two POVs, alternating (optional)</summary>
+        <summary id="advCo">👥 Co-author — two POVs, alternating</summary>
         <label class="check"><input type="checkbox" id="ckCo">
           <span><b id="ckCoTxt">Enable co-author rotation</b><small id="ckCoSub">chapters alternate between two narrators on a schedule</small></span></label>
         <div class="field" style="margin-top:6px">
@@ -544,7 +549,7 @@
       <label class="check"><input type="checkbox" id="ckStyle">
         <span><b id="ckStyleTxt">House style — your own voice</b><small id="ckStyleSub">techniques distilled from your writing on the blog “My little stories” go into the brief</small></span></label>
       <details class="adv">
-        <summary id="advLang">Language details (glossary, anti-LLM, voice sample)</summary>
+        <summary id="advLang">🎙 Voice & quality (voice sample · glossary · anti-LLM)</summary>
         <div class="field" style="margin-top:8px">
           <label class="lbl" id="lblGlossary" for="inGlossary">Glossary / fixed spellings (optional)</label>
           <input type="text" id="inGlossary">
@@ -787,6 +792,10 @@
           <button class="btn ghost" id="btnFocus" title="Full-screen writing (Esc to exit)">&#10530; Focus</button>
         </div>
         <div class="chips" id="chList"></div>
+        <div class="chips" id="chStatusRow" style="margin-top:6px"></div>
+        <div class="outbar" style="margin-top:6px">
+          <button class="btn ghost" id="btnRebrief">🔁 Re-brief the whole book (full-context prompt)</button>
+        </div>
 
         <div class="divider"></div>
         <p class="suglabel" id="lblChart">Words per chapter</p>
@@ -1883,6 +1892,7 @@
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
+    statuses:{},
     bookName:"My Book", coAuth:false, povA:"pov1", povB:"pov3c", altEvery:1, qsHidden:false,
     toolChapter:1, toolGoal:"", reviewDraft:"", reviewFull:true, indRev:true, focus:false
   };
@@ -2312,6 +2322,68 @@
     toast(anyOpen ? (S.lang==="en" ? "Advanced options hidden (beginner mode)" : "Οι προχωρημένες επιλογές κρύφτηκαν (λειτουργία αρχαρίων)") : (S.lang==="en" ? "Advanced options shown" : "Οι προχωρημένες επιλογές εμφανίστηκαν"));
   }
 
+  /* ============================================================
+     BOOK STATUS MINI-MAP + RE-BRIEF
+     ============================================================ */
+  var STATUS_LABELS = { draft:["✏ draft","✏ draft"], reviewed:["👁 reviewed","👁 reviewed"], final:["✓ final","✓ final"] };
+  function renderStatusRow(){
+    var row = $("chStatusRow"); if(!row) return;
+    var chs = S.chapters || [];
+    row.innerHTML = "";
+    if(!chs.length){ row.innerHTML = '<span class="hint">' + (S.lang==="en" ? "Status appears once you add chapters." : "Το status εμφανίζεται όταν προσθέσετε κεφάλαια.") + '</span>'; return; }
+    chs.forEach(function(ch, idx){
+      var st = (S.statuses || {})[idx] || "draft";
+      var c = document.createElement("button");
+      c.type = "button";
+      c.className = "chip st-" + st + (idx === S.curCh ? " on" : "");
+      c.textContent = (S.lang==="en" ? "Ch " : "Κεφ. ") + (idx+1) + " · " + (STATUS_LABELS[st] ? STATUS_LABELS[st][S.lang==="en"?1:0] : st);
+      c.title = S.lang==="en" ? "Click to cycle status: draft → reviewed → final" : "Κλικ για εναλλαγή: draft → reviewed → final";
+      c.onclick = function(){
+        var seq = ["draft","reviewed","final"];
+        var cur = (S.statuses || {})[idx] || "draft";
+        var next = seq[(seq.indexOf(cur)+1) % seq.length];
+        S.statuses = S.statuses || {};
+        S.statuses[idx] = next;
+        renderStatusRow(); saveLS();
+      };
+      row.appendChild(c);
+    });
+  }
+
+  function buildRebrief(){
+    var EN = S.lang === "en";
+    var loc = EN ? "en-US" : "el-GR";
+    var P = [];
+    P.push(EN ? "# RE-BRIEF — full context for " + titleOrFallback() : "# RE-BRIEF — πλήρες πλαίσιο για " + titleOrFallback());
+    P.push("");
+    P.push(EN ? "## ROLE" : "## ΡΟΛΟΣ");
+    P.push(EN
+      ? "You are the ongoing ghostwriter of this book. Below is everything established so far. Read it ALL before writing anything."
+      : "Είσαι ο μόνιμος ghostwriter αυτού του βιβλίου. Παρακάτω είναι ό,τι έχει εδραιωθεί μέχρι τώρα. ΔΙΑΒΑΣΕ ΤΑ ΟΛΑ πριν γράψεις οτιδήποτε.");
+    P.push("");
+    if((S.bible||"").trim()){ P.push(EN ? "## STORY BIBLE (locked)" : "## STORY BIBLE (κλειδωμένα)"); P.push(S.bible); P.push(""); }
+    if((S.glossary||"").trim()){ P.push(EN ? "## GLOSSARY" : "## ΓΛΩΣΣΑΡΙ"); P.push(S.glossary); P.push(""); }
+    if((S.hero||"").trim()){ P.push(EN ? "## HERO" : "## ΗΡΩΑΣ"); P.push(S.hero); P.push(""); }
+    if((S.charDesire||"").trim()){ P.push(EN ? "## CHARACTER" : "## ΧΑΡΑΚΤΗΡΑΣ"); [["charDesire","Want"],["charFear","Fear"],["charWound","Wound"],["charArc","Arc"],["charVoice","Voice"],["charSecret","Secret"]].forEach(function(p){ if(S[p[0]]){ P.push("- "+(EN?p[1]:p[1])+": "+S[p[0]]); } }); P.push(""); }
+    if((S.storyState||"").trim()){ P.push(EN ? "## STORY STATE (running memory)" : "## ΚΑΤΑΣΤΑΣΗ ΙΣΤΟΡΙΑΣ"); P.push(S.storyState); P.push(""); }
+    var chs = S.chapters || [];
+    if(chs.length){
+      P.push(EN ? "## CHAPTERS SO FAR" : "## ΚΕΦΑΛΑΙΑ ΜΕΧΡΙ ΤΩΡΑ");
+      chs.forEach(function(ch, idx){
+        P.push("");
+        P.push(EN ? "### Ch "+(idx+1)+(ch.title?" — "+ch.title:"") : "### Κεφ. "+(idx+1)+(ch.title?" — "+ch.title:""));
+        P.push("("+chWords(ch).toLocaleString(loc)+(EN?" words":" λέξεις")+")");
+        P.push(ch.text || "(empty)");
+      });
+      P.push("");
+    }
+    P.push(EN ? "## WRITE" : "## ΓΡΑΨΕ");
+    P.push(EN
+      ? "Using ALL of the above as canon, write the next chapter (or revise per your instruction). Match the established voice. Apply: voice precedence, Greek guard, proofreading gate, anti-LLM discipline, caveman protocol for comments."
+      : "Χρησιμοποιώντας ΟΛΑ τα παραπάνω ως canon, γράψε το επόμενο κεφάλαιο (ή αναθεώρησε σύμφωνα με την οδηγία σου). Ταίριαξε την εδραιωμένη φωνή. Εφάρμοσε: σειρά φωνής, φρουρό ελληνικών, πύλη διόρθωσης, αντι-LLM, σπηλαιώδες πρωτόκολλο στα σχόλια.");
+    return P.join("\n");
+  }
+
   /* ---------- manuscript ---------- */
   function chWords(ch){
     return ch && ch.text ? ch.text.trim().split(/\s+/).length : 0;
@@ -2347,6 +2419,7 @@
       } else { t.value = ""; x.value = ""; }
     }
     renderChart();
+    renderStatusRow();
     var st = $("msStats");
     if(st){
       var total = 0; chs.forEach(function(ch){ total += chWords(ch); });
@@ -2383,12 +2456,14 @@
     var el = $("tabbar"); if(!el) return;
     el.innerHTML = "";
     var active = S.activeTab || "scene";
-    TAB_LABELS.forEach(function(tab){
+    TAB_LABELS.forEach(function(tab, ti){
       var b = document.createElement("button");
       b.type = "button";
       b._dataTab = tab[0];
       b.className = "tabbtn" + (tab[0]===active ? " on" : "");
       b.textContent = S.lang==="en" ? tab[2] : tab[1];
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-label", (S.lang==="en" ? "Tab " : "Καρτέλα ") + (ti+1) + ": " + (S.lang==="en" ? tab[2] : tab[1]));
       b.onclick = function(){
         S.activeTab = tab[0]; saveLS();
         renderTabs();
@@ -2567,7 +2642,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v16.0";
+    $("pillVer").textContent = "v17.0";
   }
 
   function applyStatic(){
@@ -3825,6 +3900,8 @@
     chs.forEach(function(ch, idx){
       add("");
       add(EN ? "### Chapter "+(idx+1)+(ch.title ? " — "+ch.title : "") : "### Κεφάλαιο "+(idx+1)+(ch.title ? " — "+ch.title : ""));
+      var st = (S.statuses || {})[idx] || "draft";
+      add((EN ? "Status: " : "Status: ") + (STATUS_LABELS[st] ? STATUS_LABELS[st][EN?1:0] : st));
       add("("+chWords(ch).toLocaleString(loc)+(EN?" words":" λέξεις")+")");
       add(ch.text || (EN ? "(empty)" : "(κενό)"));
     });
@@ -4052,6 +4129,17 @@
     $("btnUsageReset").addEventListener("click", function(){ S.usageTokens = 0; usageText(); saveLS(); toast(S.lang==="en"?"Usage reset":"Η χρήση επαναφέρθηκε"); });
     $("btnChPrev2").addEventListener("click", function(){ var p = $("chPreview"); if(!p) return; p.hidden = !p.hidden; renderPreview(); });
     $("btnMsExport").addEventListener("click", exportManuscript);
+    $("btnRebrief").addEventListener("click", function(){
+      var rb = buildRebrief();
+      $("promptOut").value = rb;
+      var w = rb.trim().split(/\s+/).length;
+      var loc = S.lang==="en"?"en-US":"el-GR";
+      $("statInfo").innerHTML = (S.lang==="en"
+        ? "Re-brief · ~"+w.toLocaleString(loc)+" words · copy & send"
+        : "Re-brief · ~"+w.toLocaleString(loc)+" λέξεις · αντιγράψτε & στείλτε");
+      $("noteArea").style.display = "none";
+      toast(S.lang==="en" ? "Re-brief generated (full context) — copy & send" : "Δημιουργήθηκε re-brief (πλήρες πλαίσιο) — αντιγράψτε & στείλτε");
+    });
     $("btnPitch").addEventListener("click", function(){
       $("toolsOut").value = buildPitch();
       toast(S.lang==="en" ? "Pitch request generated 🏷" : "Αίτημα οπισθοφύλλου δημιουργήθηκε 🏷");
@@ -4065,7 +4153,12 @@
     });
     $("btnFocus").addEventListener("click", toggleFocus);
     document.addEventListener("keydown", function(e){
-      if(e && e.key === "Escape" && S.focus){ S.focus = false; applyFocus(); saveLS(); }
+      if(e && e.key === "Escape" && S.focus){ S.focus = false; applyFocus(); saveLS(); return; }
+      if(e && e.altKey && e.key && /^[1-6]$/.test(e.key)){
+        var idx = parseInt(e.key,10) - 1;
+        var lbl = TAB_LABELS[idx];
+        if(lbl){ S.activeTab = lbl[0]; saveLS(); renderTabs(); }
+      }
     });
     $("btnSelf").addEventListener("click", selfCheck);
     $("ckStyle").addEventListener("change", function(){ S.myStyle = this.checked; render(); });
@@ -4129,6 +4222,7 @@
       S.storyState = ((S.storyState||"").trim() ? S.storyState.trim()+"\n" : "") + line;
       $("inState").value = S.storyState;
       S.chWeek = (S.chWeek||0) + 1;
+      S.statuses = S.statuses || {}; if(S.statuses[S.curCh] === "draft" || !S.statuses[S.curCh]){ S.statuses[S.curCh] = "reviewed"; }
       renderManuscript(); renderRhythm(); render(); saveLS();
       toast(S.lang==="en" ? "Chapter logged to story state ✓" : "Το κεφάλαιο καταγράφηκε στην κατάσταση ιστορίας ✓");
     });
