@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v21.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v22.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -55,6 +55,7 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - **🎲 Spark** — one click: random genre, premise, hero, title, themes, pacing, ending
 - **🪶 Blog-style generator** *(opt-in)* — blog-flavored places, scenes, names & plot seeds + **🏷 Names & places** (western/Greek/invented, from the author's world) + **🌍 Mythos & worldbuilding expander** + **character background** builder
 - 🧠 **Lore field** — history/myths/world rules injected into every brief
+- ⚡ **Build from ingredients** — no idea? Pick a genre (cosmic horror, high fantasy, post-apocalyptic, environmental SF, gothic, noir, mythic, mirror), mood, setting, elements → the app builds a full brief (title, world, hero, plot, names, promise) from the blog's vocabulary; 🎲 Surprise me for random
 - **🧬 Deep character generator** — coherent protagonist + antagonist: want, fear, wound, arc, voice, secret
 - Genre, POV, narrative tense, register, pacing, ending preference, prologue/epilogue, themes
 - **Inspiration field** (music / art / film) — its mood guides the atmosphere

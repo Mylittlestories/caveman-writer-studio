@@ -95,6 +95,9 @@ Two narrators, alternating on a schedule:
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.
 - **Deliverable language** — in the prompt card, choose **Greek or English** for the book itself. This is independent of the UI language: keep the interface in ΕΛ or EN, and the *novel* is written in whichever you pick. The language guard, role, continuation and extender all adapt automatically.
 
+## ⚡ Build from ingredients (v22) — no idea?
+At the top of the left column: pick **what kind of story** (cosmic horror · high fantasy · post-apocalyptic · environmental SF · gothic · noir · mythic fairy tale · mirror/psychological), a **mood**, a **setting**, and any **elements** you want in it (e.g. "a whispering bridge", "elves and orcs fighting for the land"). Press **🧠 Build my brief** — the app fills title, world, hero, antagonist, plot, names (invented places like Μάρεςταν/Ξαναντού/Δυρρών), glossary and lore, and regenerates the prompt. No idea at all? **🎲 Surprise me**.
+
 ## 🏷 Imaginative naming + Mythos (v21)
 - **🏷 Names & places** (Blog-style card) — one click gives a person, a place and an object drawn from the blog's world: western names (Jack, Suzy, Parker…), Greek names (Δημήτρης, Νεφέλη…), invented ones (Mimik, Vragkas…), and places like Marestan / Xanandou / Dyrron.
 - **🌍 Expand mythos & world** (Memory tab) — a prompt that expands ancient history, 5 named places, institutions, the rules of the strange, and the unspoken secret. Feeds from the new **Lore** field, which is also injected into every brief.

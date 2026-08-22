@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v21.0</title>
+<title>Caveman Writer Studio — v22.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -388,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v21.0</span>
+    <span class="pill" id="pillVer">v22.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -472,6 +472,33 @@
     </div>
 
     <div class="card">
+      <div class="card">
+      <h2><span class="num">&#10024;</span> <span id="tIntent">Build from ingredients — no idea yet?</span></h2>
+      <p class="hint" id="intentHint">Tell me what you want to write (genre, mood, setting, elements). The app builds a full brief for you — title, world, hero, plot, names — from the author's vocabulary.</p>
+      <div class="field">
+        <label class="lbl" id="lblIntentGenre" for="inIntentGenre">What kind of story?</label>
+        <select id="inIntentGenre"></select>
+      </div>
+      <div class="field">
+        <label class="lbl" id="lblIntentMood" for="inIntentMood">Mood / atmosphere</label>
+        <select id="inIntentMood"></select>
+      </div>
+      <div class="field">
+        <label class="lbl" id="lblIntentSetting" for="inIntentSetting">Where?</label>
+        <select id="inIntentSetting"></select>
+      </div>
+      <div class="field">
+        <label class="lbl" id="lblIntentExtra" for="inIntentExtra">Elements you want in it (optional)</label>
+        <input type="text" id="inIntentExtra">
+      </div>
+      <div class="outbar">
+        <button class="btn" id="btnIntentBuild">&#129504; Build my brief</button>
+        <button class="btn ghost" id="btnIntentRandom">&#127922; Surprise me</button>
+        <button class="btn ghost" id="btnIntentCopy">&#10697; Copy summary</button>
+      </div>
+      <div id="intentOut" class="hint" style="white-space:pre-wrap;margin-top:6px;line-height:1.6"></div>
+    </div>
+
       <h2><span class="num">2</span> <span id="t2">Inspiring authors</span>
         <button type="button" class="chip" id="btnPreset" style="margin-left:auto">🧠 My profile</button></h2>
       <p class="hint" id="h2" style="margin-bottom:10px">Pick one or more. Their techniques are baked into the prompt.</p>
@@ -1458,7 +1485,11 @@
     ["thriller","Θρίλερ","Thriller"],
     ["dystopian","Δυστοπικό","Dystopian"],
     ["social","Κοινωνικό / Ρεαλιστικό","Social / Realism"],
-    ["fairytale","Παραμύθι","Fairy tale"]
+    ["fairytale","Παραμύθι","Fairy tale"],
+    ["cosmic","Κοσμικός τρόμος","Cosmic horror"],
+    ["postapo","Μετα-αποκαλυπτικό","Post-apocalyptic"],
+    ["ecosf","Οικολογικό SF","Environmental sci-fi"],
+    ["darkfantasy","Σκοτεινή φαντασία","Dark fantasy"]
   ];
 
   var THEMES = [
@@ -1737,6 +1768,15 @@
     loreHint:["αρχαία γεγονότα, μύθοι, γεωγραφία, κανόνες μαγείας/τεχνολογίας — το ΑΙ χτίζει πάνω τους","ancient events, myths, geography, magic/tech rules — the AI builds on these"],
     btnMythGen:["🌍 Επέκταση μύθου & κόσμου","🌍 Expand mythos & world"],
     btnMythCopy:["⧉ Αντιγραφή","⧉ Copy"],
+    tIntent:["Χτίσε από υλικά — δεν έχεις ιδέα ακόμα;","Build from ingredients — no idea yet?"],
+    intentHint:["Πες μου τι θέλεις να γράψεις (είδος, διάθεση, σκηνικό, στοιχεία). Το app χτίζει ένα πλήρες brief — τίτλο, κόσμο, ήρωα, πλοκή, ονόματα — από το λεξιλόγιο του συγγραφέα.","Tell me what you want to write (genre, mood, setting, elements). The app builds a full brief — title, world, hero, plot, names — from the author's vocabulary."],
+    lblIntentGenre:["Τι είδους ιστορία;","What kind of story?"],
+    lblIntentMood:["Διάθεση / ατμόσφαιρα","Mood / atmosphere"],
+    lblIntentSetting:["Πού;","Where?"],
+    lblIntentExtra:["Στοιχεία που θέλεις μέσα (προαιρετικό)","Elements you want in it (optional)"],
+    btnIntentBuild:["🧠 Χτίσε το brief μου","🧠 Build my brief"],
+    btnIntentRandom:["🎲 Έκπληξέ με","🎲 Surprise me"],
+    btnIntentCopy:["⧉ Αντιγραφή σύνοψης","⧉ Copy summary"],
     syncHint:["Συγχρονισμός μέσω συνδέσμου: κωδικοποιεί όλο το βιβλίο σε ένα URL — ανοίξτε το σε άλλη συσκευή για να φορτωθεί. Χωρίς server, εντελώς ιδιωτικό. Πολύ μεγάλα βιβλία (όριο URL) → χρησιμοποιήστε 💾 Αποθήκευση βιβλίου (.json).","Link-based sync: encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json)."],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
     lblChText:["Κείμενο κεφαλαίου","Chapter text"],
@@ -1964,6 +2004,7 @@
     contNext:2, contSummary:"", contNote:"",
     seedStory:"", seedNote:"", act3:true, budget:true,
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene", lore:"",
+    intentGenre:"cosmic", intentMood:"dread", intentSetting:"far", intentExtra:"",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
     statuses:{}, chGoals:{}, chSearch:"",
@@ -2173,6 +2214,92 @@
   }
 
   /* ============================================================
+     BUILD-FROM-INGREDIENTS — renders + builder
+     ============================================================ */
+  function renderIntentSelects(){
+    var g = $("inIntentGenre"), m = $("inIntentMood"), s = $("inIntentSetting");
+    if(!g || !m || !s) return;
+    g.innerHTML = ""; m.innerHTML = ""; s.innerHTML = "";
+    Object.keys(INTENTS).forEach(function(k){
+      var it = INTENTS[k];
+      var o = document.createElement("option"); o.value = k; o.textContent = S.lang==="en"?it.label[1]:it.label[0]; g.appendChild(o);
+    });
+    MOODS.forEach(function(md){
+      var o = document.createElement("option"); o.value = md[0]; o.textContent = S.lang==="en"?md[2]:md[1]; m.appendChild(o);
+    });
+    SETTINGS.forEach(function(st){
+      var o = document.createElement("option"); o.value = st[0]; o.textContent = S.lang==="en"?st[2]:st[1]; s.appendChild(o);
+    });
+    g.value = S.intentGenre || "cosmic";
+    m.value = S.intentMood || "dread";
+    s.value = S.intentSetting || "far";
+  }
+  function moodName(id){ for(var i=0;i<MOODS.length;i++){ if(MOODS[i][0]===id){ return S.lang==="en"?MOODS[i][2]:MOODS[i][1]; } } return ""; }
+  function settingName(id){ for(var i=0;i<SETTINGS.length;i++){ if(SETTINGS[i][0]===id){ return S.lang==="en"?SETTINGS[i][2]:SETTINGS[i][1]; } } return ""; }
+
+  function buildFromIntent(){
+    var EN = S.lang === "en";
+    var r = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
+    var pv = function(p){ return EN ? p[1] : p[0]; };
+    var it = INTENTS[S.intentGenre] || INTENTS.cosmic;
+    // enrich genre defaults with a blog-flavored variation (names/places/objects)
+    var place = r(NAME_POOLS.placesA);
+    var first = r(NAME_POOLS.firstW), last = r(NAME_POOLS.lastW);
+    var hero = (EN ? last[1]+", "+first[1] : first[0]+" "+last[0]);
+    var obj = r(NAME_POOLS.objects);
+    var age = 24 + Math.floor(Math.random()*40);
+    var mood = moodName(S.intentMood || it.mood);
+    var setting = settingName(S.intentSetting || it.setting);
+    var worldTxt = (EN ? it.world[1] : it.world[0]) + " " + (EN ? "Setting: "+setting+"." : "Σκηνικό: "+setting+".") + " " + (EN ? "Named place: "+pv(place)+"." : "Ονομασμένος τόπος: "+pv(place)+".");
+    var plotTxt = (EN ? it.plot[1] : it.plot[0]);
+    var extra = (S.intentExtra||"").trim();
+    if(extra){ plotTxt += " " + (EN ? "Also include: "+extra : "Επίσης συμπεριλάβε: "+extra); }
+    var logline = (EN ? "A "+S.intentGenre+" story. " : "Μια ιστορία "+S.intentGenre+". ") + (EN ? "Mood: "+mood+". " : "Διάθεση: "+mood+". ") + plotTxt;
+    // fill the brief
+    S.genre = S.intentGenre;
+    S.title = "";
+    S.premise = logline;
+    S.world = worldTxt;
+    S.hero = hero + ", " + age + (EN ? ", a " : ", ") + (EN ? "local" : "ντόπιος") + ".";
+    S.antagonist = (EN ? it.antag[1] : it.antag[0]);
+    S.themes = (it.themes||[]).slice();
+    S.glossary = (EN ? last[1] : first[0]+" "+last[0]) + " · " + pv(place);
+    S.inspo = mood;
+    S.lore = (EN ? it.world[1] : it.world[0]);
+    S.charDesire = EN ? "to understand what this place hides" : "να καταλάβει τι κρύβει αυτός ο τόπος";
+    S.charFear = EN ? "the truth he is chasing" : "την αλήθεια που κυνηγά";
+    S.charWound = EN ? "a loss that made him leave, once" : "μια απώλεια που τον έκανε να φύγει, κάποτε";
+    S.charArc = EN ? "from fear to witness" : "από τον φόβο στη μαρτυρία";
+    S.charVoice = EN ? "clipped, careful, notices too much" : "κοφτός, προσεκτικός, προσέχει υπερβολικά πολλά";
+    // update form
+    syncInputs(); renderThemes(); renderGenres(); render();
+    // summary
+    var lines = [
+      (EN ? "🎭 KIND: " : "🎭 Είδος: ") + (EN?it.label[1]:it.label[0]),
+      (EN ? "🌫 MOOD: " : "🌫 Διάθεση: ") + mood,
+      (EN ? "🗺 SETTING: " : "🗺 Σκηνικό: ") + setting,
+      (EN ? "📜 LOGLINE: " : "📜 Logline: ") + logline,
+      (EN ? "👤 HERO: " : "👤 Ήρωας: ") + S.hero,
+      (EN ? "⚔️ FORCES: " : "⚔️ Δυνάμεις: ") + (EN?it.antag[1]:it.antag[0]),
+      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + pv(obj),
+      (EN ? "🤝 PROMISE TO READER: " : "🤝 Υπόσχεση στον αναγνώστη: ") + (EN?it.promise[1]:it.promise[0])
+    ];
+    var out = $("intentOut"); if(out){ out.textContent = lines.join("\n"); }
+    toast(EN ? "Brief built from your ingredients 🧠" : "Το brief χτίστηκε από τα υλικά σας 🧠");
+  }
+  function randomIntent(){
+    var keys = Object.keys(INTENTS);
+    S.intentGenre = keys[Math.floor(Math.random()*keys.length)];
+    var it = INTENTS[S.intentGenre];
+    S.intentMood = (it.mood || "dread");
+    S.intentSetting = (it.setting || "far");
+    S.intentExtra = "";
+    renderIntentSelects();
+    buildFromIntent();
+    toast(S.lang==="en" ? "Surprise brief ready 🎲" : "Έτοιμο surprise brief 🎲");
+  }
+
+  /* ============================================================
      BLOG-STYLE GENERATOR — inspired by "My little stories"
      ============================================================ */
   var BLOG_STYLE = {
@@ -2288,7 +2415,7 @@
     renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings();
     renderTenses(); renderModes(); renderCoPovs(); renderThemes(); renderTitleSug(); renderStorySug();
     renderCharSug(); renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg();
-    renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText();
+    renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText(); renderIntentSelects();
     renderTabs(); renderBunnyList(); renderManuscript(); renderBooks(); renderLayoutSeg(); applyCompact();
     applyFocus(); renderQuote(); render();
   }
@@ -2467,6 +2594,96 @@
       : "Χρησιμοποιώντας ΟΛΑ τα παραπάνω ως canon, γράψε το επόμενο κεφάλαιο (ή αναθεώρησε σύμφωνα με την οδηγία σου). Ταίριαξε την εδραιωμένη φωνή. Εφάρμοσε: σειρά φωνής, φρουρό ελληνικών, πύλη διόρθωσης, αντι-LLM, σπηλαιώδες πρωτόκολλο στα σχόλια.");
     return P.join("\n");
   }
+
+  /* ============================================================
+     BUILD-FROM-INGREDIENTS ENGINE
+     ============================================================ */
+  var MOODS = [
+    ["dread","Φρίκη & δέος","Dread & awe"],["mystery","Μυστήριο & ψίθυροι","Mystery & whispers"],
+    ["lyric","Λυρισμός & μελαγχολία","Lyricism & melancholy"],["epic","Επικό & μεγαλειώδες","Epic & grand"],
+    ["dark","Σκοτεινό & ωμό","Dark & raw"],["hope","Ελπίδα μέσα στην ήττα","Hope inside defeat"],
+    ["strange","Παράδοξο & αλλόκοτο","Strange & uncanny"],["quiet","Ήσυχο & υποδόριο","Quiet & simmering"]
+  ];
+  var SETTINGS = [
+    ["far","Μακρινός / ξένος τόπος","A far-away / foreign place"],["town","Μικρή κωμόπολη","A small town"],
+    ["city","Πόλη (σύγχρονη ή δυστοπική)","A city (modern or dystopian)"],["island","Νησί","An island"],
+    ["other","Άλλος κόσμος","Another world"],["waste","Ερημότοποι / ερείπια","Wastelands / ruins"],
+    ["sea","Θάλασσα / κάτω από τη θάλασσα","Sea / under the sea"],["house","Παλιό σπίτι / αρχοντικό","An old house / manor"]
+  ];
+  var INTENTS = {
+    cosmic: {
+      label:["Κοσμικός τρόμος σε μακρινό τόπο","Cosmic horror in a far-away place"],
+      mood:"dread", setting:"far",
+      themes:["madness","fate","isolation","fear"],
+      world:["Μια απομονωμένη επαρχία στα όρια του χάρτη, όπου το τοπίο θυμίζει πληγή· ένα χωριό που ψέλνει σε κάτι που δεν έχει όνομα, κι ένας ουρανός που κρύβει κάτι.","A remote province at the edge of the map, where the land looks like a wound; a village that chants to something nameless, and a sky that hides something."],
+      plot:["Ένας ξένος φτάνει για να λύσει ένα μυστήριο και ανακαλύπτει ότι το μυστικό δεν θέλει να λυθεί — θέλει να τον απορροφήσει. Η γνώση είναι πληγή· το τέλος τον βρίσκει αλλαγμένο.","A stranger arrives to solve a mystery and discovers the secret doesn't want solving — it wants to absorb him. Knowledge is a wound; the ending finds him changed."],
+      antag:["Αυτό που ψέλνουν στο χωριό — παρόν σε κάθε σκιά, σε κάθε ψίθυρο","What the village chants to — present in every shadow, every whisper"],
+      promise:["Ο αναγνώστης πρέπει να νιώσει το δέος του αδιανόητου, όχι να το δει.","The reader must feel the awe of the inconceivable, not see it."]
+    },
+    fantasy: {
+      label:["Φαντασία: μάχη για τη γη (ξωτικά & όρκ)","High fantasy: war for the land (elves & orcs)"],
+      mood:"epic", setting:"other",
+      themes:["power","fate","nature","survival"],
+      world:["Ένα βασίλειο όπου ξωτικά και όρκ μοιράζονται την ίδια γη — και την έχουν πληγώσει και οι δύο. Πέντε φυλές, πέντε καρδιές· ο πόλεμος κρατά αιώνες.","A realm where elves and orcs share the same land — and both have wounded it. Five clans, five hearts; the war has lasted centuries."],
+      plot:["Μια παλιά συμμαχία σπάει ακριβώς όταν ένα αρχαίο κακό ξυπνά κάτω από τη γη που διεκδικούν. Ο ήρωας πρέπει να ενώσει ό,τι μισείται πριν χαθεί και το τελευταίο δάσος.","An old alliance breaks exactly when an ancient evil wakes beneath the land they claim. The hero must unite what is hated before the last forest falls."],
+      antag:["Ο άρχοντας της τελευταίας φυλής που θέλει τη γη μόνο για τον εαυτό του","The lord of the last clan who wants the land only for himself"],
+      promise:["Οι μάχες να πονάνε· καμία νίκη δίχως τίμημα.","Battles must hurt; no victory without a price."]
+    },
+    postapo: {
+      label:["Μετα-αποκαλυπτικό","Post-apocalyptic"],
+      mood:"dark", setting:"waste",
+      themes:["survival","hope","memory","power"],
+      world:["Ερημότοποι: πόλεις-φαντάσματα όπου οι μηχανές συνεχίζουν τη δουλειά των ανθρώπων. Λίγοι επιζώντες, λιγότερα όνειρα.","Wastelands: ghost cities where machines still do the work of people. Few survivors, fewer dreams."],
+      plot:["Ένας επιζών βρίσκει κάτι που θα μπορούσε να ξαναφέρει τη ζωή — ή να τελειώσει ό,τι έμεινε. Κάθε επιλογή κοστίζει.","A survivor finds something that could bring life back — or finish what remains. Every choice costs."],
+      antag:["Η ομάδα που θέλει να κρατήσει τον κόσμο όπως είναι — σκοτεινό και δικό της","The group that wants to keep the world as it is — dark and theirs"],
+      promise:["Η ελπίδα μέσα στην ήττα· όχι εύκολα, όχι φτηνά.","Hope inside defeat; not easily, not cheaply."]
+    },
+    ecosf: {
+      label:["Οικολογικό SF","Environmental sci-fi"],
+      mood:"quiet", setting:"far",
+      themes:["nature","survival","identity","power"],
+      world:["Ένας πλανήτης-ορχήστρα όπου το οικοσύστημα παίζει μόνο του — μέχρι που κάτι σπάει τη μελωδία. Γη που αναπνέει, θάλασσες που θυμούνται.","A planet-orchestra where the ecosystem plays itself — until something breaks the melody. Breathing earth, seas that remember."],
+      plot:["Μια επιστήμονας ανακαλύπτει ότι το σύστημα δεν καταρρέει — αποσύρεται, με πρόθεση. Η σχέση ανθρώπου-κόσμου θα ξαναγραφτεί.","A scientist discovers the system isn't collapsing — it's withdrawing, deliberately. The human-world relationship will be rewritten."],
+      antag:["Η εταιρεία που εξάγει τον τελευταίο πόρο του πλανήτη","The corporation mining the planet's last resource"],
+      promise:["Το τοπίο ως χαρακτήρας· η λεπτομέρεια κάνει το απίθανο αναπόφευκτο.","The landscape as a character; detail makes the improbable inevitable."]
+    },
+    gothic: {
+      label:["Γοτθικό μυστήριο / παλιό σπίτι","Gothic mystery / old house"],
+      mood:"mystery", setting:"house",
+      themes:["memory","guilt","death","identity"],
+      world:["Ένα πέτρινο αρχοντικό στις πλαγιές που θυμάται τα πάντα· κάθε δωμάτιο μια εποχή, κάθε καθρέφτης μια ενοχή.","A stone manor on the hillside that remembers everything; each room an era, each mirror a guilt."],
+      plot:["Μια κληρονομιά σέρνει πίσω όσους ορκίστηκαν να ξεχάσουν. Το σπίτι κρατά ένα μυστικό που όλοι ξέρουν και κανείς δεν λέει.","An inheritance drags back those who swore to forget. The house holds a secret everyone knows and no one says."],
+      antag:["Ο φύλακας του σπιτιού — ή ό,τι έγινε ο φύλακας","The house's keeper — or what became the keeper"],
+      promise:["Η αλήθεια βγαίνει στο φως την τελευταία σελίδα· τίποτα δεν συγχωρείται φτηνά.","The truth comes to light on the last page; nothing is forgiven cheaply."]
+    },
+    noir: {
+      label:["Νουάρ / αστυνομικό","Crime noir"],
+      mood:"dark", setting:"city",
+      themes:["guilt","power","memory","identity"],
+      world:["Μια πόλη που βρέχει απόψεις· σκοτεινά σοκάκια, αρχεία που χάνονται, άνθρωποι που μετρούν τις απώλειες σε βάρδιες.","A city that rains opinions; dark alleys, files that vanish, people who count losses in shifts."],
+      plot:["Μια υπόθεση που δεν έπρεπε να ανοιχτεί ξανά. Ο ντετέκτιβ ξέρει την αλήθεια — το πρόβλημα είναι τι θα κάνει μ' αυτήν.","A case that should never be reopened. The detective knows the truth — the problem is what to do with it."],
+      antag:["Αυτός που κρατάει τα αρχεία — και τα πουλάει","The one who holds the files — and sells them"],
+      promise:["Ο διάλογος-σκάκι· τίποτα δεν λέγεται τυχαία.","Dialogue as chess; nothing said by chance."]
+    },
+    mythic: {
+      label:["Παραμύθι / μύθος (στυλ Ξαναντού)","Mythic fairy tale (Xanandou-style)"],
+      mood:"lyric", setting:"other",
+      themes:["fate","nature","hope","memory"],
+      world:["Ένα αρχιπέλαγος με πέντε βασίλεια, καθένα με καρδιά που δίνει πνοή στο νησί. Παραμύθι με βάθος χιλιάδων ετών.","An archipelago of five kingdoms, each with a heart that gives breath to the island. A fairy tale with millennia of depth."],
+      plot:["Μια καρδιά σταματά να χτυπά, κι όλα τα βασίλεια αρχίζουν να μαραίνονται. Ένα παιδί αναλαμβάνει το ταξίδι για να την ξανανάψει.","One heart stops beating, and all the kingdoms begin to wither. A child undertakes the journey to relight it."],
+      antag:["Η λήθη — το αντίθετο της μνήμης που κρατά τον κόσμο ζωντανό","Forgetting — the opposite of the memory that keeps the world alive"],
+      promise:["Να μυρίζει παραμύθι αλλά να πονάει αλήθεια.","It must smell like a fairy tale but hurt like truth."]
+    },
+    mirror: {
+      label:["Κατοπτρικό / ψυχολογικό","Mirror / psychological"],
+      mood:"strange", setting:"town",
+      themes:["identity","memory","guilt","madness"],
+      world:["Μια πόλη όπου κάθε κάτοικος έχει ένα αντίγραφο που ζει τη ζωή που φοβήθηκε. Οι καθρέφτες θυμούνται.","A town where every resident has a double living the life they feared. Mirrors remember."],
+      plot:["Ο ήρωας συναντά το κατοπτρικό του εαυτό και δεν ξέρει ποιος είναι ο πρωτότυπος. Η μνήμη δεν είναι δική του.","The hero meets his mirror double and doesn't know which is the original. The memory isn't his."],
+      antag:["Το ίδιο του το αντίγραφο — ή ό,τι έγινε","His own double — or what it became"],
+      promise:["Η ταυτότητα ρευστή· κάθε απάντηση γεννά νέα ερώτηση.","Identity fluid; every answer births a new question."]
+    }
+  };
 
   /* ============================================================
      IMAGINATIVE NAMING + WORLD/MYTHOS (derived from the blog)
@@ -2796,7 +3013,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v21.0";
+    $("pillVer").textContent = "v22.0";
   }
 
   function applyStatic(){
@@ -4264,6 +4481,10 @@
     $("inPovB").value = S.povB || "pov3c";
     $("inAuthorSearch").value = S.authorSearch || "";
     $("inDeliver").value = S.deliverLang || "el";
+    $("inIntentGenre").value = S.intentGenre || "cosmic";
+    $("inIntentMood").value = S.intentMood || "dread";
+    $("inIntentSetting").value = S.intentSetting || "far";
+    $("inIntentExtra").value = S.intentExtra || "";
     $("inAltEvery").value = S.altEvery || 1;
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
@@ -4349,6 +4570,17 @@
       genBlogStyle();
     });
     $("btnNames").addEventListener("click", genNames);
+    $("inIntentGenre").addEventListener("change", function(){ S.intentGenre = this.value; saveLS(); });
+    $("inIntentMood").addEventListener("change", function(){ S.intentMood = this.value; saveLS(); });
+    $("inIntentSetting").addEventListener("change", function(){ S.intentSetting = this.value; saveLS(); });
+    $("inIntentExtra").addEventListener("input", function(){ S.intentExtra = this.value; saveLS(); });
+    $("btnIntentBuild").addEventListener("click", buildFromIntent);
+    $("btnIntentRandom").addEventListener("click", randomIntent);
+    $("btnIntentCopy").addEventListener("click", function(){
+      var t = ($("intentOut").textContent||"").trim();
+      if(!t){ toast(S.lang==="en" ? "Build a brief first" : "Χτίστε πρώτα ένα brief"); return; }
+      copyText(t, S.lang==="en" ? "Brief summary copied" : "Η σύνοψη brief αντιγράφηκε");
+    });
     $("btnMythGen").addEventListener("click", function(){
       $("mythOut").textContent = buildMyth();
       toast(S.lang==="en" ? "Mythos & worldbuilding prompt generated 🌍" : "Δημιουργήθηκε prompt μύθου & κοσμοπλασίας 🌍");
@@ -4647,9 +4879,10 @@
     renderLayoutSeg(); applyCompact();
     wrapCards();
     renderTabs(); renderBunnyList(); renderManuscript();
-    renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText();
+    renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText(); renderIntentSelects();
     var bb = $("btnBlogGen"); if(bb){ bb.disabled = !(S.blogOn === true); }
     renderBooks(); renderCoPovs(); applyQS(); renderDeliver();
+    renderIntentSelects();
     restoreFromHash();
     applyFocus();
     renderQuote();
