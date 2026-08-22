@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v23.0</title>
+<title>Caveman Writer Studio — v24.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -388,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v23.0</span>
+    <span class="pill" id="pillVer">v24.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -693,6 +693,7 @@
         <button class="btn ghost" id="btnSaveJson">💾 Save .json</button>
         <button class="btn ghost" id="btnLoadJson">📂 Load</button>
         <input type="file" id="inJson" accept="application/json,.json" style="display:none">
+        <select id="inDemoSel" title="Demo" style="max-width:250px"></select>
         <button class="btn ghost" id="btnDemo">✦ Demo</button>
         <button class="btn ghost" id="btnReset">✕ Clear</button>
         <span class="stat" id="statInfo"></span>
@@ -2350,8 +2351,8 @@
     var inputs = document.querySelectorAll ? document.querySelectorAll("input,select,textarea").length : -1;
     var cards = document.querySelectorAll ? document.querySelectorAll(".card").length : -1;
     var chapters = (S.chapters||[]).length;
-    var msg = (S.lang==="en" ? "v23 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
-                             : "v23 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
+    var msg = (S.lang==="en" ? "v24 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
+                             : "v24 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
   }
 
@@ -2567,6 +2568,7 @@
     renderTenses(); renderModes(); renderCoPovs(); renderThemes(); renderTitleSug(); renderStorySug();
     renderCharSug(); renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg();
     renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText(); renderIntentSelects();
+    renderDemoSel();
     renderTabs(); renderBunnyList(); renderManuscript(); renderBooks(); renderLayoutSeg(); applyCompact();
     applyFocus(); renderQuote(); render();
   }
@@ -3165,7 +3167,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v23.0";
+    $("pillVer").textContent = "v24.0";
   }
 
   function applyStatic(){
@@ -3646,7 +3648,41 @@
     P.push(EN
       ? "- Respect the language: flawless orthography, accents, syntax; rich vocabulary without affectation."
       : "- Σεβασμός στη γλώσσα: ορθογραφία, τονικά, σύνταξη άψογα· πλούσιο λεξιλόγιο χωρίς επιτήδευση.");
+    P.push(EN
+      ? "- First line: a precise moment or a concrete image (an exact time, an object, a smell) — never an abstract statement. The opening promises a fact, not a dream."
+      : "- Πρώτη γραμμή: ακριβής στιγμή ή συγκεκριμένη εικόνα (ακριβής ώρα, αντικείμενο, όσμη) — ποτέ αφηρημένη δήλωση. Το άνοιγμα υποσχέεται γεγονός, όχι όνειρο.");
+    P.push(EN
+      ? "- Smell & texture: the story must smell (coffee, oil, wet cardboard, the cold of concrete). At least one bodily image per chapter."
+      : "- Όσμη & ύφε: η ιστορία πρέπει να μυρίζει (καφές, πετρέλαιο, βρεγμένο χαρτόνι, το κρύο του τσιμεντού). Τουλάχιστον μία «σωματική» εικόνα ανά κεφάλαιο.");
     P.push("");
+
+    /* signature techniques — the author's methods, gated to genres where they fit */
+    var CRAFT_GENRES = { horror:1, gothic:1, cosmic:1, darkfantasy:1, magreal:1, noir:1, mystery:1, thriller:1 };
+    if(CRAFT_GENRES[S.genre]){
+      P.push(EN ? "## SIGNATURE TECHNIQUES (the author's methods — apply when they fit)" : "## ΤΕΧΝΙΚΕΣ ΣΗΜΑΤΟΣ (μέθοδοι του συγγραφέα — εφάρμοσέ τις όταν ταιριάζουν)");
+      P.push(EN
+        ? "- The mundane is the threshold: the wrong thing lives INSIDE the everyday (a basement, a carport, a house full of radios) — never in a separate “haunted place”."
+        : "- Το συνηθισμένο είναι το κατώφλι: το λάθος ζει ΜΕΣΑ στο καθημερινό (ένα ημιυπόγειο, ένα υπόστεγο, ένα σπίτι γεμάτο ραδιόφωνα) — ποτέ σε ξεχωριστό «μαγεμένο μέρος».");
+      P.push(EN
+        ? "- Found documents: at least one dated document (a torn page, a diary, a cassette, an internal memo) — damaged or incomplete. It PROVES, never explains; it opens more questions than it closes."
+        : "- Εγγράφα-εύρημα: τουλάχιστον ένα έγγραφο με ημερομηνία (σκισμένη σελίδα, ημερολόγιο, κασέτα, εσωτερικό) — κατεστραμμένο ή ατελές. ΑΠΟΔΕΙΚΝΥΕΙ, ποτέ δεν εξηγεί· ανοίγει περισσότερα ερωτήματα απ' όσα κλείνει.");
+      P.push(EN
+        ? "- Institutional cover-up in ONE line: the institution is scarier than the monster (“The personnel of Wing B were removed from the registries. Profits maintained.”)."
+        : "- Ινστιτουσιαλική κάλυψη σε ΜΙΑ γραμμή: ο θεσμός είναι πιο τρομακτικός από το τέρας («Το προσωπικό του παραρτήματος Β αποσύρθηκε από τους καταλόγους. Τα κέρδη διατηρήθηκαν.»).");
+      P.push(EN
+        ? "- Knowledge has a bodily price: every step toward the truth costs the body (a nosebleed, burning fingers, a lost day). The hero pays for what he saw."
+        : "- Η γνώση έχει σωματικό τίμημα: κάθε βήμα προς την αλήθεια κοστίζει στο σώμα (ρινόρροια, καμμένα δάχτυλα, μία χαμένη μέρα). Ο ήρωας πληρώνει για ό,τι είδε.");
+      P.push(EN
+        ? "- When there is an entity: it does not KNOW — it REMEMBERS. It breathes, it pulses, it says names. It has a finite cost: each use consumes something (the tape runs, the slide burns, a memory empties). It is NEVER destroyed."
+        : "- Όταν υπάρχει οντότητα: ΔΕΝ ξέρει — ΘΥΜΑΤΑΙ. Πνεύει, παλμάρει, λέει ονόματα. Έχει πεπερασμένο κόστος: κάθε χρήση καταναλώνει κάτι (η κασέτα τρέχει, το σλάιντ καίγεται, η μνήμη αδειάζει). Δεν καταστρέφεται ποτέ.");
+      P.push(EN
+        ? "- Sound motif: one sound or song (an old gramophone, a tick, a voice on the radio) enters early, passes through subtly, and returns CHANGED at the end."
+        : "- Ηχητικό μοτίβο: ένας ήχος ή ένα τραγούδι (παλιό γραμμόφωνο, ένα τικ, μία φωνή στο ραδιόφωνο) μπαίνει νωρίς, περνάει διακριτικά και επιστρέφει ΑΛΛΑΓΜΕΝΟ στο τέλος.");
+      P.push(EN
+        ? "- Ending: a double twist or a circle. The final sentence is ONE image that reframes the whole story — never a summary."
+        : "- Τέλος: διπλό στρίψιμο ή κύκλος. Η τελευταία πρόταση είναι ΜΙΑ εικόνα που αναδιατυπώνει ολόκληρη την ιστορία — ποτέ μια σύνοψη.");
+      P.push("");
+    }
 
     /* caveman protocol */
     P.push((EN ? "## CAVEMAN PROTOCOL (LEVEL: " : "## ΣΠΗΛΑΙΩΔΕΣ ΠΡΩΤΟΚΟΛΛΟ (ΕΠΙΠΕΔΟ: ")+lvl.label.toUpperCase()+(EN ? " — "+lvl.sub+")" : " — "+lvl.sub+")"));
@@ -4079,6 +4115,11 @@
       "Μακρές, ρέουσες προτάσεις με «καθώς» και «ενώ»· κόμματα που χτίζουν ρυθμό — στον τρόμο ο ρυθμός πνίγει.",
       "Γκροτέσκα ομορφιά: η ασχήμια με σχεδόν ποιητικό μάτι (πρισματικά ντους, γαλακτώματα λαδιού στο νερό).",
       "Ακρίβεια ιατροδικαστή στο έγκλημα: ακριβείς αριθμοί, υλικά, διαδικασίες.",
+      "Ακριβής ώρα ή συγκεκριμένη εικόνα στην πρώτη γραμμή: το άνοιγμα υποσχέεται γεγονός, όχι όνειρο.",
+      "Εγγράφα-εύρημα με ημερομηνία, κατεστραμμένα ή ατελή: αποδεικνύουν, ποτέ δεν εξηγούν· ανοίγουν ερωτήματα.",
+      "Η γνώση έχει σωματικό τίμημα: η αλήθεια κοστίζει στο σώμα (ρινόρροια, καμμένα δάχτυλα, χαμένες μέρες).",
+      "Η οντότητα δεν ξέρει — θυμάται: πνεύει, λέει ονόματα, καταναλώνει κάτι σε κάθε χρήση· δεν καταστρέφεται ποτέ.",
+      "Ένα ηχητικό μοτίβο ανά ιστορία που επιστρέφει αλλαγμένο στο τέλος· τέλος-εικόνα: μία τελευταία φράση που αναδιατυπώνει τα πάντα.",
       "Βαθιά συμπάθεια για τους αδικημένους, τα «misfits», τα θύματα — ο αφηγητής πονάει μαζί τους.",
       "Δυστοπική αιχμή: ελευθερία απέναντι στη μηχανή· το προσωπικό γίνεται πολιτικό· θυμός χωρίς κήρυγμα.",
       "Η διάθεση της έμπνευσης (μουσική/πίνακας/ταινία) καθοδηγεί την ατμόσφαιρα της σκηνής.",
@@ -4091,6 +4132,11 @@
       "Long flowing sentences with 'καθώς'/'while' and commas that build rhythm — in horror the rhythm suffocates.",
       "Grotesque beauty: ugliness described with an almost poetic eye (prismatic showers, oil-in-water emulsions).",
       "Forensic precision in crime: exact counts, materials, procedures.",
+      "A precise time or a concrete image in the first line: the opening promises a fact, not a dream.",
+      "Dated found documents, damaged or incomplete: they prove, never explain; they open questions.",
+      "Knowledge has a bodily price: the truth costs the body (a nosebleed, burning fingers, lost days).",
+      "The entity does not know — it remembers: it breathes, it says names, it consumes something with every use; it is never destroyed.",
+      "One sound motif per story that returns changed at the end; an image-ending: one last sentence that reframes everything.",
       "Deep empathy for the wronged, the misfits, the victims — the narrator feels with them.",
       "Dystopian sting: freedom against the machine; the personal becomes political; anger without preaching.",
       "The inspiration's mood (music/painting/film) guides the scene's atmosphere.",
@@ -4525,7 +4571,7 @@
         renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings(); renderThemes(); renderTenses(); renderModes();
         renderTitleSug(); renderStorySug(); renderCharSug();
         renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg(); render();
-        renderDensity(); renderModel(); renderDeliver(); renderRhythm(); usageText();
+        renderDensity(); renderModel(); renderDeliver(); renderRhythm(); usageText(); renderDemoSel();
         applyTheme(); renderThemeSeg(); renderQuote();
         saveLS();
         toast(S.lang==="en" ? "Brief loaded ✓" : "Το brief φορτώθηκε ✓");
@@ -4608,6 +4654,15 @@
     P.push(EN
       ? "- A visual core: one image the reader will never forget."
       : "- Ένα οπτικό κέντρο: μία εικόνα που ο αναγνώστης δεν θα ξεχάσει ποτέ.");
+    P.push(EN
+      ? "- A precise opening: an exact time, a concrete object, a smell — a fact, not an abstract statement."
+      : "- Μια ακριβής έναρξη: μια ακριβής ώρα, ένα συγκεκριμένο αντικείμενο, μια μυρωδιά — ένα γεγονός, όχι μια αφηρημένη δήλωση.");
+    P.push(EN
+      ? "- It must smell: one bodily sensory detail (smell/texture/temperature) and one “wrong” detail that doesn't quite fit."
+      : "- Πρέπει να μυρίζει: μία σωματική αισθητηριακή λεπτομέρεια (μυρωδιά/ύφες/θερμοκρασία) και ένα «λάθος» detail που δεν ταιριάζει τελείως.");
+    P.push(EN
+      ? "- If there is a thing/entity: it does not know — it REMEMBERS. And it is never destroyed."
+      : "- Αν υπάρχει ένα πράγμα/οντότητα: δεν ξέρει — ΘΥΜΑΤΑΙ. Και δεν καταστρέφεται ποτέ.");
     P.push("");
     P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
     P.push(sparkNamingRule(EN, profileId));
@@ -4633,7 +4688,7 @@
     P.push(L[8] + (EN ? ": fast clipped / medium / slow-burn" : ": γρήγορο κοφτό / μέτριο / αργό καθηλωτικό"));
     P.push(L[9] + (EN ? ": open / closed / bittersweet / cliffhanger" : ": ανοιχτό / κλειστό / πικρόγλυκο / κρεμαστό"));
     P.push(L[10] + (EN ? ": (4–8 fixed names/spellings, separated by “ · ”)" : ": (4–8 σταθερές ορθογραφίες, χωρισμένες με « · »)"));
-    P.push(L[11] + (EN ? ": (the ACTUAL first sentence of Chapter 1 — real prose, not a description)" : ": (την ΠΡΑΓΜΑΤΙΚΗ πρώτη πρόταση του Κεφαλαίου 1 — αληθινή πρόζα, όχι περιγραφή)"));
+    P.push(L[11] + (EN ? ": (the ACTUAL first sentence of Chapter 1 — a concrete image or an exact time, real prose, never an abstract statement or a description)" : ": (την ΠΡΑΓΜΑΤΙΚΗ πρώτη πρόταση του Κεφαλαίου 1 — μια συγκεκριμένη εικόνα ή μια ακριβής ώρα, αληθινή πρόζα, ποτέ όχι μια αφηρημένη δήλωση ή περιγραφή)"));
     return P.join("\n");
   }
   function sparkIdea(){
@@ -4744,28 +4799,68 @@
   }
 
   /* demo */
-  var DEMO = {
-    format:"novella", title:"Η Γέφυρα των Ψιθύρων", words:25000, genre:"horror", pov:"pov1", tone:"mid", pacing:"slow", ending:"",
-    authors:["king","lovecraft"],
-    themes:["madness","death","isolation","hope"],
-    premise:"Σε μια ορεινή επαρχιακή πόλη, ο βιβλιοθηκάριος Δημήτρης ανακαλύπτει ότι οι ψίθυροι που ακούγονται στη γέφυρα του ποταμού ανήκουν σε όλους όσοι πέθαναν εκεί — και ότι το όνομά του είναι ο επόμενος στη λίστα.",
-    hero:"Δημήτρης Σεραφείμ, 41, βιβλιοθηκάριος, χήρος· κρατιέται από τη ρουτίνα και από το μυθιστόρημα που γράφει κρυφά.",
-    antagonist:"Αβραάμ Χαλκιάς, ο δήμαρχος που ξέρει το μυστικό της γέφυρας και το κρατάει κλειδωμένο.",
-    charDesire:"να ακούσει μια φορά ακόμη τη φωνή της γυναίκας του",
-    charFear:"τη σιωπή της βιβλιοθήκης μετά τα μεσάνυχτα",
-    charWound:"ο θάνατος της γυναίκας του πριν τρία χρόνια — δεν πρόλαβε να της πει αντίο",
-    charArc:"από τη ρουτίνα στην πράξη· από τον φόβο στη μαρτυρία",
-    charVoice:"χαμηλή φωνή, μιλά με αποσπάσματα βιβλίων, σταματά στη μέση της πρότασης",
-    charSecret:"η βιβλιοθήκη κρύβει το αρχείο της γέφυρας — και εκείνος το ξέρει",
-    glossary:"Αβραάμ Χαλκιάς · η Γέφυρα των Ψιθύρων · το Αρχείο · Σεραφείμ",
-    world:"Ορεινή ελληνική κωμόπολη, δεκαετία του '90. Πέτρινη γέφυρα του '30 πάνω από ποτάμι, δάσος που σκεπάζει τον ήχο, βιβλιοθήκη με σκόνη και μυστικά.",
-    struct:"12 κεφάλαια, χρονική γραμμή μίας εβδομάδας",
-    extra:"Η φρίκη να χτίζεται από ήχο και ψίθυρο, όχι από εικόνες. Τέλος ανοιχτό αλλά με αχτίδα ελπίδας.",
-    plan:true, alt:true, clich:true, pro:true, epi:false, level:"full", auto:true, bound:true,
-    contNext:2, contSummary:"", contNote:""
+  var DEMOS = {
+    /* the v24 flagship demo — the sealed prompt from the blog analysis, as brief state */
+    park: {
+      format:"serial", title:"Το Πάρκο που Θυμάται", words:10000, genre:"horror", pov:"pov1", tone:"mid", pacing:"slow", ending:"open",
+      authors:["king","lovecraft"],
+      themes:["isolation","memory","identity","fate"],
+      premise:"Ένα πάρκο διασκέδασης που χτίστηκε στα τέλη του '80 στα περίχωρα μιας κωμόπολης και έκλεισε κάποια στιγμή τα '90. Ένας άνδρας 44 ετών, που είχε δουλέψει εκεί ως συντηρητής μηχανών, επιστρέφει για εκκαθάριση περιουσίας — και βρίσκει μια τραπεζαία χωρίς μάρκα, σαν να της σβήστηκε σκόπιμα η ταυτότητα. Από την πρώτη χρήση αρχίζει να χάνει μικρά κομμάτια — ένα λεπτό, μία ανάμνηση, η γεύση του καφέ — και να ακούει κάτι που θυμάται τις φωνές του.",
+      hero:"Νίκος Στεργιόπουλος, 44, πρώην συντηρητής μηχανών του πάρκου· κρατιέται από τη ρουτίνα και από τον καφέ με κονιάκ.",
+      antagonist:"Το σύστημα κάτω από το πάρκο — κάτι που ήταν εκεί πριν το πάρκο. Η εταιρεία το «διαχειριζόταν». Και ο Γεράσιμος, ο γέρος υπάλληλος, που δεν θέλει να μιλήσει — μέχρι που θα μιλήσει.",
+      charDesire:"να τελειώσει η εκκαθάριση σε μία εβδομάδα και να φύγει",
+      charFear:"να χάσει ακόμα μία φορά — χωρίς να ξέρει πού",
+      charWound:"το '92, τη νύχτα που το πάρκο «έκλεισε πρόωρα», η μητέρα του δεν ξαναγύρισε ποτέ από τη βάρδιά της",
+      charArc:"από τον περασμένο στον φύλακα — ή από τον φύλακα στον περασμένο",
+      charVoice:"κοντές φράσεις, ονομάζει τις μηχανές σαν να ήταν άνθρωποι",
+      charSecret:"εκείνες τις νύχτες είχε κρατήσει τα ημερολόγια συντήρησης — και ξέρει τι «παρείχε» η τραπεζαία",
+      glossary:"Νίκος Στεργιόπουλος · ο Γεράσιμος · το Πάρκο · η τραπεζαία χωρίς μάρκα · Πελοπόννησος Διοργάνωση Εκδηλώσεων Α.Ε. · η πλατεία του παλιού σινεμά",
+      world:"Κωμόπολη στην ηπειρωτική Ελλάδα, σήμερα. Το Πάρκο: κλειστό από τα '90, νέον που τρεμοπαίζει, κενή αίθουσα γεύματος, διαδρόμια συντήρησης, μηχανοστάσιο. Γύρω: εταιρεία που δεν υπάρχει πλέον στους καταλόγους, πλατεία με σινεμά-νεκρό, ένας γέρος που μιλάει με τον τοίχο.",
+      struct:"5 πράξεις, μία ανά κεφάλαιο (~2.000 λέξεις): 1. Η Επιστροφή — το «λάθος» detail που θυμάται τον ήρωα + πρώτο έγγραφο με ημερομηνία · 2. Η Διασύνδεση — δύο χρήσεις, δύο σωματικά τιμήματα + τεχνικό βιβλίο + ο μάρτυρας · 3. Η Κατάδυση — το πάρκο μεγαλύτερο τη νύχτα + εταιρικό έγγραφο σε μία γραμμή + η τραπεζαία λέει ένα όνομα · 4. Η Αποκάλυψη — συντίθεται από έγγραφα και σώματα, σωματικό τίμημα, η μουσική επιστρέφει αλλαγμένη · 5. Το Επόμενο — η τραπεζαία δεν καταστρέφεται, τελευταία πρόταση = μία εικόνα που αναδιατυπώνει τα πάντα",
+      extra:"Η τραπεζαία: χωρίς μάρκα (η μάρκα της σβήστηκε σκόπιμα). Η οντότητα: δεν ξέρει — θυμάται· πεπερασμένο κόστος ανά χρήση. Η κάλυψη: αποδεικνύεται σε μία γραμμή, ποτέ δεν εξηγείται. Η μουσική: ένα τραγούδι από παλιό γραμμόφωνο που τρέχει μέσα από τα καλώδια.",
+      plan:true, alt:true, clich:true, pro:false, epi:false, level:"full", auto:true, bound:true,
+      contNext:2, contSummary:"", contNote:""
+    },
+    bridge: {
+      format:"novella", title:"Η Γέφυρα των Ψιθύρων", words:25000, genre:"horror", pov:"pov1", tone:"mid", pacing:"slow", ending:"",
+      authors:["king","lovecraft"],
+      themes:["madness","death","isolation","hope"],
+      premise:"Σε μια ορεινή επαρχιακή πόλη, ο βιβλιοθηκάριος Δημήτρης ανακαλύπτει ότι οι ψίθυροι που ακούγονται στη γέφυρα του ποταμού ανήκουν σε όλους όσοι πέθαναν εκεί — και ότι το όνομά του είναι ο επόμενος στη λίστα.",
+      hero:"Δημήτρης Σεραφείμ, 41, βιβλιοθηκάριος, χήρος· κρατιέται από τη ρουτίνα και από το μυθιστόρημα που γράφει κρυφά.",
+      antagonist:"Αβραάμ Χαλκιάς, ο δήμαρχος που ξέρει το μυστικό της γέφυρας και το κρατάει κλειδωμένο.",
+      charDesire:"να ακούσει μια φορά ακόμη τη φωνή της γυναίκας του",
+      charFear:"τη σιωπή της βιβλιοθήκης μετά τα μεσάνυχτα",
+      charWound:"ο θάνατος της γυναίκας του πριν τρία χρόνια — δεν πρόλαβε να της πει αντίο",
+      charArc:"από τη ρουτίνα στην πράξη· από τον φόβο στη μαρτυρία",
+      charVoice:"χαμηλή φωνή, μιλά με αποσπάσματα βιβλίων, σταματά στη μέση της πρότασης",
+      charSecret:"η βιβλιοθήκη κρύβει το αρχείο της γέφυρας — και εκείνος το ξέρει",
+      glossary:"Αβραάμ Χαλκιάς · η Γέφυρα των Ψιθύρων · το Αρχείο · Σεραφείμ",
+      world:"Ορεινή ελληνική κωμόπολη, δεκαετία του '90. Πέτρινη γέφυρα του '30 πάνω από ποτάμι, δάσος που σκεπάζει τον ήχο, βιβλιοθήκη με σκόνη και μυστικά.",
+      struct:"12 κεφάλαια, χρονική γραμμή μίας εβδομάδας",
+      extra:"Η φρίκη να χτίζεται από ήχο και ψίθυρο, όχι από εικόνες. Τέλος ανοιχτό αλλά με αχτίδα ελπίδας.",
+      plan:true, alt:true, clich:true, pro:true, epi:false, level:"full", auto:true, bound:true,
+      contNext:2, contSummary:"", contNote:""
+    }
   };
+  var DEMO_OPTIONS = [
+    ["park","✦ Το Πάρκο που Θυμάται (5 πράξεις, ~10.000)","✦ The Park That Remembers (5 acts, ~10,000)"],
+    ["bridge","✦ Η Γέφυρα των Ψιθύρων (novella, ~25.000)","✦ The Bridge of Whispers (novella, ~25,000)"]
+  ];
+  function renderDemoSel(){
+    var sel = $("inDemoSel"); if(!sel) return;
+    var cur = sel.value || "park";
+    sel.innerHTML = "";
+    DEMO_OPTIONS.forEach(function(d){
+      var o = document.createElement("option");
+      o.value = d[0];
+      o.textContent = S.lang==="en" ? d[2] : d[1];
+      sel.appendChild(o);
+    });
+    sel.value = cur;
+  }
   function loadDemo(){
-    for(var k in DEMO){ S[k] = DEMO[k]; }
+    var D = DEMOS[$("inDemoSel").value] || DEMOS.park;
+    for(var k in D){ S[k] = D[k]; }
     syncInputs(); renderFormats(); renderAuthors(); renderThemes(); renderLevels();
     renderTitleSug(); renderStorySug(); renderCharSug(); renderWords(); renderAuthorDetail(); renderModeSeg(); render();
     toast(S.lang==="en" ? "Demo loaded ✦" : "Παράδειγμα φορτώθηκε ✦");
@@ -5213,6 +5308,7 @@
     wrapCards();
     renderTabs(); renderBunnyList(); renderManuscript();
     renderDensity(); renderModel(); renderDeliver(); renderRhythm(); renderPreview(); usageText(); renderIntentSelects();
+    renderDemoSel();
     var bb = $("btnBlogGen"); if(bb){ bb.disabled = !(S.blogOn === true); }
     renderBooks(); renderCoPovs(); applyQS(); renderDeliver();
     renderIntentSelects();

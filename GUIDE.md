@@ -8,7 +8,7 @@ Welcome! This is a **one-file writing studio**. You paste ideas, it builds a sma
 
 ## 🚀 The 3-step start (30 seconds)
 
-1. **Get an idea** — click **🎲 Spark** (card 3): it builds a spark prompt for your AI that returns ONE fresh, original idea (premise, hero, title, world, themes) with genre-aware naming. Copy it to your AI, paste the answer back into the spark box, press **⤵ Load** — the brief fills itself. Or paste your own premise. If you have an unfinished story, use the **📖 Extender** tab later.
+1. **Get an idea** — click **🎲 Spark** (card 3): it builds a spark prompt for your AI that returns ONE fresh, original idea (premise, hero, title, world, themes) with genre-aware naming *and* the author's craft (precise opening, “it must smell”, the thing that remembers). Copy it to your AI, paste the answer back into the spark box, press **⤵ Load** — the brief fills itself. Or paste your own premise. No idea at all? Load a **demo** (card 5: the demo picker → ✦) — «Το Πάρκο που Θυμάται» is the sealed 5-act retro-liminal brief, «Η Γέφυρα των Ψιθύρων» the original horror novella. If you have an unfinished story, use the **📖 Extender** tab later.
 2. **Pick a voice** — click **🧠 My profile** (card 2) to write like the house style, or tick one or more of the **19 masters**.
 3. **Copy the prompt** — press **⧉ Copy prompt** (top of the right column), paste it into any AI, and let it write Chapter 1.
 
@@ -89,7 +89,7 @@ Two narrators, alternating on a schedule:
 
 ## 🛡 Reliability
 - The app is hardened so it **never breaks**: if a control is ever missing it becomes a no-op instead of crashing; unexpected errors show a friendly notice (your work is always autosaved); storage-full shows a clear warning.
-- Developers: run `node tests/bullet.js` — 70 checks across 5 angles (syntax, structure, functional, robustness, regression).
+- Developers: run `node tests/bullet.js` — 74 checks across 5 angles (syntax, structure, functional, robustness, regression).
 
 ## 🔍 Finding a master + writing in English (v19)
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.

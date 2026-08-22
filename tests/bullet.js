@@ -98,7 +98,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v23.0 present', HTML.includes('v23.0'));
+  chk('structure', 'version v24.0 present', HTML.includes('v24.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -124,10 +124,17 @@ function boot(overrides) {
   chk('functional', 'fresh start: title empty', els['inTitle']._val === '');
   chk('functional', 'prompt generates (Untitled)', (els['promptOut']._val||'').includes('Untitled'));
 
-  // demo
+  // demo (default = the v24 park demo)
   els['btnDemo'].click();
-  chk('functional', 'demo fills title', (els['inTitle']._val||'').includes('Γέφυρα'));
+  chk('functional', 'demo fills title (park default)', (els['inTitle']._val||'').includes('Πάρκο'));
+  chk('functional', 'demo fills glossary + 5-act structure', (els['inGlossary']._val||'').includes('τραπεζαία') && (els['inStruct']._val||'').includes('5 πράξεις'));
   chk('functional', 'prompt after demo has ROLE', (els['promptOut']._val||'').includes('## ROLE'));
+  chk('functional', 'horror genre gets SIGNATURE TECHNIQUES', (els['promptOut']._val||'').includes('SIGNATURE TECHNIQUES') && (els['promptOut']._val||'').includes('REMEMBERS'));
+  // demo switch: bridge demo still loads
+  els['inDemoSel']._val = 'bridge';
+  els['btnDemo'].click();
+  chk('functional', 'demo switch loads bridge', (els['inTitle']._val||'').includes('Γέφυρα'));
+  els['inDemoSel']._val = 'park';
 
   // profile
   els['btnPreset'].click();
@@ -193,6 +200,7 @@ function boot(overrides) {
   els['btnDice'].click();
   chk('functional', 'spark builds a prompt (not a local roll)', (els['sparkOut']._val||'').includes('SPARK') && (els['sparkOut']._val||'').includes('NAMING DISCIPLINE'));
   chk('functional', 'spark prompt enforces invented names for fantasy', (els['sparkOut']._val||'').includes('NEVER real-world names'));
+  chk('functional', 'spark prompt carries the author craft', (els['sparkOut']._val||'').includes('It must smell') && (els['sparkOut']._val||'').includes('it does not know'));
   // spark v2: paste the AI's structured answer back → brief gets filled
   const sparkAns = [
     'GENRE: fantasy',
@@ -366,7 +374,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v23.0', (b.els['pillVer'].textContent||'').includes('v23.0'));
+  chk('regression', 'pill shows v24.0', (b.els['pillVer'].textContent||'').includes('v24.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);
