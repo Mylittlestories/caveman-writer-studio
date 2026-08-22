@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v22.0</title>
+<title>Caveman Writer Studio — v23.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -388,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v22.0</span>
+    <span class="pill" id="pillVer">v23.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -516,6 +516,19 @@
     <div class="card">
       <h2><span class="num">3</span> <span id="t3">The story</span>
         <button type="button" class="chip" id="btnDice" style="margin-left:auto">🎲 Spark</button></h2>
+      <div id="sparkBox" style="border:1px dashed var(--border2);border-radius:12px;padding:12px;margin-bottom:14px;background:var(--bg2)">
+        <div class="outbar">
+          <button class="btn" id="btnSparkGen">🎲 Spark — fresh idea (prompt for your AI)</button>
+          <button class="btn ghost" id="btnSparkCopy">⧉ Copy</button>
+          <button class="btn ghost" id="btnSparkLoad">⤵ Load AI's answer into brief</button>
+        </div>
+        <textarea id="sparkOut" readonly spellcheck="false" style="min-height:120px"></textarea>
+        <div class="field" style="margin-top:8px">
+          <label class="lbl" id="lblSparkAns">AI's answer — paste it all, then «⤵ Load»</label>
+          <textarea id="inSparkAns" style="min-height:84px"></textarea>
+          <div class="hint" id="sparkAnsHint">The prompt asks the AI for fixed labels (GENRE/TITLE/PREMISE/HERO/ANTAGONIST/WORLD/THEMES/TONE/PACING/ENDING/GLOSSARY/HOOK). «Load» reads the answer and fills this card — names &amp; places follow the genre's naming discipline, not a ready-made list.</div>
+        </div>
+      </div>
       <div class="field">
         <label class="lbl" id="lblPremise" for="inPremise">Premise / Logline</label>
         <textarea id="inPremise"></textarea>
@@ -1585,6 +1598,129 @@
   var GSURNAMES = ["Βράχος","Λεβέντης","Χαλκιάς","Σεραφείμ","Νέγρης","Κρανιά","Δελής","Φωκάς","Παπαδήμας","Καπνιάς","Αρβανίτης","Στεργίου","Κοκκίνης","Λαζαρίδης","Αγγέλου","Βαμβακάς","Ρούσης","Μελάς","Ζέρβας","Καρυώτης"];
   var GAGES = [24,29,31,35,38,42,45,48,52,55,58,61,63,66];
 
+  /* ============================================================
+     GENRE-AWARE NAMING — the right names for the right world.
+     fantasy → invented, internally consistent (no real-world names)
+     other   → sci-fi / post-apocalyptic / cosmic: everyday + invented mix
+     greek   → the real blog world: everyday Greek names & real places
+     ============================================================ */
+  var NAMEDATA = {
+    fantasy: {
+      label:["Φανταστικά (εφευρημένα)","Fantasy (invented)"],
+      first:[
+        ["Καλένθιρ","Calethir"],["Θαντέριλ","Thandiril"],["Μοραΐνα","Moraina"],
+        ["Ορίνθας","Orynthas"],["Βελιάνθα","Velianda"],["Αξάνθρος","Axantheros"],
+        ["Νεροβάλτα","Nervalta"],["Σαβρελ","Sabrel"],["Καέλντις","Kaelthis"],
+        ["Μορνιέλ","Morniel"],["Άλταριον","Altarion"],["Νυμελίς","Nymelis"],
+        ["Τάλβιρ","Talvir"],["Ελάνθις","Elanthys"],["Ροχάνορ","Rochanor"],
+        ["Βεραλίνα","Veralina"],["Νυχταρίθας","Nychtarithas"],["Φερόν","Feron"],
+        ["Λυσιάντα","Lysianta"],["Αέρον","Aeron"]
+      ],
+      last:[
+        ["Δράγκοβελ","Dragobel"],["Μορνχαλ","Morncal"],["Άσφαελ","Asfael"],
+        ["Θορνμέιρ","Thornmayr"],["Βράντοφ","Brandtof"],["Σιλβάρε","Silvare"],
+        ["Φενγκάρ","Fengar"],["Λιθβάρν","Lithvorn"],["Αλμάριν","Almarin"],
+        ["Καέλντιν","Kaelntin"],["Οστριάν","Ostrian"],["Νεροβάντ","Nervand"],
+        ["Βελφόρ","Velfor"],["Γκράντιρ","Grandir"]
+      ],
+      places:[
+        ["Μαρεστάν","Marestan"],["Ξαναντού","Xanandou"],["Δυρρών","Dyrron"],
+        ["Γκρόουνιν","Grouin"],["Άκεντροου","Akentrou"],["Βαλμορ","Valmor"],
+        ["Σερέντι","Serendi"],["Αρκάνα","Arkana"],["Ελντάρα","Eldara"],
+        ["Θόρνχαλ","Thornhal"],["Μορνβαλ","Morval"],["Σίλαρα","Silara"],
+        ["Οστριανός Κόλπος","Ostrian Bay"],["Κάστρο Λιθβάρν","Lithvorn Hold"],
+        ["Η Επταποτάμια","The Seven-River"]
+      ],
+      objects:[
+        ["το δαχτυλίδι των ονείρων","the ring of dreams"],
+        ["η Γέφυρα των Ψιθύρων","the Bridge of Whispers"],
+        ["το καταραμένο ρολόι","the cursed clock"],
+        ["ο χάρτης της στάχτης","the map of ashes"],
+        ["η λάμπα της μνήμης","the memory lamp"],
+        ["το κλειδί της βροχής","the rain key"],
+        ["η μάσκα του δούκα","the duke's mask"],
+        ["το βιβλίο με τα κλειδωμένα ονόματα","the book of locked names"],
+        ["το σπαθί χωρίς λαβή","the blade without hilt"],
+        ["η καρδιά του νησιού","the island's heart"]
+      ],
+      jobs:[
+        ["βάρδος","bard"],["μάγισσα","witch"],["χαρτογράφος","cartographer"],
+        ["σιδηροχύτες","blacksmith"],["φύλακας","guard"],["ιππότης","knight"],
+        ["ιερέας","priest"],["ζωγράφος","painter"],["στρατιώτης","soldier"]
+      ]
+    },
+    other: {
+      label:["Δυτικά + εφευρημένα","Western + invented"],
+      first:null, last:null, // filled lazily from NAME_POOLS (defined later in file)
+      places:[
+        ["Ερημότοποι","Wastelands"],["Λούιβιλ","Louisville"],
+        ["Όρος του Βορρά","North Mountain"],["Θάλασσα της Νύχτας","Sea of Night"],
+        ["Πέτρινη Κοιλάδα","Stone Valley"],["Δάσος των Σκιών","Forest of Shadows"],
+        ["Νησί της Ομίχλης","Mist Isle"],["Πλατεία του Άγνωστου","Unknown Square"],
+        ["Κρόουμπουργκ","Crowburg"],["Βαλμορ","Valmor"],["Σερέντι","Serendi"]
+      ],
+      objects:[
+        ["ο αναμεταδότης χρόνου","the time relay"],
+        ["το μηχάνημα προβολής","the projection machine"],
+        ["το βιβλίο με τα κλειδωμένα ονόματα","the book of locked names"],
+        ["το καταραμένο ρολόι","the cursed clock"],
+        ["η μάσκα του δούκα","the duke's mask"],
+        ["ο χάρτης της στάχτης","the map of ashes"]
+      ],
+      jobs:[
+        ["μηχανικός","engineer"],["επιστήμονας","scientist"],["πιλότος","pilot"],
+        ["γιατρός","doctor"],["ντετέκτιβ","detective"],["χαρτογράφος","cartographer"],
+        ["τεχνίτης","technician"]
+      ]
+    },
+    greek: {
+      label:["Κοινά ελληνικά (ο κόσμος του blog)","Everyday Greek (the blog's world)"],
+      first:null, last:null, // filled lazily from NAME_POOLS (defined later in file)
+      places:[
+        ["Αθήνα","Athens"],["Αραχώβης","Arachovis st."],["Μεσόγεια","Mesogeia"],
+        ["Πέτρινη Κοιλάδα","Stone Valley"],["Ορεινή κωμόπολη","A mountain town"],
+        ["Νησιώτικη κωμόπολη","An island town"]
+      ],
+      objects:[
+        ["η χαμένη διαθήκη","the lost will"],
+        ["η Γέφυρα των Ψιθύρων","the Bridge of Whispers"],
+        ["το Αρχείο","the Archive"],
+        ["το μηχάνημα προβολής","the projection machine"],
+        ["το βιβλίο με τα κλειδωμένα ονόματα","the book of locked names"],
+        ["ο αναμεταδότης χρόνου","the time relay"]
+      ],
+      jobs:[
+        ["βιβλιοθηκάριος","librarian"],["χαρτογράφος","cartographer"],
+        ["δάσκαλος","schoolteacher"],["γιατρός","doctor"],["καπετάνιος","ship captain"],
+        ["δημοσιογράφος","journalist"],["ντετέκτιβ","detective"],
+        ["μηχανικός","engineer"],["φύλακας","guard"],["ζωγράφος","painter"]
+      ]
+    }
+  };
+  var GENRE_NAMING = {
+    fantasy:"fantasy", darkfantasy:"fantasy", mythic:"fantasy", fairytale:"fantasy",
+    scifi:"other", ecosf:"other", postapo:"other", dystopian:"other", cosmic:"other",
+    horror:"greek", noir:"greek", mystery:"greek", literary:"greek", social:"greek",
+    historical:"greek", gothic:"greek", thriller:"greek", magreal:"greek"
+  };
+  function namingProfileFor(genreId){ return GENRE_NAMING[genreId] || ""; }
+  function namedPick(genreId){
+    var prof = namingProfileFor(genreId);
+    if(!prof){ prof = ["fantasy","other","greek"][Math.floor(Math.random()*3)]; }
+    var P = NAMEDATA[prof];
+    if(prof === "other" && !P.first){
+      P.first = NAME_POOLS.firstW.concat(NAME_POOLS.inventF);
+      P.last = NAME_POOLS.lastW.concat(NAME_POOLS.inventL);
+    }
+    if(prof === "greek" && !P.first){
+      P.first = NAME_POOLS.firstG;
+      P.last = NAME_POOLS.lastG;
+    }
+    var ri = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
+    return { profile:prof, first:ri(P.first), last:ri(P.last),
+             place:ri(P.places), obj:ri(P.objects), job:ri(P.jobs) };
+  }
+
   /* ---- suggestion pools: [el, en] ---- */
   var SUG = {
     titles: [
@@ -1668,7 +1804,12 @@
     btnDownload:["⇩ Λήψη .md","⇩ Download .md"],
     btnDemo:["✦ Παράδειγμα","✦ Demo"],
     btnReset:["✕ Καθαρισμός","✕ Clear"],
-    noteArea:["3 βήματα: 1) Γράψτε την ιδέα σας (ή 🎲 Spark) · 2) Διαλέξτε τη φωνή (🧠 Το προφίλ μου / δάσκαλοι) · 3) Δημιουργήστε prompt. Ξεκινήστε εύκολα με «✦ Παράδειγμα».","3 steps: 1) Paste your idea (or 🎲 Spark) · 2) Pick your voice (🧠 My profile / masters) · 3) Generate. Quick start: “✦ Demo”."],
+    noteArea:["3 βήματα: 1) Γράψτε την ιδέα σας (ή 🎲 Spark → φρέσκια ιδέα από το ΑΙ σας) · 2) Διαλέξτε τη φωνή (🧠 Το προφίλ μου / δάσκαλοι) · 3) Δημιουργήστε prompt. Ξεκινήστε εύκολα με «✦ Παράδειγμα».","3 steps: 1) Paste your idea (or 🎲 Spark → a fresh idea from your AI) · 2) Pick your voice (🧠 My profile / masters) · 3) Generate. Quick start: “✦ Demo”."],
+    btnSparkGen:["🎲 Σπίρτο — φρέσκια ιδέα (prompt για το ΑΙ)","🎲 Spark — fresh idea (prompt for your AI)"],
+    btnSparkCopy:["⧉ Αντιγραφή","⧉ Copy"],
+    btnSparkLoad:["⤵ Φόρτωση της απάντησης στο brief","⤵ Load AI's answer into brief"],
+    lblSparkAns:["Απάντηση του ΑΙ — επικολλήστε όλη της, μετά «⤵ Φόρτωση»","AI's answer — paste it all, then «⤵ Load»"],
+    sparkAnsHint:["Το prompt ζητάει από το ΑΙ σταθερές ετικέτες (ΕΙΔΟΣ/ΤΙΤΛΟΣ/ΥΠΟΘΕΣΗ/ΗΡΩΑΣ/ΑΝΤΑΓΩΝΙΣΤΗΣ/ΚΟΣΜΟΣ/ΘΕΜΑΤΑ/ΤΟΝΟΣ/ΡΥΘΜΟΣ/ΤΕΛΟΣ/ΓΛΩΣΣΑΡΙΟ/ΑΓΚΙΣΤΡΙ). Η «Φόρτωση» διαβάζει την απάντηση και γεμίζει την κάρτα — ονόματα &amp; τόποι ακολουθούν την πειθαρχία ονομασίας του είδους, όχι μια έτοιμη λίστα.","The prompt asks the AI for fixed labels (GENRE/TITLE/PREMISE/HERO/ANTAGONIST/WORLD/THEMES/TONE/PACING/ENDING/GLOSSARY/HOOK). «Load» reads the answer and fills this card — names &amp; places follow the genre's naming discipline, not a ready-made list."],
     t6:["Πώς δουλεύει το σπηλαιώδες πρωτόκολλο","How the caveman protocol works"],
     t7:["Ενισχυτής επόμενου κεφαλαίου","Next-chapter booster"],
     h7:["Αφού το ΑΙ τελειώσει ένα κεφάλαιο, βάλτε εδώ μια περίληψη 1 γραμμής και πάρτε καθαρό prompt συνέχειας — με το πρωτόκολλο μέσα.","After the AI finishes a chapter, drop a one-line recap here and get a clean continuation prompt — protocol included."],
@@ -1922,7 +2063,7 @@
       +'<li><b>Κατεβάστε το .md</b> για να κρατήσετε το αρχικό brief ως αναφορά.</li>'
       +'<li><b>Ο στόχος λέξεων:</b> το ρυθμιστικό ορίζει τον στόχο· το ΑΙ αναφέρει μήκος κεφαλαίων στη γραμμή-περίληψή του.</li>'
       +'<li><b>Ποιο ΑΙ να χρησιμοποιήσω;</b> Chat μοντέλα (Claude, ChatGPT, Gemini, Grok): κάντε επικόλληση ως έχει. Coding agents με αρχεία (Claude Code, Codex): επιλέξτε «Αρχεία workspace» — το brief απαγορεύει ρητά την άρνηση για χαμένα αρχεία.</li>'
-      +'<li><b>Κενό χαρτί;</b> Πατήστε «🎲 Spark» στο κάρτα 3 για τυχαία υπόθεση, ήρωα, τίτλο, είδος, θέματα και ρυθμό.</li>'
+      +'<li><b>Κενό χαρτί;</b> Πατήστε «🎲 Spark» στο κάρτα 3: φτιάχνει ένα προσηλωμένο prompt που ζητάει από το ΑΙ σας ΜΙΑ φρέσκια, πρωτότυπη ιδέα (υπόθεση, ήρωα, τίτλο, κόσμο, θέματα) — με πειθαρχία ονομασίας ανά είδος (φαντασία = μόνο εφευρημένα ονόματα &amp; τόποι, ρεαλιστικό ελληνικό = καθημερινά ονόματα &amp; αληθινοί τόποι). Επικολλήστε την απάντησή του και «⤵ Load» γεμίζει την κάρτα.</li>'
       +'<li><b>Καρτέλα ήρωα:</b> γεμίστε επιθυμία/φόβο/πληγή/τόξο + ανταγωνιστή — μπαίνουν στο brief ως ενότητα CHARACTER SHEET.</li>'
       +'<li><b>Πολλά έργα;</b> «💾 Save .json» κρατά το brief, «📂 Load» το ξαναφορτώνει όποτε θέλετε.</li>'
       +'<li><b>Τέλεια ελληνικά:</b> ο «Φρουρός ελληνικής γλώσσας» και η «Πύλη διόρθωσης» είναι ενεργά — κάθε κεφάλαιο περνά από δύο ελέγχους (γλώσσα + συνέπεια) πριν παραδοθεί.</li>'
@@ -1957,7 +2098,7 @@
       +'<li><b>Download the .md</b> to keep your original brief as reference.</li>'
       +'<li><b>Word target:</b> the slider sets the goal; the AI reports chapter length in its one-line recap.</li>'
       +'<li><b>Which AI to use?</b> Chat models (Claude, ChatGPT, Gemini, Grok): paste as-is. Coding agents with files (Claude Code, Codex): pick “Workspace files” — the brief explicitly forbids refusing for missing files.</li>'
-      +'<li><b>Blank page?</b> Hit “🎲 Spark” in card 3 for a random premise, hero, title, genre, themes and pacing.</li>'
+      +'<li><b>Blank page?</b> Hit “🎲 Spark” in card 3: it builds a crafted prompt asking YOUR AI for ONE fresh, original idea (premise, hero, title, world, themes) — with genre-aware naming discipline (fantasy = invented names &amp; places only, realistic Greek = everyday names &amp; real places). Paste its answer, “⤵ Load” fills the card.</li>'
       +'<li><b>Character sheet:</b> fill want/fear/wound/arc + antagonist — they land in the brief as a CHARACTER SHEET section.</li>'
       +'<li><b>Multiple projects?</b> “💾 Save .json” keeps the brief; “📂 Load” brings it back anytime.</li>'
       +'<li><b>Flawless Greek:</b> the Greek language guard + proofreading gate are on — every chapter passes two passes (language + consistency) before delivery.</li>'
@@ -2005,6 +2146,7 @@
     seedStory:"", seedNote:"", act3:true, budget:true,
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene", lore:"",
     intentGenre:"cosmic", intentMood:"dread", intentSetting:"far", intentExtra:"",
+    sparkAns:"",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
     statuses:{}, chGoals:{}, chSearch:"",
@@ -2208,8 +2350,8 @@
     var inputs = document.querySelectorAll ? document.querySelectorAll("input,select,textarea").length : -1;
     var cards = document.querySelectorAll ? document.querySelectorAll(".card").length : -1;
     var chapters = (S.chapters||[]).length;
-    var msg = (S.lang==="en" ? "v14 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
-                             : "v14 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
+    var msg = (S.lang==="en" ? "v23 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
+                             : "v23 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
   }
 
@@ -2242,11 +2384,20 @@
     var r = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
     var pv = function(p){ return EN ? p[1] : p[0]; };
     var it = INTENTS[S.intentGenre] || INTENTS.cosmic;
-    // enrich genre defaults with a blog-flavored variation (names/places/objects)
-    var place = r(NAME_POOLS.placesA);
-    var first = r(NAME_POOLS.firstW), last = r(NAME_POOLS.lastW);
+    // enrich genre defaults with genre-matched names/places/objects (fantasy → invented, realistic → everyday Greek)
+    var prof = NAMEDATA[it.naming] || NAMEDATA.greek;
+    if(prof === NAMEDATA.other && !prof.first){
+      prof.first = NAME_POOLS.firstW.concat(NAME_POOLS.inventF);
+      prof.last = NAME_POOLS.lastW.concat(NAME_POOLS.inventL);
+    }
+    if(prof === NAMEDATA.greek && !prof.first){
+      prof.first = NAME_POOLS.firstG;
+      prof.last = NAME_POOLS.lastG;
+    }
+    var place = r(prof.places);
+    var first = r(prof.first), last = r(prof.last);
     var hero = (EN ? last[1]+", "+first[1] : first[0]+" "+last[0]);
-    var obj = r(NAME_POOLS.objects);
+    var obj = r(prof.objects);
     var age = 24 + Math.floor(Math.random()*40);
     var mood = moodName(S.intentMood || it.mood);
     var setting = settingName(S.intentSetting || it.setting);
@@ -2613,7 +2764,7 @@
   var INTENTS = {
     cosmic: {
       label:["Κοσμικός τρόμος σε μακρινό τόπο","Cosmic horror in a far-away place"],
-      mood:"dread", setting:"far",
+      mood:"dread", setting:"far", naming:"other",
       themes:["madness","fate","isolation","fear"],
       world:["Μια απομονωμένη επαρχία στα όρια του χάρτη, όπου το τοπίο θυμίζει πληγή· ένα χωριό που ψέλνει σε κάτι που δεν έχει όνομα, κι ένας ουρανός που κρύβει κάτι.","A remote province at the edge of the map, where the land looks like a wound; a village that chants to something nameless, and a sky that hides something."],
       plot:["Ένας ξένος φτάνει για να λύσει ένα μυστήριο και ανακαλύπτει ότι το μυστικό δεν θέλει να λυθεί — θέλει να τον απορροφήσει. Η γνώση είναι πληγή· το τέλος τον βρίσκει αλλαγμένο.","A stranger arrives to solve a mystery and discovers the secret doesn't want solving — it wants to absorb him. Knowledge is a wound; the ending finds him changed."],
@@ -2622,7 +2773,7 @@
     },
     fantasy: {
       label:["Φαντασία: μάχη για τη γη (ξωτικά & όρκ)","High fantasy: war for the land (elves & orcs)"],
-      mood:"epic", setting:"other",
+      mood:"epic", setting:"other", naming:"fantasy",
       themes:["power","fate","nature","survival"],
       world:["Ένα βασίλειο όπου ξωτικά και όρκ μοιράζονται την ίδια γη — και την έχουν πληγώσει και οι δύο. Πέντε φυλές, πέντε καρδιές· ο πόλεμος κρατά αιώνες.","A realm where elves and orcs share the same land — and both have wounded it. Five clans, five hearts; the war has lasted centuries."],
       plot:["Μια παλιά συμμαχία σπάει ακριβώς όταν ένα αρχαίο κακό ξυπνά κάτω από τη γη που διεκδικούν. Ο ήρωας πρέπει να ενώσει ό,τι μισείται πριν χαθεί και το τελευταίο δάσος.","An old alliance breaks exactly when an ancient evil wakes beneath the land they claim. The hero must unite what is hated before the last forest falls."],
@@ -2631,7 +2782,7 @@
     },
     postapo: {
       label:["Μετα-αποκαλυπτικό","Post-apocalyptic"],
-      mood:"dark", setting:"waste",
+      mood:"dark", setting:"waste", naming:"other",
       themes:["survival","hope","memory","power"],
       world:["Ερημότοποι: πόλεις-φαντάσματα όπου οι μηχανές συνεχίζουν τη δουλειά των ανθρώπων. Λίγοι επιζώντες, λιγότερα όνειρα.","Wastelands: ghost cities where machines still do the work of people. Few survivors, fewer dreams."],
       plot:["Ένας επιζών βρίσκει κάτι που θα μπορούσε να ξαναφέρει τη ζωή — ή να τελειώσει ό,τι έμεινε. Κάθε επιλογή κοστίζει.","A survivor finds something that could bring life back — or finish what remains. Every choice costs."],
@@ -2640,7 +2791,7 @@
     },
     ecosf: {
       label:["Οικολογικό SF","Environmental sci-fi"],
-      mood:"quiet", setting:"far",
+      mood:"quiet", setting:"far", naming:"other",
       themes:["nature","survival","identity","power"],
       world:["Ένας πλανήτης-ορχήστρα όπου το οικοσύστημα παίζει μόνο του — μέχρι που κάτι σπάει τη μελωδία. Γη που αναπνέει, θάλασσες που θυμούνται.","A planet-orchestra where the ecosystem plays itself — until something breaks the melody. Breathing earth, seas that remember."],
       plot:["Μια επιστήμονας ανακαλύπτει ότι το σύστημα δεν καταρρέει — αποσύρεται, με πρόθεση. Η σχέση ανθρώπου-κόσμου θα ξαναγραφτεί.","A scientist discovers the system isn't collapsing — it's withdrawing, deliberately. The human-world relationship will be rewritten."],
@@ -2649,7 +2800,7 @@
     },
     gothic: {
       label:["Γοτθικό μυστήριο / παλιό σπίτι","Gothic mystery / old house"],
-      mood:"mystery", setting:"house",
+      mood:"mystery", setting:"house", naming:"greek",
       themes:["memory","guilt","death","identity"],
       world:["Ένα πέτρινο αρχοντικό στις πλαγιές που θυμάται τα πάντα· κάθε δωμάτιο μια εποχή, κάθε καθρέφτης μια ενοχή.","A stone manor on the hillside that remembers everything; each room an era, each mirror a guilt."],
       plot:["Μια κληρονομιά σέρνει πίσω όσους ορκίστηκαν να ξεχάσουν. Το σπίτι κρατά ένα μυστικό που όλοι ξέρουν και κανείς δεν λέει.","An inheritance drags back those who swore to forget. The house holds a secret everyone knows and no one says."],
@@ -2658,7 +2809,7 @@
     },
     noir: {
       label:["Νουάρ / αστυνομικό","Crime noir"],
-      mood:"dark", setting:"city",
+      mood:"dark", setting:"city", naming:"greek",
       themes:["guilt","power","memory","identity"],
       world:["Μια πόλη που βρέχει απόψεις· σκοτεινά σοκάκια, αρχεία που χάνονται, άνθρωποι που μετρούν τις απώλειες σε βάρδιες.","A city that rains opinions; dark alleys, files that vanish, people who count losses in shifts."],
       plot:["Μια υπόθεση που δεν έπρεπε να ανοιχτεί ξανά. Ο ντετέκτιβ ξέρει την αλήθεια — το πρόβλημα είναι τι θα κάνει μ' αυτήν.","A case that should never be reopened. The detective knows the truth — the problem is what to do with it."],
@@ -2667,7 +2818,7 @@
     },
     mythic: {
       label:["Παραμύθι / μύθος (στυλ Ξαναντού)","Mythic fairy tale (Xanandou-style)"],
-      mood:"lyric", setting:"other",
+      mood:"lyric", setting:"other", naming:"fantasy",
       themes:["fate","nature","hope","memory"],
       world:["Ένα αρχιπέλαγος με πέντε βασίλεια, καθένα με καρδιά που δίνει πνοή στο νησί. Παραμύθι με βάθος χιλιάδων ετών.","An archipelago of five kingdoms, each with a heart that gives breath to the island. A fairy tale with millennia of depth."],
       plot:["Μια καρδιά σταματά να χτυπά, κι όλα τα βασίλεια αρχίζουν να μαραίνονται. Ένα παιδί αναλαμβάνει το ταξίδι για να την ξανανάψει.","One heart stops beating, and all the kingdoms begin to wither. A child undertakes the journey to relight it."],
@@ -2676,7 +2827,7 @@
     },
     mirror: {
       label:["Κατοπτρικό / ψυχολογικό","Mirror / psychological"],
-      mood:"strange", setting:"town",
+      mood:"strange", setting:"town", naming:"greek",
       themes:["identity","memory","guilt","madness"],
       world:["Μια πόλη όπου κάθε κάτοικος έχει ένα αντίγραφο που ζει τη ζωή που φοβήθηκε. Οι καθρέφτες θυμούνται.","A town where every resident has a double living the life they feared. Mirrors remember."],
       plot:["Ο ήρωας συναντά το κατοπτρικό του εαυτό και δεν ξέρει ποιος είναι ο πρωτότυπος. Η μνήμη δεν είναι δική του.","The hero meets his mirror double and doesn't know which is the original. The memory isn't his."],
@@ -2701,23 +2852,19 @@
   };
   function genNames(){
     var EN = S.lang === "en";
-    var r = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
     var pv = function(p){ return EN ? p[1] : p[0]; };
-    var style = Math.floor(Math.random()*3);
-    var first, last;
-    if(style===0){ first = r(NAME_POOLS.firstW); last = r(NAME_POOLS.lastW); }
-    else if(style===1){ first = r(NAME_POOLS.firstG); last = r(NAME_POOLS.lastG); }
-    else { first = r(NAME_POOLS.inventF); last = r(NAME_POOLS.inventL); }
-    var person = (EN ? last[1] + ", " + first[1] : first[0] + " " + last[0]);
-    var place = Math.random() < 0.5 ? pv(r(NAME_POOLS.placesA)) : pv(r(NAME_POOLS.placesB));
-    var obj = pv(r(NAME_POOLS.objects));
+    var np = namedPick(S.genre); // follows the selected genre; no genre → rolls freely
+    var person = (EN ? np.last[1] + ", " + np.first[1] : np.first[0] + " " + np.last[0]);
     var lines = [
+      (EN ? "🏷 STYLE: " : "🏷 ΣΤΥΛ: ") + pv(NAMEDATA[np.profile].label)
+        + (S.genre ? (EN ? " — because genre is " : " — επειδή είδος είναι ") + genreLabel(S.genre)
+                   : (EN ? " (no genre set — rolled freely)" : " (χωρίς είδος — ελεύθερο ρολόι)")),
       (EN ? "👤 PERSON: " : "👤 Πρόσωπο: ") + person,
-      (EN ? "🏞 PLACE: " : "🏞 Τόπος: ") + place,
-      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + obj
+      (EN ? "🏞 PLACE: " : "🏞 Τόπος: ") + pv(np.place),
+      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + pv(np.obj)
     ];
     var out = $("blogOut"); if(out){ out.textContent = lines.join("\n"); }
-    toast(EN ? "Imaginative names generated 🏷" : "Γεννήθηκαν φανταστικά ονόματα 🏷");
+    toast(EN ? "Names generated in the right style for the genre 🏷" : "Ονόματα στο σωστό στυλ για το είδος 🏷");
   }
 
   function buildMyth(){
@@ -2731,9 +2878,14 @@
     if((S.world||"").trim()){ P.push(EN ? "## WORLD" : "## ΚΟΣΜΟΣ"); P.push(S.world); P.push(""); }
     if((S.lore||"").trim()){ P.push(EN ? "## LORE SO FAR" : "## ΓΝΩΣΗ ΜΕΧΡΙ ΤΩΡΑ"); P.push(S.lore); P.push(""); }
     P.push(EN ? "## EXPAND" : "## ΕΠΕΚΤΑΣΗ");
+    var placeRule = (namingProfileFor(S.genre) === "greek")
+      ? (EN ? "real Greek places — authentic, specific (Athens, a small town, an island, a named village)"
+            : "αληθινοί ελληνικοί τόποι — αυθεντικοί, συγκεκριμένοι (Αθήνα, κωμόπολη, νησί, ονομασμένο χωριό)")
+      : (EN ? "invented, internally consistent names (in the spirit of Marestan / Xanandou / Dyrron)"
+            : "εφευρημένα, εσωτερικά συνεπή ονόματα (στο πνεύμα του Μαρεστάν / Ξαναντού / Δυρρών)");
     P.push(EN
-      ? "- Ancient history: 3 events that shaped this place, each with a name and a scar still visible. - Places: 5 named locations (invented like Μαρεστάν / Ξαναντού / Δυρρών) with one evocative line each. - Institutions: 3 (a guild, a church/cult, an archive). - Rules: the logic of the strange (how the bridge whispers, what the machine costs). - The unspoken: one secret everyone in this world knows but never says."
-      : "- Αρχαία ιστορία: 3 γεγονότα που διαμόρφωσαν τον τόπο, καθένα με όνομα και σημάδι ορατό ακόμα. - Τόποι: 5 ονομασμένα μέρη (εφευρημένα σαν Μαρεστάν / Ξαναντού / Δυρρών) με μία υποβλητική γραμμή το καθένα. - Θεσμοί: 3 (μια συντεχνία, μια εκκλησία/λατρεία, ένα αρχείο). - Κανόνες: η λογική του παράξενου (πώς ψιθυρίζει η γέφυρα, τι κοστίζει η μηχανή). - Το ανείπωτο: ένα μυστικό που όλοι ξέρουν αλλά κανείς δεν λέει.");
+      ? "- Ancient history: 3 events that shaped this place, each with a name and a scar still visible. - Places: 5 named locations (" + placeRule + ") with one evocative line each. - Institutions: 3 (a guild, a church/cult, an archive). - Rules: the logic of the strange (how the bridge whispers, what the machine costs). - The unspoken: one secret everyone in this world knows but never says. - Naming: follow the book's genre — character names must match the world's naming discipline, never mixing it with the other register."
+      : "- Αρχαία ιστορία: 3 γεγονότα που διαμόρφωσαν τον τόπο, καθένα με όνομα και σημάδι ορατό ακόμα. - Τόποι: 5 ονομασμένα μέρη (" + placeRule + ") με μία υποβλητική γραμμή το καθένα. - Θεσμοί: 3 (μια συντεχνία, μια εκκλησία/λατρεία, ένα αρχείο). - Κανόνες: η λογική του παράξενου (πώς ψιθυρίζει η γέφυρα, τι κοστίζει η μηχανή). - Το ανείπωτο: ένα μυστικό που όλοι ξέρουν αλλά κανείς δεν λέει. - Ονομασία: βάλε τη γλώσσα του είδους του βιβλίου — τα ονόματα των χαρακτήρων να ταιριάζουν στην πειθαρχία ονομασίας του κόσμου, χωρίς μίγμα με το άλλο ύφος.");
     P.push("");
     P.push(EN ? "Write in the deliverable language, matching the established voice. Plain list, one line per item, no fluff." : "Γράψε στη γλώσσα του έργου, ταιριάζοντας την εδραιωμένη φωνή. Απλή λίστα, μία γραμμή το καθένα, χωρίς φλυαρία.");
     return P.join("\n");
@@ -3013,7 +3165,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v22.0";
+    $("pillVer").textContent = "v23.0";
   }
 
   function applyStatic(){
@@ -3779,12 +3931,12 @@
   function genDeepChar(){
     var EN = S.lang === "en";
     var a = ARCHETYPES[Math.floor(Math.random()*ARCHETYPES.length)];
-    var nm = GNAMES[Math.floor(Math.random()*GNAMES.length)];
-    var sn = GSURNAMES[Math.floor(Math.random()*GSURNAMES.length)];
+    var np = namedPick(S.genre); // genre-aware: fantasy gets invented names, realistic gets everyday Greek
     var age = GAGES[Math.floor(Math.random()*GAGES.length)];
     var pick = function(arr){ return EN ? arr[1] : arr[0]; };
     var sh = EN ? a.en : a.el; // [want,fear,wound,arc,voice,secret,job,trait]
-    S.hero = nm + " " + sn + ", " + age + ", " + sh[6] + "; " + sh[7] + ".";
+    var nm = EN ? np.last[1] + ", " + np.first[1] : np.first[0] + " " + np.last[0];
+    S.hero = nm + ", " + age + ", " + sh[6] + "; " + sh[7] + ".";
     S.antagonist = pick(a.antag);
     S.charDesire = sh[0];
     S.charFear = sh[1];
@@ -4383,26 +4535,198 @@
     ev.target.value = "";
   }
 
-  function randomStarter(){
-    var EN = S.lang === "en";
-    var r = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
-    var pickVal = function(pair){ return EN ? pair[1] : pair[0]; };
-    S.genre = r(GENRES)[0];
-    S.premise = pickVal(r(SUG.stories));
-    S.hero = pickVal(r(SUG.chars));
-    S.title = pickVal(r(SUG.titles));
-    S.tone = r(TONES)[0];
-    S.pacing = r(PACINGS)[0];
-    S.ending = r(ENDINGS.slice(1))[0];
-    S.themes = [];
-    var n = 2 + Math.floor(Math.random()*2);
-    while(S.themes.length < n){
-      var t = r(THEMES)[0];
-      if(S.themes.indexOf(t) === -1){ S.themes.push(t); }
+  /* ============================================================
+     SPARK v2 — the spark is no longer a roll among predefined ideas.
+     It builds a well-crafted PROMPT for the user's AI: one fresh,
+     original idea + genre-aware naming discipline (fantasy worlds get
+     invented names/places, the real Greek world gets everyday names &
+     real places) + a fixed output format that «⤵ Load» parses back
+     straight into the brief.
+     ============================================================ */
+  var SPARK_LABELS = [
+    ["GENRE","ΕΙΔΟΣ"],["TITLE","ΤΙΤΛΟΣ"],["PREMISE","ΥΠΟΘΕΣΗ"],
+    ["HERO","ΗΡΩΑΣ"],["ANTAGONIST","ΑΝΤΑΓΩΝΙΣΤΗΣ"],["WORLD","ΚΟΣΜΟΣ"],
+    ["THEMES","ΘΕΜΑΤΑ"],["TONE","ΤΟΝΟΣ"],["PACING","ΡΥΘΜΟΣ"],
+    ["ENDING","ΤΕΛΟΣ"],["GLOSSARY","ΓΛΩΣΣΑΡΙΟ"],["HOOK","ΑΓΚΙΣΤΡΙ"]
+  ];
+  function sparkNamingRule(EN, profileId){
+    if(!profileId){
+      return EN
+        ? "The genre decides the naming: if you choose a fantasy genre (fantasy / darkfantasy / mythic / fairytale) → EVERY name must be invented, original and internally consistent, as if from the world's own language — NEVER real-world names (no Athens, no real Greek villages or streets, no everyday Greek first names like Δημήτρης, Ελένη, Αντώνης…). If you choose a realistic Greek genre (horror, noir, mystery, literary, social, historical, gothic, thriller, magreal) → common everyday Greek names and real Greek places (Athens, a small town, an island, a specific village), the world of the blog «My little stories». If you choose sci-fi / post-apocalyptic / dystopian / cosmic horror → everyday and invented names may mix; places may be real, ruined or far-future. Whatever the genre, keep all names internally consistent."
+        : "Το είδος καθορίζει την ονομασία: αν διαλέξεις είδος φαντασίας (fantasy / darkfantasy / mythic / fairytale) → ΚΑΘΕ όνομα πρέπει να είναι εφευρημένο, πρωτότυπο και εσωτερικά συνεπές, σαν να προέρχεται από τη γλώσσα του ίδιου του κόσμου — ΠΟΤΕ αληθινοί όροι (χωρίς Αθήνα, χωρίς αληθινά ελληνικά χωριά ή δρόμους, χωρίς καθημερινά ονόματα όπως Δημήτρης, Ελένη, Αντώνης…). Αν διαλέξεις ρεαλιστικό ελληνικό είδος (horror, noir, mystery, literary, social, historical, gothic, thriller, magreal) → κοινά καθημερινά ελληνικά ονόματα και αληθινοί ελληνικοί τόποι (Αθήνα, κωμόπολη, νησί, συγκεκριμένο χωριό), ο κόσμος του blog «My little stories». Αν διαλέξεις sci-fi / post-apocalyptic / dystopian / cosmic horror → καθημερινά και εφευρημένα ονόματα μπορούν να αναμειχθούν· οι τόποι μπορούν να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Όποιο κι αν είναι το είδος, κράτα όλα τα ονόματα εσωτερικά συνεπή.";
     }
-    S.antagonist = EN ? "A hidden force that feeds on the hero's wound" : "Μια κρυφή δύναμη που τρέφεται από την πληγή του ήρωα";
-    syncInputs(); renderThemes(); render();
-    toast(EN ? "Spark struck! 🎲" : "Σπίρκο! 🎲");
+    if(profileId === "fantasy"){
+      return EN
+        ? "This is a FANTASY world: EVERY name — people, places, objects, houses, clans — must be INVENTED, original and internally consistent, as if spoken in the world's own language. NEVER real-world names: no Athens, no real Greek villages, streets or islands, no everyday Greek first names (Δημήτρης, Ελένη, Αντώνης…), no real countries or cities."
+        : "Αυτός είναι ένας ΚΟΣΜΟΣ ΦΑΝΤΑΣΙΑΣ: ΚΑΘΕ όνομα — άνθρωποι, τόποι, αντικείμενα, σπίτια, φυλές — πρέπει να είναι ΕΦΕΥΡΗΜΕΝΟ, πρωτότυπο και εσωτερικά συνεπές, σαν να λέγεται στη γλώσσα του ίδιου του κόσμου. ΠΟΤΕ αληθινοί όροι: χωρίς Αθήνα, χωρίς αληθινά ελληνικά χωριά, δρόμους ή νησιά, χωρίς καθημερινά ελληνικά ονόματα (Δημήτρης, Ελένη, Αντώνης…), χωρίς αληθινές χώρες ή πόλεις.";
+    }
+    if(profileId === "greek"){
+      return EN
+        ? "This is the REAL, everyday world of Greece: character names must be common, everyday Greek names, and places must be real Greek places (Athens, a small town, an island, a specific village). The world must feel like the actual Greece of the blog «My little stories» — no invented fantasy names."
+        : "Αυτός είναι ο ΠΡΑΓΜΑΤΙΚΟΣ, καθημερινός κόσμος της Ελλάδας: τα ονόματα των χαρακτήρων πρέπει να είναι κοινά, καθημερινά ελληνικά ονόματα, και οι τόποι αληθινοί ελληνικοί (Αθήνα, κωμόπολη, νησί, συγκεκριμένο χωριό). Ο κόσμος πρέπει να μυρίζει την πραγματική Ελλάδα του blog «My little stories» — χωρίς εφευρημένα ονόματα φαντασίας.";
+    }
+    return EN
+      ? "Far-future / broken-world setting: names may mix everyday and invented; places may be real, ruined or far-future. Whatever you invent, keep it internally consistent."
+      : "Κόσμος στο μακρινό μέλλον / σπασμένος κόσμος: τα ονόματα μπορούν να αναμείξουν καθημερινά με εφευρημένα· οι τόποι μπορεί να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Ό,τι εφεύρεις, κράτα το εσωτερικά συνεπές.";
+  }
+  function buildSpark(){
+    var EN = S.lang === "en";
+    var f = FORMATS[S.format];
+    var loc = EN ? "en-US" : "el-GR";
+    var genreId = S.genre || "";
+    var profileId = namingProfileFor(genreId);
+    var genreLine = genreId
+      ? genreLabel(genreId) + (EN ? " (id: " + genreId + ")" : " (id: " + genreId + ")")
+      : (EN ? "none set — choose the best-fit genre yourself and answer the GENRE line with its id"
+            : "καμία — εσύ διαλέγεις το κατάλληλο είδος και απαντάς στη γραμμή ΕΙΔΟΣ με το id του");
+    var genreList = GENRES.map(function(g){ return g[0]; }).join(" / ");
+    var themeList = THEMES.map(function(t){ return EN ? t[2] : t[1]; }).join(", ");
+    var L = SPARK_LABELS.map(function(p){ return EN ? p[0] : p[1]; });
+    var P = [];
+    P.push(EN ? "# SPARK — ONE fresh story idea (not from any list)" : "# ΣΠΙΡΤΟ — ΜΙΑ φρέσκια ιδέα ιστορίας (όχι από καμία λίστα)");
+    P.push("");
+    P.push(EN
+      ? "You are a creative co-conspirator for a new book. Generate ONE original story spark for:"
+      : "Είσαι συνεκνοστής για ένα νέο βιβλίο. Δημιούργησε ΜΙΑ πρωτότυπη σπίθα ιδέας για:");
+    P.push(EN ? "- Format: **" + f.labelEn + "** (~" + Number(S.words).toLocaleString(loc) + " words)"
+             : "- Μορφή: **" + f.label + "** (~" + Number(S.words).toLocaleString(loc) + " λέξεις)");
+    P.push(EN ? "- Genre: **" + genreLine + "**" : "- Είδος: **" + genreLine + "**");
+    P.push(EN
+      ? "- The book is written in **" + dlName() + "**. Answer every line in that same language, EXCEPT the labels, which stay EXACTLY as shown (caps)."
+      : "- Το βιβλίο γράφεται στα **" + dlName() + "**. Άπαντα κάθε γραμμή σε αυτή τη γλώσσα, ΕΚΤΟΣ από τις ετικέτες, που μένουν ΑΚΡΙΒΩΣ όπως φαίνονται (με κεφαλαία).");
+    P.push("");
+    P.push(EN ? "## WHAT MAKES A GOOD SPARK" : "## ΤΙ ΚΑΝΕΙ ΜΙΑ ΚΑΛΗ ΣΠΙΡΤΑ");
+    P.push(EN
+      ? "- Specific: a concrete protagonist, a concrete place, a concrete inciting event — no “a certain town”."
+      : "- Συγκεκριμένη: ένας συγκεκριμένος πρωταγωνιστής, ένας συγκεκριμένος τόπος, ένα συγκεκριμένο γεγονός που κινεί — όχι «μια ορισμένη πόλη».");
+    P.push(EN
+      ? "- NOT the most obvious version of its genre. No chosen one, no dark lord, no “a small town hides a secret” — unless twisted until unrecognizable."
+      : "- ΟΧΙ η πιο προφανής εκδοχή του είδους της. Χωρίς εκλεκτός, χωρίς σκοτεινός άρχοντας, χωρίς «μια μικρή πόλη κρύβει μυστικό» — εκτός αν στριμωχτεί μέχρι να μη μαλώνεται.");
+    P.push(EN
+      ? "- A theme tension: two values pulling apart."
+      : "- Ένα θεματικό τέντωμα: δύο αξίες που τραβάνε αντίθετα.");
+    P.push(EN
+      ? "- A visual core: one image the reader will never forget."
+      : "- Ένα οπτικό κέντρο: μία εικόνα που ο αναγνώστης δεν θα ξεχάσει ποτέ.");
+    P.push("");
+    P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(sparkNamingRule(EN, profileId));
+    P.push(EN
+      ? "- The GLOSSARY must list 4–8 exact spellings (people + places + key objects) so the whole book stays consistent."
+      : "- Το ΓΛΩΣΣΑΡΙΟ πρέπει να παραθέτει 4–8 ακριβείς ορθογραφίες (άνθρωποι + τόποι + βασικά αντικείμενα) για να μένει ολόκληρο το βιβλίο συνεπές.");
+    if(!genreId){
+      P.push("");
+      P.push(EN ? "## GENRE IDS (answer " + L[0] + " with ONE of these)" : "## ΕΙΔΟΣ IDS (άπαντα το " + L[0] + " με ΕΝΑ από αυτά)");
+      P.push(genreList);
+    }
+    P.push("");
+    P.push(EN ? "## OUTPUT — reply with EXACTLY these lines, one per line, no numbering, no extra commentary:"
+             : "## ΕΞΟΔΟΣ — άπαντα ΑΚΡΙΒΩΣ με αυτές τις γραμμές, μία την γραμμή, χωρίς αρίθμηση, χωρίς επιπλέον σχόλια:");
+    P.push(L[0] + (EN ? ": (one genre id" + (genreId ? " — repeat: " + genreId : " from the list above") + ")" : ": (ένα id είδους" + (genreId ? " — επανάλαβε: " + genreId : " από τη λίστα πάνω)") ));
+    P.push(L[1] + (EN ? ": (short, evocative)" : ": (σύντομος, υποβλητικός)"));
+    P.push(L[2] + (EN ? ": (2–4 sentences: who, what, why now, what it costs)" : ": (2–4 προτάσεις: ποιος, τι, γιατί τώρα, τι κοστίζει)"));
+    P.push(L[3] + (EN ? ": (name, age, occupation, one human flaw — one line)" : ": (όνομα, ηλικία, επάγγελμα, μία ανθρώπινη αδυναμία — μία γραμμή)"));
+    P.push(L[4] + (EN ? ": (one line)" : ": (μία γραμμή)"));
+    P.push(L[5] + (EN ? ": (2–3 sentences: place, time, one rule that makes the world strange)" : ": (2–3 προτάσεις: τόπος, εποχή, ένας κανόνας που κάνει τον κόσμο παράξενο)"));
+    P.push(L[6] + (EN ? ": (pick 2–3 from: " + themeList + ") — comma-separated" : ": (διάλεξε 2–3 από: " + themeList + ") — με κόμμα"));
+    P.push(L[7] + (EN ? ": high literary / medium flowing / colloquial with lyricism" : ": υψηλό λογοτεχνικό / μέτριο ρέον / καθημερινό με λυρισμό"));
+    P.push(L[8] + (EN ? ": fast clipped / medium / slow-burn" : ": γρήγορο κοφτό / μέτριο / αργό καθηλωτικό"));
+    P.push(L[9] + (EN ? ": open / closed / bittersweet / cliffhanger" : ": ανοιχτό / κλειστό / πικρόγλυκο / κρεμαστό"));
+    P.push(L[10] + (EN ? ": (4–8 fixed names/spellings, separated by “ · ”)" : ": (4–8 σταθερές ορθογραφίες, χωρισμένες με « · »)"));
+    P.push(L[11] + (EN ? ": (the ACTUAL first sentence of Chapter 1 — real prose, not a description)" : ": (την ΠΡΑΓΜΑΤΙΚΗ πρώτη πρόταση του Κεφαλαίου 1 — αληθινή πρόζα, όχι περιγραφή)"));
+    return P.join("\n");
+  }
+  function sparkIdea(){
+    var EN = S.lang === "en";
+    $("sparkOut").value = buildSpark();
+    var box = $("sparkBox");
+    if(box && box.scrollIntoView){ box.scrollIntoView({behavior:"smooth", block:"nearest"}); }
+    toast(EN
+      ? "Spark prompt ready — send it to your AI, paste its answer back, then «⤵ Load» "
+      : "Το prompt σπϭρτος είναι έτοιμο — στείλτέ το στο ΑΙ σας, επικολλήστε την απάντησή του, μετά «⤵ Load» 🎲");
+  }
+  function parseSparkAnswer(txt){
+    var fields = {};
+    var lines = String(txt || "").split(/\r?\n/);
+    SPARK_LABELS.forEach(function(pair, idx){
+      for(var li = 0; li < lines.length && fields[idx] === undefined; li++){
+        var ln = lines[li];
+        for(var j = 0; j < 2; j++){
+          var re = new RegExp("^\\s*(?:[-*•]\\s*|\\d+\\s*[.)]\\s*)?\\**\\s*" + pair[j] + "\\s*\\**\\s*[:·]\\s*(.+)$", "i");
+          var m = ln.match(re);
+          if(m){ fields[idx] = m[1].replace(/^\*+|\*+$/g, "").trim(); break; }
+        }
+      }
+    });
+    return fields;
+  }
+  function greekBase(s){
+    return String(s).replace(/[άΆ]/g,"α").replace(/[έΈ]/g,"ε").replace(/[ήΉ]/g,"η")
+                    .replace(/[ίΊ]/g,"ι").replace(/[όΌ]/g,"ο").replace(/[ύΎ]/g,"υ").replace(/[ώΏ]/g,"ω");
+  }
+  function loadSpark(){
+    var EN = S.lang === "en";
+    var ans = (S.sparkAns || "").trim();
+    if(!ans){ toast(EN ? "Paste the AI's answer first" : "Επικολλήστε πρώτα την απάντηση του ΑΙ"); return; }
+    var f = parseSparkAnswer(ans);
+    var norm = function(v){ return greekBase(String(v || "")).toLowerCase(); };
+    var got = 0;
+    if(f[0]){
+      var gv = String(f[0]).toLowerCase().replace(/[^a-z]/g, "");
+      for(var i = 0; i < GENRES.length; i++){ if(GENRES[i][0] === gv){ S.genre = GENRES[i][0]; got++; break; } }
+    }
+    if(f[1]){ S.title = String(f[1]).replace(/^[\s"'«]+|[\s"'»]+$/g, ""); got++; }
+    if(f[2]){ S.premise = f[2]; got++; }
+    if(f[3]){ S.hero = f[3]; got++; }
+    if(f[4]){ S.antagonist = f[4]; got++; }
+    if(f[5]){ S.world = f[5]; got++; }
+    if(f[10]){ S.glossary = f[10]; got++; }
+    if(f[6]){
+      S.themes = [];
+      String(f[6]).split(/,|;|\s\/\s| και | and /i).forEach(function(tok){
+        tok = greekBase(tok.trim()).toLowerCase();
+        if(!tok) return;
+        for(var i = 0; i < THEMES.length; i++){
+          var a = greekBase(THEMES[i][1]).toLowerCase(), b = greekBase(THEMES[i][2]).toLowerCase();
+          if(tok === a || tok === b || a.indexOf(tok) === 0 || b.indexOf(tok) === 0 || tok.indexOf(a) === 0 || tok.indexOf(b) === 0){
+            if(S.themes.indexOf(THEMES[i][0]) === -1){ S.themes.push(THEMES[i][0]); }
+            break;
+          }
+        }
+      });
+      if(S.themes.length){ got++; }
+    }
+    if(f[7]){
+      var t = norm(f[7]);
+      if(/high|υψηλ/i.test(t)){ S.tone = "high"; }
+      else if(/medium|mid|μετρι/i.test(t)){ S.tone = "mid"; }
+      else if(/colloquial|plain|καθημεριν/i.test(t)){ S.tone = "plain"; }
+      else { S.tone = "mid"; }
+      got++;
+    }
+    if(f[8]){
+      var p = norm(f[8]);
+      if(/fast|γρηγορ/i.test(p)){ S.pacing = "fast"; }
+      else if(/medium|μετρι/i.test(p)){ S.pacing = "medium"; }
+      else { S.pacing = "slow"; }
+      got++;
+    }
+    if(f[9]){
+      var e = norm(f[9]);
+      if(/open|ανοιχ/i.test(e)){ S.ending = "open"; }
+      else if(/closed|κλεισ/i.test(e)){ S.ending = "closed"; }
+      else if(/bitter|πικρο/i.test(e)){ S.ending = "bittersweet"; }
+      else if(/cliff|κρεμασ/i.test(e)){ S.ending = "cliff"; }
+      got++;
+    }
+    if(f[11]){ S.extra = ((S.extra || "").trim() ? S.extra.trim() + "\n" : "") + (EN ? "Opening line (from spark): " : "Πρώτη γραμμή (από το σπίρτο): ") + f[11]; got++; }
+    if(!got){
+      toast(EN ? "No spark lines found — check the labels (TITLE / PREMISE / HERO…)" : "Δεν βρέθηκαν γραμμές σπίρτος — ελέγξτε τις ετικέτες (ΤΙΤΛΟΣ / ΥΠΟΘΕΣΗ / ΗΡΩΑΣ…)");
+      return;
+    }
+    S.sparkAns = "";
+    syncInputs(); renderThemes(); renderGenres(); render();
+    toast(EN ? "Spark loaded into the brief — " + got + " fields 🎲" : "Το σπίρτο φορτώθηκε στο brief — " + got + " πεδία 🎲");
   }
 
   function downloadPrompt(){
@@ -4488,6 +4812,7 @@
     $("inAltEvery").value = S.altEvery || 1;
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
+    $("inSparkAns").value = S.sparkAns || "";
     $("inHero").value = S.hero;
     $("inAntagonist").value = S.antagonist;
     $("inCharDesire").value = S.charDesire;
@@ -4551,7 +4876,15 @@
     $("btnGuide").addEventListener("click", function(){
       var g = $("guide"); if(g){ g.setAttribute("open", ""); g.scrollIntoView({behavior:"smooth", block:"start"}); }
     });
-    $("qsSpark").addEventListener("click", randomStarter);
+    $("qsSpark").addEventListener("click", sparkIdea);
+    $("btnSparkGen").addEventListener("click", sparkIdea);
+    $("btnSparkCopy").addEventListener("click", function(){
+      var t = ($("sparkOut").value||"").trim();
+      if(!t){ sparkIdea(); t = $("sparkOut").value; }
+      copyText(t, S.lang==="en" ? "Spark prompt copied 🎲" : "Το prompt σπίρτος αντιγράφηκε 🎲");
+    });
+    $("btnSparkLoad").addEventListener("click", loadSpark);
+    $("inSparkAns").addEventListener("input", function(){ S.sparkAns = this.value; });
     $("qsVoice").addEventListener("click", loadProfile);
     $("qsCopy").addEventListener("click", function(){ $("btnCopy").click(); });
     $("qsHide").addEventListener("click", function(){ S.qsHidden = true; applyQS(); saveLS(); });
@@ -4767,7 +5100,7 @@
     $("btnDownload").addEventListener("click", downloadPrompt);
     $("btnDemo").addEventListener("click", loadDemo);
     $("btnReset").addEventListener("click", resetAll);
-    $("btnDice").addEventListener("click", randomStarter);
+    $("btnDice").addEventListener("click", sparkIdea);
     $("btnCharGen").addEventListener("click", genDeepChar);
     $("btnBeats").addEventListener("click", function(){
       $("toolsOut").value = buildBeats();

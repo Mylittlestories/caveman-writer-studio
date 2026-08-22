@@ -10,14 +10,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v22.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v23.0-8a6d3b?style=flat-square" alt="v23.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square" alt="Zero dependencies">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml/badge.svg" alt="Pages deploy"></a>
   <img src="https://img.shields.io/badge/build-single%20HTML-27ae60?style=flat-square" alt="Single HTML">
-  <img src="https://img.shields.io/badge/tests-59%20passed-8fbc8f?style=flat-square" alt="59 tests passing">
+  <img src="https://img.shields.io/badge/tests-70%20passed-8fbc8f?style=flat-square" alt="70 tests passing">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/ci.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/languages-EN%20%E2%80%A2%20%CE%95%CE%9B-e8b46a?style=flat-square" alt="Bilingual">
 </p>
@@ -52,8 +52,8 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 ### The brief
 - **Format**: Novel · Novella · **Serial** (chapter-cliffhanger mode for serialized fiction)
 - **19 inspiring masters** (multi-select, bilingual) + **🧠 My profile** (house style distilled from the author's own writing) + **author voice sample** (the AI matches *your* prose)
-- **🎲 Spark** — one click: random genre, premise, hero, title, themes, pacing, ending
-- **🪶 Blog-style generator** *(opt-in)* — blog-flavored places, scenes, names & plot seeds + **🏷 Names & places** (western/Greek/invented, from the author's world) + **🌍 Mythos & worldbuilding expander** + **character background** builder
+- **🎲 Spark v2** — no more rolling among fixed ideas: one click builds a **crafted spark prompt for YOUR AI** (fresh original premise, hero, title, world, themes) with **genre-aware naming discipline** — fantasy worlds get invented names & places only, the real Greek world gets everyday names & real places. Paste the AI's structured answer back, **⤵ Load** fills the brief
+- **🪶 Blog-style generator** *(opt-in)* — blog-flavored places, scenes, names & plot seeds + **🏷 Names & places** (now **genre-aware**: fantasy → invented like Μάρεςταν/Ξαναντού, realistic Greek → everyday names & real places, sci-fi → western + invented) + **🌍 Mythos & worldbuilding expander** + **character background** builder
 - 🧠 **Lore field** — history/myths/world rules injected into every brief
 - ⚡ **Build from ingredients** — no idea? Pick a genre (cosmic horror, high fantasy, post-apocalyptic, environmental SF, gothic, noir, mythic, mirror), mood, setting, elements → the app builds a full brief (title, world, hero, plot, names, promise) from the blog's vocabulary; 🎲 Surprise me for random
 - **🧬 Deep character generator** — coherent protagonist + antagonist: want, fear, wound, arc, voice, secret
@@ -102,7 +102,7 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
    python3 -m http.server 8000
    # open http://localhost:8000
    ```
-2. **Paste your idea** (or hit 🎲 Spark).
+2. **Paste your idea** — or hit 🎲 Spark: it builds a spark prompt for your AI (fresh idea + genre-aware naming), you paste the AI's answer back, and **⤵ Load** fills the brief.
 3. **Pick your voice** — 🧠 My profile, or one/more of the 19 masters.
 4. **Copy the generated prompt** into any AI (Claude, ChatGPT, Gemini…) and paste the AI's output back into the **Manuscript** tab.
 5. Keep the loop: write → review → save as chapter → next.
@@ -146,12 +146,13 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 
 ## ✅ Reliability
 - Resilience-hardened: a missing element can never crash the app (safe `$` stub), global error handler, autosave + quota fallback, guarded empty-state actions.
-- **Bulletproof test suite** — `tests/bullet.js` (59 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
+- **Bulletproof test suite** — `tests/bullet.js` (70 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
 - **CI (GitHub Actions)** — every push runs the suite automatically (see [.github/workflows/ci.yml](.github/workflows/ci.yml)); the badge above shows the latest result.
 
 ## 📦 Releases
 | Version | What's new |
 |---|---|
+| v23.0 | Genre-aware naming (fantasy = invented names & places, realistic Greek = everyday names & real places) across character generator, names & places, build-from-ingredients and mythos; **Spark v2** — a crafted spark prompt for your AI + «⤵ Load» paste-back instead of a roll among predefined ideas |
 | v1.8.0 | Build-from-ingredients wizard, imaginative naming, mythos & worldbuilding, lore, character backgrounds |
 | v1.7.0 | (v21) blog-derived names/places/objects, mythos expander, lore field, character background |
 | v1.6.2 | Always start on the main screen |
@@ -174,7 +175,7 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 - [x] Dictation (Web Speech)
 - [x] Co-author (two-POV rotation)
 - [x] Cloud sync (link-based, offline — no server)
-- [x] CI — the 59-check suite auto-runs on every push
+- [x] CI — the 70-check suite auto-runs on every push
 - [x] Build-from-ingredients wizard (v1.8) · blog-derived naming & mythos (v1.7–1.8)
 - [ ] Cloud sync with real backend (optional, opt-in) · [#3](https://github.com/Mylittlestories/caveman-writer-studio/issues/3)
 - [ ] In-app AI chat (optional API key) · [#12](https://github.com/Mylittlestories/caveman-writer-studio/issues/12)

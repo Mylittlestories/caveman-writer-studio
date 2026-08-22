@@ -98,7 +98,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v22.0 present', HTML.includes('v22.0'));
+  chk('structure', 'version v23.0 present', HTML.includes('v23.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -187,6 +187,55 @@ function boot(overrides) {
   els['ckBlog'].checked = true; els['ckBlog'].dispatch('change');
   els['btnBlogGen'].click();
   chk('functional', 'blog gen fills premise', (els['inPremise']._val||'').length > 10);
+
+  // spark v2: builds a prompt for the user's AI (no predefined roll)
+  els['inGenre']._val = 'fantasy'; els['inGenre'].dispatch('change');
+  els['btnDice'].click();
+  chk('functional', 'spark builds a prompt (not a local roll)', (els['sparkOut']._val||'').includes('SPARK') && (els['sparkOut']._val||'').includes('NAMING DISCIPLINE'));
+  chk('functional', 'spark prompt enforces invented names for fantasy', (els['sparkOut']._val||'').includes('NEVER real-world names'));
+  // spark v2: paste the AI's structured answer back → brief gets filled
+  const sparkAns = [
+    'GENRE: fantasy',
+    'TITLE: The Ash Cartographer',
+    'PREMISE: A cartographer maps a kingdom where every road she draws becomes real overnight — and the roads are drawing her back.',
+    'HERO: Talvir Lithvorn, 34, cartographer; trusts ink more than people.',
+    'ANTAGONIST: The Unwritten — the blank space on the map that hunts what is drawn.',
+    'WORLD: A realm of five clans where roads are laws; one rule: what is drawn cannot be erased, only overwritten.',
+    'THEMES: fate, identity, power',
+    'TONE: high literary',
+    'PACING: medium',
+    'ENDING: bittersweet',
+    'GLOSSARY: Talvir Lithvorn · Eldara · the Unwritten · Marestan',
+    'HOOK: The ink dried before she did.'
+  ].join('\n');
+  els['inSparkAns']._val = sparkAns; els['inSparkAns'].dispatch('input');
+  els['btnSparkLoad'].click();
+  chk('functional', 'spark load fills title', els['inTitle']._val === 'The Ash Cartographer');
+  chk('functional', 'spark load fills hero + world', (els['inHero']._val||'').includes('Talvir') && (els['inWorld']._val||'').includes('five clans'));
+  chk('functional', 'spark load sets glossary + hook', (els['inGlossary']._val||'').includes('Eldara') && (els['inExtra']._val||'').includes('ink dried before she did'));
+  chk('functional', 'spark load maps tone/pacing/ending', els['inTone']._val==='high' && els['inPacing']._val==='medium' && els['inEnding']._val==='bittersweet');
+  chk('functional', 'spark load maps themes', (els['themeChips']._html||'').includes('Fate'));
+
+  // genre-aware naming: fantasy → invented only (no Athens, no everyday Greek names)
+  els['btnNames'].click();
+  const namesFant = els['blogOut'].textContent || '';
+  chk('functional', 'fantasy genre: invented names & places (no real Greek)',
+      !/Athens|Αθήνα|Δημήτρης|Eleni|Dimitris/.test(namesFant)
+      && /Marestan|Xanandou|Dyrron|Grouin|Akentrou|Valmor|Serendi|Arkana|Eldara|Thornhal|Morval|Silara|Ostrian Bay|Lithvorn Hold|The Seven-River/.test(namesFant));
+  // realistic Greek genre → everyday names & real Greek places
+  els['inGenre']._val = 'horror'; els['inGenre'].dispatch('change');
+  els['btnNames'].click();
+  const namesGr = els['blogOut'].textContent || '';
+  chk('functional', 'greek genre: everyday names (no fantasy pool)',
+      !/Calethir|Thandiril|Moraina|Orynthas|Velianda|Dragobel|Morncal|Thornmayr/.test(namesGr));
+  chk('functional', 'greek genre: real Greek place', /Athens|Arachovis|Mesogeia|Stone Valley|A mountain town|An island town/.test(namesGr));
+  // build-from-ingredients: fantasy blueprint gets fantasy names (not the western pool)
+  els['inIntentGenre']._val = 'fantasy'; els['inIntentGenre'].dispatch('change');
+  els['btnIntentBuild'].click();
+  const intentHero = els['inHero']._val || '';
+  chk('functional', 'intent fantasy: hero from fantasy pool (not western)',
+      !/Jack|Suzy|Tate|Pete|Johnny|Charlie|Florence|Willie|Daria|Ramona|Helen|Lucas|Vera|Oliver|Myra|Parker|Lawrence|Anderson|Johnson|Stefanou|Clayton|Bellamy|Stone|Comy|Rudd|Leon|Crowe/.test(intentHero)
+      && /Calethir|Thandiril|Moraina|Orynthas|Velianda|Axantheros|Nervalta|Sabrel|Kaelthis|Morniel|Altarion|Nymelis|Talvir|Elanthys|Rochanor|Veralina|Nychtarithas|Feron|Lysianta|Aeron/.test(intentHero));
 
   // bunny
   els['inBunny']._val = 'Ιδέα δοκιμή'; els['inBunny'].dispatch('input');
@@ -317,7 +366,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v22.0', (b.els['pillVer'].textContent||'').includes('v22.0'));
+  chk('regression', 'pill shows v23.0', (b.els['pillVer'].textContent||'').includes('v23.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);

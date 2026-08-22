@@ -8,7 +8,7 @@ Welcome! This is a **one-file writing studio**. You paste ideas, it builds a sma
 
 ## 🚀 The 3-step start (30 seconds)
 
-1. **Get an idea** — click **🎲 Spark** (card 3) or paste your own premise. Or, if you have an unfinished story, use the **📖 Extender** tab later.
+1. **Get an idea** — click **🎲 Spark** (card 3): it builds a spark prompt for your AI that returns ONE fresh, original idea (premise, hero, title, world, themes) with genre-aware naming. Copy it to your AI, paste the answer back into the spark box, press **⤵ Load** — the brief fills itself. Or paste your own premise. If you have an unfinished story, use the **📖 Extender** tab later.
 2. **Pick a voice** — click **🧠 My profile** (card 2) to write like the house style, or tick one or more of the **19 masters**.
 3. **Copy the prompt** — press **⧉ Copy prompt** (top of the right column), paste it into any AI, and let it write Chapter 1.
 
@@ -89,17 +89,17 @@ Two narrators, alternating on a schedule:
 
 ## 🛡 Reliability
 - The app is hardened so it **never breaks**: if a control is ever missing it becomes a no-op instead of crashing; unexpected errors show a friendly notice (your work is always autosaved); storage-full shows a clear warning.
-- Developers: run `node tests/bullet.js` — 59 checks across 5 angles (syntax, structure, functional, robustness, regression).
+- Developers: run `node tests/bullet.js` — 70 checks across 5 angles (syntax, structure, functional, robustness, regression).
 
 ## 🔍 Finding a master + writing in English (v19)
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.
 - **Deliverable language** — in the prompt card, choose **Greek or English** for the book itself. This is independent of the UI language: keep the interface in ΕΛ or EN, and the *novel* is written in whichever you pick. The language guard, role, continuation and extender all adapt automatically.
 
 ## ⚡ Build from ingredients (v22) — no idea?
-At the top of the left column: pick **what kind of story** (cosmic horror · high fantasy · post-apocalyptic · environmental SF · gothic · noir · mythic fairy tale · mirror/psychological), a **mood**, a **setting**, and any **elements** you want in it (e.g. "a whispering bridge", "elves and orcs fighting for the land"). Press **🧠 Build my brief** — the app fills title, world, hero, antagonist, plot, names (invented places like Μάρεςταν/Ξαναντού/Δυρρών), glossary and lore, and regenerates the prompt. No idea at all? **🎲 Surprise me**.
+At the top of the left column: pick **what kind of story** (cosmic horror · high fantasy · post-apocalyptic · environmental SF · gothic · noir · mythic fairy tale · mirror/psychological), a **mood**, a **setting**, and any **elements** you want in it (e.g. "a whispering bridge", "elves and orcs fighting for the land"). Press **🧠 Build my brief** — the app fills title, world, hero, antagonist, plot, names (genre-matched: high fantasy & mythic → invented names and places like Μάρεςταν/Ξαναντού/Δυρρών; noir & gothic → everyday Greek names and real places), glossary and lore, and regenerates the prompt. No idea at all? **🎲 Surprise me**.
 
 ## 🏷 Imaginative naming + Mythos (v21)
-- **🏷 Names & places** (Blog-style card) — one click gives a person, a place and an object drawn from the blog's world: western names (Jack, Suzy, Parker…), Greek names (Δημήτρης, Νεφέλη…), invented ones (Mimik, Vragkas…), and places like Marestan / Xanandou / Dyrron.
+- **🏷 Names & places** (Blog-style card) — one click gives a person, a place and an object **in the right register for the selected genre**: high fantasy / dark fantasy / mythic / fairy tale → invented, internally consistent names (Calethir, Orynthas…) and places (Marestan, Xanandou, Dyrron, Eldara…); realistic Greek genres (horror, noir, mystery, literary, gothic, magical realism…) → everyday Greek names (Δημήτρης, Νεφέλη…) and real places (Athens, Arachovis st., a mountain town); sci-fi / post-apocalyptic / cosmic / dystopian → western + invented (Jack Parker, Wastelands, Crowburg…). No genre set → it rolls freely and tells you which style it used.
 - **🌍 Expand mythos & world** (Memory tab) — a prompt that expands ancient history, 5 named places, institutions, the rules of the strange, and the unspoken secret. Feeds from the new **Lore** field, which is also injected into every brief.
 - **Character background** — every brief now asks for a solid origin: family, the day that changed everything, livelihood, a keepsake, the line they'd never cross.
 
