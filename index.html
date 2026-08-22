@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v20.1</title>
+<title>Caveman Writer Studio — v21.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -388,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v20.1</span>
+    <span class="pill" id="pillVer">v21.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -590,9 +590,11 @@
           <span><b id="ckBlogTxt">Enable blog-style generator</b><small id="ckBlogSub">a choice — not the standard flow; fill the brief with blog-flavored places/names/plots</small></span></label>
         <div class="outbar" style="margin-top:8px">
           <button class="btn ghost" id="btnBlogGen">🧠 Generate like my blog</button>
+          <button class="btn ghost" id="btnNames">🏷 Names &amp; places</button>
           <button class="btn ghost" id="btnBlogCopy">⧉ Copy</button>
         </div>
         <div id="blogOut" class="hint" style="white-space:pre-wrap;margin-top:6px;line-height:1.6"></div>
+        <p class="hint" style="margin-top:8px" id="nameHint">Imaginative names drawn from your blog's world: western & Greek pools, invented suffixes (‑ου, ‑άκι, ‑ένη, ‑ος), and place-makers (Μαρεστάν-style, Ξαναντού-style, Δυρρών-style).</p>
       </details>
     </div>
 
@@ -779,6 +781,18 @@
           <button class="btn ghost" id="btnSync">&#128279; Share book via link</button>
         </div>
         <p class="hint" id="syncHint">Link-based "cloud sync": encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json).</p>
+        <div class="divider"></div>
+        <p class="suglabel" id="lblMyth">Mythos &amp; worldbuilding</p>
+        <div class="field">
+          <label class="lbl" id="lblLore" for="inLore">Lore / history / world notes (optional)</label>
+          <textarea id="inLore"></textarea>
+          <div class="hint" id="loreHint">ancient events, myths, geography, magic/tech rules — the AI builds on these</div>
+        </div>
+        <div class="outbar">
+          <button class="btn ghost" id="btnMythGen">🌍 Expand mythos &amp; world</button>
+          <button class="btn ghost" id="btnMythCopy">⧉ Copy</button>
+        </div>
+        <div id="mythOut" class="hint" style="white-space:pre-wrap;margin-top:6px;line-height:1.6"></div>
         <div class="divider"></div>
         <div class="field">
           <label class="lbl" id="lblBunny" for="inBunny">Idea inbox (plot bunnies)</label>
@@ -1716,6 +1730,13 @@
     lblChGoal:["Στόχος (λέξεις)","Goal (words)"],
 
     btnSync:["🔗 Κοινή χρήση βιβλίου με σύνδεσμο","🔗 Share book via link"],
+    btnNames:["🏷 Ονόματα & τόποι","🏷 Names & places"],
+    nameHint:["Φανταστικά ονόματα από τον κόσμο του blog: δυτικά & ελληνικά + εφευρημένα (‑ου, ‑άκι, ‑ένη, ‑ος) και τόποι τύπου Μαρεστάν / Ξαναντού / Δυρρών.","Imaginative names from the blog's world: western & Greek + invented (‑ou, ‑aki, ‑eni, ‑os) and places like Marestan / Xanandou / Dyrron."],
+    lblMyth:["Μύθος & κοσμοπλασία","Mythos & worldbuilding"],
+    lblLore:["Ιστορία / κόσμος / σημειώσεις (προαιρετικό)","Lore / history / world notes (optional)"],
+    loreHint:["αρχαία γεγονότα, μύθοι, γεωγραφία, κανόνες μαγείας/τεχνολογίας — το ΑΙ χτίζει πάνω τους","ancient events, myths, geography, magic/tech rules — the AI builds on these"],
+    btnMythGen:["🌍 Επέκταση μύθου & κόσμου","🌍 Expand mythos & world"],
+    btnMythCopy:["⧉ Αντιγραφή","⧉ Copy"],
     syncHint:["Συγχρονισμός μέσω συνδέσμου: κωδικοποιεί όλο το βιβλίο σε ένα URL — ανοίξτε το σε άλλη συσκευή για να φορτωθεί. Χωρίς server, εντελώς ιδιωτικό. Πολύ μεγάλα βιβλία (όριο URL) → χρησιμοποιήστε 💾 Αποθήκευση βιβλίου (.json).","Link-based sync: encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json)."],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
     lblChText:["Κείμενο κεφαλαίου","Chapter text"],
@@ -1942,7 +1963,7 @@
     level:"full", auto:true, bound:true, lang:"en", mode:"chat", compact:false,
     contNext:2, contSummary:"", contNote:"",
     seedStory:"", seedNote:"", act3:true, budget:true,
-    storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene",
+    storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene", lore:"",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
     statuses:{}, chGoals:{}, chSearch:"",
@@ -2447,6 +2468,60 @@
     return P.join("\n");
   }
 
+  /* ============================================================
+     IMAGINATIVE NAMING + WORLD/MYTHOS (derived from the blog)
+     ============================================================ */
+  var NAME_POOLS = {
+    firstW: [["Τζακ","Jack"],["Μαρκ","Mark"],["Σούζι","Suzy"],["Τέιτ","Tate"],["Πιτ","Pete"],["Τζόνι","Johnny"],["Τσάρλι","Charlie"],["Φλόρενς","Florence"],["Γουίλι","Willie"],["Σαμ","Sam"],["Ρον","Ron"],["Ντάρια","Daria"],["Ραμόνα","Ramona"],["Έλεν","Helen"],["Λούκας","Lucas"],["Βέρα","Vera"],["Όλιβερ","Oliver"],["Μάιρα","Myra"]],
+    lastW: [["Πάρκερ","Parker"],["Λόρενς","Lawrence"],["Άντερσον","Anderson"],["Τζόνσον","Johnson"],["Στεφάνου","Stefanou"],["Κλέιτον","Clayton"],["Μπέλαμι","Bellamy"],["Στόουν","Stone"],["Κόμη","Comy"],["Ραντ","Rudd"],["Λεόν","Leon"],["Κρόου","Crowe"]],
+    firstG: [["Δημήτρης","Dimitris"],["Ελένη","Eleni"],["Άννα","Anna"],["Μάρκος","Markos"],["Ηλίας","Ilias"],["Φαίδρα","Phaedra"],["Όμηρος","Homer"],["Λευτέρης","Lefteris"],["Καλλιόπη","Kalliopi"],["Θοδωρής","Thodoris"],["Νεφέλη","Nefeli"],["Ορέστης","Orestis"],["Δάφνη","Daphne"],["Μελίνα","Melina"],["Ζωή","Zoi"],["Ρηνιώ","Rinio"],["Σμαρώ","Smaro"],["Αλεξάνδρα","Alexandra"]],
+    lastG: [["Σεραφείμ","Serafeim"],["Βράχος","Vrachos"],["Κρανιά","Krania"],["Δελής","Delis"],["Νέγρης","Negris"],["Φωκάς","Fokas"],["Χαλκιάς","Halkias"],["Λεβέντης","Levendis"],["Παπαδήμας","Papadimas"],["Καπνιάς","Kapnias"],["Αρβανίτης","Arvanitis"],["Κοκκίνης","Kokkinis"],["Λαζαρίδης","Lazaridis"],["Αγγέλου","Aggelou"],["Βαμβακάς","Vamvakas"],["Μελάς","Melas"],["Ζέρβας","Zervas"]],
+    inventF: [["Μίμικ","Mimik"],["Τένιους","Tennius"],["Τινγκ","Ting"],["Κόμη","Comy"],["Βάρος","Varos"],["Λούμος","Loumos"],["Σέμπα","Semba"],["Ούρδα","Ourda"]],
+    inventL: [["Βέλμ","Velm"],["Άρκαν","Arkan"],["Ζόρ","Zor"],["Μέλλος","Mellos"],["Βράγκας","Vragkas"],["Σέλμος","Selmós"],["Ούρδος","Ourdos"],["Λάκος","Lakos"]],
+    placesA: [["Μαρεστάν","Marestan"],["Ξαναντού","Xanandou"],["Δυρρών","Dyrron"],["Γκρόουνιν","Grouin"],["Άκεντροου","Akentrou"],["Λούιβιλ","Louisville"],["Κρόουμπουργκ","Crowburg"],["Βαλμορ","Valmor"],["Σερέντι","Serendi"],["Αρκάνα","Arkana"]],
+    placesB: [["Ερημότοποι","Wastelands"],["Αθήνα","Athens"],["Αραχώβης","Arachovis st."],["Μεσόγεια","Mesogeia"],["Όρος του Βορρά","North Mountain"],["Θάλασσα της Νύχτας","Sea of Night"],["Πέτρινη Κοιλάδα","Stone Valley"],["Δάσος των Σκιών","Forest of Shadows"],["Νησί της Ομίχλης","Mist Isle"],["Πλατεία του Άγνωστου","Unknown Square"]],
+    objects: [["η χαμένη διαθήκη","the lost will"],["η Γέφυρα των Ψιθύρων","the Bridge of Whispers"],["το Αρχείο","the Archive"],["το μηχάνημα προβολής","the projection machine"],["το βιβλίο με τα κλειδωμένα ονόματα","the book of locked names"],["ο αναμεταδότης χρόνου","the time relay"],["το καταραμένο ρολόι","the cursed clock"],["η μάσκα του δούκα","the duke's mask"],["το κλειδί της βροχής","the rain key"],["ο χάρτης της στάχτης","the map of ashes"],["το δαχτυλίδι των ονείρων","the ring of dreams"],["η λάμπα της μνήμης","the memory lamp"]]
+  };
+  function genNames(){
+    var EN = S.lang === "en";
+    var r = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
+    var pv = function(p){ return EN ? p[1] : p[0]; };
+    var style = Math.floor(Math.random()*3);
+    var first, last;
+    if(style===0){ first = r(NAME_POOLS.firstW); last = r(NAME_POOLS.lastW); }
+    else if(style===1){ first = r(NAME_POOLS.firstG); last = r(NAME_POOLS.lastG); }
+    else { first = r(NAME_POOLS.inventF); last = r(NAME_POOLS.inventL); }
+    var person = (EN ? last[1] + ", " + first[1] : first[0] + " " + last[0]);
+    var place = Math.random() < 0.5 ? pv(r(NAME_POOLS.placesA)) : pv(r(NAME_POOLS.placesB));
+    var obj = pv(r(NAME_POOLS.objects));
+    var lines = [
+      (EN ? "👤 PERSON: " : "👤 Πρόσωπο: ") + person,
+      (EN ? "🏞 PLACE: " : "🏞 Τόπος: ") + place,
+      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + obj
+    ];
+    var out = $("blogOut"); if(out){ out.textContent = lines.join("\n"); }
+    toast(EN ? "Imaginative names generated 🏷" : "Γεννήθηκαν φανταστικά ονόματα 🏷");
+  }
+
+  function buildMyth(){
+    var EN = S.lang === "en";
+    var P = [];
+    P.push(EN ? "# MYTHOS & WORLDBUILDING — " + titleOrFallback() : "# ΜΥΘΟΣ & ΚΟΣΜΟΠΛΑΣΙΑ — " + titleOrFallback());
+    P.push("");
+    P.push(EN ? "You are the worldbuilder for this book. Expand its background in the author's spirit: ancient history, myths, geography, institutions, magic/tech rules, and the 'unspoken' that hangs over everything." : "Είσαι ο κοσμοπλάστης αυτού του βιβλίου. Επέκτεινε το υπόβαθρό του στο πνεύμα του συγγραφέα: αρχαία ιστορία, μύθοι, γεωγραφία, θεσμοί, κανόνες μαγείας/τεχνολογίας και το «ανείπωτο» που αιωρείται πάνω από όλα.");
+    P.push("");
+    if((S.bible||"").trim()){ P.push(EN ? "## STORY BIBLE (locked)" : "## STORY BIBLE (κλειδωμένα)"); P.push(S.bible); P.push(""); }
+    if((S.world||"").trim()){ P.push(EN ? "## WORLD" : "## ΚΟΣΜΟΣ"); P.push(S.world); P.push(""); }
+    if((S.lore||"").trim()){ P.push(EN ? "## LORE SO FAR" : "## ΓΝΩΣΗ ΜΕΧΡΙ ΤΩΡΑ"); P.push(S.lore); P.push(""); }
+    P.push(EN ? "## EXPAND" : "## ΕΠΕΚΤΑΣΗ");
+    P.push(EN
+      ? "- Ancient history: 3 events that shaped this place, each with a name and a scar still visible. - Places: 5 named locations (invented like Μαρεστάν / Ξαναντού / Δυρρών) with one evocative line each. - Institutions: 3 (a guild, a church/cult, an archive). - Rules: the logic of the strange (how the bridge whispers, what the machine costs). - The unspoken: one secret everyone in this world knows but never says."
+      : "- Αρχαία ιστορία: 3 γεγονότα που διαμόρφωσαν τον τόπο, καθένα με όνομα και σημάδι ορατό ακόμα. - Τόποι: 5 ονομασμένα μέρη (εφευρημένα σαν Μαρεστάν / Ξαναντού / Δυρρών) με μία υποβλητική γραμμή το καθένα. - Θεσμοί: 3 (μια συντεχνία, μια εκκλησία/λατρεία, ένα αρχείο). - Κανόνες: η λογική του παράξενου (πώς ψιθυρίζει η γέφυρα, τι κοστίζει η μηχανή). - Το ανείπωτο: ένα μυστικό που όλοι ξέρουν αλλά κανείς δεν λέει.");
+    P.push("");
+    P.push(EN ? "Write in the deliverable language, matching the established voice. Plain list, one line per item, no fluff." : "Γράψε στη γλώσσα του έργου, ταιριάζοντας την εδραιωμένη φωνή. Απλή λίστα, μία γραμμή το καθένα, χωρίς φλυαρία.");
+    return P.join("\n");
+  }
+
   /* ---------- manuscript ---------- */
   function chGoal(idx){
     var g = (S.chGoals || {})[idx];
@@ -2721,7 +2796,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v20.1";
+    $("pillVer").textContent = "v21.0";
   }
 
   function applyStatic(){
@@ -3153,6 +3228,13 @@
       csLines.forEach(function(l){ P.push("- "+l); });
       P.push("");
     }
+    if(S.hero.trim() || csLines.length){
+      P.push(EN ? "## CHARACTER BACKGROUND" : "## ΥΠΟΒΑΘΡΟ ΧΑΡΑΚΤΗΡΑ");
+      P.push(EN
+        ? "Give the protagonist a solid background, consistent with the sheet and the story: (1) origin & family (where from, what they carry), (2) the day that changed everything (one concrete scene), (3) what they do for a living and why, (4) a habit or object they can't let go, (5) what they'd never do — and one situation that might make them. Weave it in through action and memory, not exposition."
+        : "Δώσε στον πρωταγωνιστή ένα στέρεο υπόβαθρο, συνεπές με την καρτέλα και την ιστορία: (1) καταγωγή & οικογένεια (από πού, τι κουβαλά), (2) η μέρα που άλλαξε τα πάντα (μία συγκεκριμένη σκηνή), (3) τι κάνει για να ζήσει και γιατί, (4) μια συνήθεια ή αντικείμενο που δεν αφήνει, (5) τι δεν θα έκανε ποτέ — και μία περίσταση που θα μπορούσε να τον/την κάνει. Ύφανέ το μέσα από δράση και μνήμη, όχι μέσα από εξήγηση.");
+      P.push("");
+    }
 
     /* story bible */
     if((S.bible||"").trim()){
@@ -3161,6 +3243,15 @@
         ? "Never contradict these. If a chapter would break one, change the chapter, not the bible:"
         : "Μην τα αντιφάσκεις ποτέ. Αν ένα κεφάλαιο πρόκειται να σπάσει κάποιο, άλλαξε το κεφάλαιο, όχι το bible:");
       P.push("- "+S.bible.trim());
+      P.push("");
+    }
+    /* lore / worldbuilding */
+    if((S.lore||"").trim()){
+      P.push(EN ? "## LORE & WORLDBUILDING" : "## ΜΥΘΟΣ & ΚΟΣΜΟΠΛΑΣΙΑ");
+      P.push(EN
+        ? "Build on this background — ancient history, myths, geography, rules. Introduce it gradually, through the story:"
+        : "Χτίσε πάνω σε αυτό το υπόβαθρο — αρχαία ιστορία, μύθοι, γεωγραφία, κανόνες. Φέρε το σταδιακά, μέσα από την ιστορία:");
+      P.push("- "+S.lore.trim());
       P.push("");
     }
 
@@ -4188,6 +4279,7 @@
     $("inGlossary").value = S.glossary;
     $("inInspo").value = S.inspo;
     $("inBible").value = S.bible;
+    $("inLore").value = S.lore;
     $("inToolChapter").value = S.toolChapter;
     $("inToolGoal").value = S.toolGoal;
     $("ckGreek").checked = S.greek;
@@ -4256,6 +4348,17 @@
       if(!S.blogOn){ toast(S.lang==="en" ? "Enable the blog-style generator first" : "Ενεργοποιήστε πρώτα τον δημιουργό στυλ blog"); return; }
       genBlogStyle();
     });
+    $("btnNames").addEventListener("click", genNames);
+    $("btnMythGen").addEventListener("click", function(){
+      $("mythOut").textContent = buildMyth();
+      toast(S.lang==="en" ? "Mythos & worldbuilding prompt generated 🌍" : "Δημιουργήθηκε prompt μύθου & κοσμοπλασίας 🌍");
+    });
+    $("btnMythCopy").addEventListener("click", function(){
+      var t = ($("mythOut").textContent||"").trim();
+      if(!t){ toast(S.lang==="en" ? "Generate first" : "Δημιουργήστε πρώτα"); return; }
+      copyText(t, S.lang==="en" ? "Mythos prompt copied" : "Το prompt μύθου αντιγράφηκε");
+    });
+    $("inLore").addEventListener("input", function(){ S.lore = this.value; render(); saveLS(); });
     $("btnBlogCopy").addEventListener("click", function(){
       var t = ($("blogOut").textContent||"").trim();
       if(!t){ toast(S.lang==="en" ? "Generate first" : "Δημιουργήστε πρώτα"); return; }

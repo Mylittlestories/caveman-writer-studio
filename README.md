@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v20.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v21.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -53,7 +53,8 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - **Format**: Novel · Novella · **Serial** (chapter-cliffhanger mode for serialized fiction)
 - **19 inspiring masters** (multi-select, bilingual) + **🧠 My profile** (house style distilled from the author's own writing) + **author voice sample** (the AI matches *your* prose)
 - **🎲 Spark** — one click: random genre, premise, hero, title, themes, pacing, ending
-- **🪶 Blog-style generator** *(opt-in)* — one click: blog-flavored places, scenes, character names & plot seeds (in the spirit of the author's «My little stories») + back-cover pitch generator
+- **🪶 Blog-style generator** *(opt-in)* — blog-flavored places, scenes, names & plot seeds + **🏷 Names & places** (western/Greek/invented, from the author's world) + **🌍 Mythos & worldbuilding expander** + **character background** builder
+- 🧠 **Lore field** — history/myths/world rules injected into every brief
 - **🧬 Deep character generator** — coherent protagonist + antagonist: want, fear, wound, arc, voice, secret
 - Genre, POV, narrative tense, register, pacing, ending preference, prologue/epilogue, themes
 - **Inspiration field** (music / art / film) — its mood guides the atmosphere

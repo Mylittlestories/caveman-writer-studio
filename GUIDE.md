@@ -95,6 +95,11 @@ Two narrators, alternating on a schedule:
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.
 - **Deliverable language** — in the prompt card, choose **Greek or English** for the book itself. This is independent of the UI language: keep the interface in ΕΛ or EN, and the *novel* is written in whichever you pick. The language guard, role, continuation and extender all adapt automatically.
 
+## 🏷 Imaginative naming + Mythos (v21)
+- **🏷 Names & places** (Blog-style card) — one click gives a person, a place and an object drawn from the blog's world: western names (Jack, Suzy, Parker…), Greek names (Δημήτρης, Νεφέλη…), invented ones (Mimik, Vragkas…), and places like Marestan / Xanandou / Dyrron.
+- **🌍 Expand mythos & world** (Memory tab) — a prompt that expands ancient history, 5 named places, institutions, the rules of the strange, and the unspoken secret. Feeds from the new **Lore** field, which is also injected into every brief.
+- **Character background** — every brief now asks for a solid origin: family, the day that changed everything, livelihood, a keepsake, the line they'd never cross.
+
 ## 🎨 Themes & clarity (v20)
 - **📜 Parchment (default, light)** is tuned for clarity: white input fields on warm paper, deeper text, clearer borders and selected states.
 - **🌙 Night / 🌲 Forest** are dark options for low-light writing.

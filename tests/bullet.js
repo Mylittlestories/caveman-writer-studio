@@ -98,7 +98,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v20.1 present', HTML.includes('v20.1'));
+  chk('structure', 'version v21.0 present', HTML.includes('v21.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -317,7 +317,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v20.1', (b.els['pillVer'].textContent||'').includes('v20.1'));
+  chk('regression', 'pill shows v21.0', (b.els['pillVer'].textContent||'').includes('v21.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);
