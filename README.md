@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v14.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v15.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -22,7 +22,7 @@
 
 <p align="center">
   <a href="#-what-it-is">What it is</a> ·
-  <a href="#-features">Features</a> ·
+  <a href="#-features">Features</a> · <a href="GUIDE.md">📘 Beginner's guide</a> ·
   <a href="#-quick-start">Quick start</a> ·
   <a href="#-how-it-works">How it works</a> ·
   <a href="#-screenshots">Screenshots</a> ·
@@ -70,6 +70,13 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - Levels: Off · Lite · Full · Ultra · Wenyan (novelty)
 - Auto-Clarity (full prose for warnings / irreversible actions / ambiguity), Boundaries (the novel text is always full, polished prose), self-containment (never refuses for missing files), voice precedence (voice sample > house style > masters > genre defaults)
 
+### Power features (v15)
+- 📊 **Words-per-chapter chart** — see every chapter's length vs target at a glance
+- 📚 **Multi-book switching** — keep several books side by side; each with its own brief, chapters, memory, usage
+- ☁️ **Full-book backup** — 💾 Save book (.json) exports brief + chapters + memory; 📂 Load book restores
+- 🎤 **Dictation** — speak your chapter (Chrome/Edge), Greek or English
+- 👥 **Co-author mode** — two narrators, alternating every N chapters, with distinct voices
+
 ### UX
 - Bilingual EN/ΕΛ, 3 themes (🌙 Night / 📜 Parchment / 🌲 Forest), compact mode, collapsible cards, **⛶ focus writing mode**, autosave with "✓ saved" indicator, export/import `.json`, `🩺 self-check`
 
@@ -88,6 +95,8 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 4. **Copy the generated prompt** into any AI (Claude, ChatGPT, Gemini…) and paste the AI's output back into the **Manuscript** tab.
 5. Keep the loop: write → review → save as chapter → next.
 
+> 🆕 New here? Read the **[📘 Beginner's Guide](GUIDE.md)** — 3-step start, daily workflow, FAQ.
+>
 > Runs on **GitHub Pages** out of the box (see [.github/workflows/pages.yml](.github/workflows/pages.yml)).
 
 ---
@@ -127,9 +136,12 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 
 - [x] Full writing loop (idea → chapters → review → memory)
 - [x] Seed-to-novel extender with 3-act + word budget
-- [ ] Word-per-chapter vs plan dashboard chart
-- [ ] Multi-book project switching
-- [ ] Import/export of the full manuscript (not just the brief)
+- [x] Word-per-chapter chart
+- [x] Multi-book switching
+- [x] Full-book export/import (brief + chapters + memory)
+- [x] Dictation (Web Speech)
+- [x] Co-author (two-POV rotation)
+- [ ] Cloud sync (optional, opt-in)
 
 ---
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v14.0</title>
+<title>Caveman Writer Studio — v15.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -345,6 +345,18 @@
   .mdprev ul,.mdprev ol{margin-left:20px}
   .mdprev hr{border:0;border-top:1px solid var(--border2);margin:12px 0}
   .mdprev p{margin:6px 0}
+  /* header book select */
+  #bookSel{background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:4px 8px;font-size:12px;max-width:150px}
+  body.compact #bookSel{padding:3px 6px;font-size:11px}
+  /* word-per-chapter chart */
+  .chchart{margin-top:6px}
+  .chbar-row{display:flex;align-items:center;gap:8px;margin:3px 0}
+  .chbar-lbl{flex:0 0 44px;font-size:11px;color:var(--muted);text-align:right}
+  .chbar{flex:1;height:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .chbar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-soft),var(--accent));border-radius:6px;transition:width .3s}
+  .chbar-val{flex:0 0 52px;font-size:11px;font-family:var(--mono);color:var(--accent)}
+  /* dictation active */
+  #btnMic.on{background:var(--danger);color:#fff;border-color:var(--danger)}
 </style>
 </head>
 <body>
@@ -358,11 +370,14 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v14.0</span>
+    <span class="pill" id="pillVer">v15.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
     <span class="hdrseg" id="layoutSeg"></span>
+    <select id="bookSel" title="Switch book" style="max-width:130px"></select>
+    <button type="button" class="chip" id="btnNewBook">+</button>
+    <button type="button" class="chip" id="btnGuide">📘 Guide</button>
     <span class="hdrseg" id="uiLangSeg"></span>
   </div>
 </header>
@@ -419,6 +434,23 @@
         <label class="lbl" id="lblEnding" for="inEnding">Ending preference</label>
         <select id="inEnding"></select>
       </div>
+      <details class="adv">
+        <summary id="advCo">👥 Co-author — two POVs, alternating (optional)</summary>
+        <label class="check"><input type="checkbox" id="ckCo">
+          <span><b id="ckCoTxt">Enable co-author rotation</b><small id="ckCoSub">chapters alternate between two narrators on a schedule</small></span></label>
+        <div class="field" style="margin-top:6px">
+          <label class="lbl" id="lblPovA" for="inPovA">Narrator A</label>
+          <select id="inPovA"></select>
+        </div>
+        <div class="field">
+          <label class="lbl" id="lblPovB" for="inPovB">Narrator B</label>
+          <select id="inPovB"></select>
+        </div>
+        <div class="field">
+          <label class="lbl" id="lblAlt" for="inAltEvery">Alternate every N chapters</label>
+          <input type="number" id="inAltEvery" min="1" max="10" value="1" style="max-width:80px">
+        </div>
+      </details>
     </div>
 
     <div class="card">
@@ -556,6 +588,17 @@
 
   <!-- ================= RIGHT COLUMN ================= -->
   <div class="col">
+
+    <div class="card" id="qsCard">
+      <h2><span class="num">•</span> <span id="tQS">Start here — 3 steps</span></h2>
+      <div class="chips" style="margin-bottom:8px">
+        <button type="button" class="chip" id="qsSpark">1 · 🎲 Spark an idea</button>
+        <button type="button" class="chip" id="qsVoice">2 · 🧠 Pick my voice</button>
+        <button type="button" class="chip" id="qsCopy">3 · ⧉ Copy prompt</button>
+        <button type="button" class="chip" id="qsHide">✕ Hide</button>
+      </div>
+      <p class="hint" id="qsHint">New here? 1) Get an idea · 2) Choose a voice (your profile or a master) · 3) Copy the prompt into any AI, then paste chapters into 📚 Manuscript. Full guide: 📘 button up top.</p>
+    </div>
 
     <div class="card">
       <h2><span class="num">5</span> <span id="t5">Your prompt (ready to copy)</span></h2>
@@ -731,6 +774,7 @@
         <div id="chPreview" class="mdprev" hidden></div>
         <div class="outbar">
           <button class="btn" id="btnChCount">&#128202; Count</button>
+          <button class="btn ghost" id="btnMic">&#127908; Dictate</button>
           <button class="btn ghost" id="btnChPrev2">&#128065; Preview</button>
           <button class="btn ghost" id="btnChMd">&#128196; .md</button>
           <button class="btn ghost" id="btnMsExport">&#128196;&#128196; Export all</button>
@@ -739,6 +783,10 @@
           <button class="btn ghost" id="btnFocus">&#10530; Focus</button>
         </div>
         <div class="chips" id="chList"></div>
+
+        <div class="divider"></div>
+        <p class="suglabel" id="lblChart">Words per chapter</p>
+        <div id="chChart" class="chchart"></div>
 
         <div class="divider"></div>
         <p class="suglabel" id="lblRhythm">Weekly rhythm</p>
@@ -1534,8 +1582,8 @@
     lblAntagonist:["Ανταγωνιστής / Εμπόδιο","Antagonist / Obstacle"],
     lblCharSheet:["Καρτέλα ήρωα (προαιρετικό)","Character sheet (optional)"],
     btnDice:["🎲 Σπίρκο ιδέας","🎲 Spark"],
-    btnSaveJson:["💾 Αποθήκευση .json","💾 Save .json"],
-    btnLoadJson:["📂 Φόρτωση","📂 Load"],
+    btnSaveJson:["💾 Αποθήκευση βιβλίου (.json)","💾 Save book (.json)"],
+    btnLoadJson:["📂 Φόρτωση βιβλίου","📂 Load book"],
     lblLangQuality:["Ποιότητα γλώσσας","Language quality"],
     ckGreekTxt:["Φρουρός ελληνικής γλώσσας","Greek language guard"],
     ckGreekSub:["άψογη ορθογραφία, τονικά, γραμματική και φυσική ροή — χωρίς ασυνέπειες","flawless orthography, tonics, grammar and natural flow — no inconsistencies"],
@@ -1596,6 +1644,15 @@
     btnBlogCopy:["⧉ Αντιγραφή","⧉ Copy"],
     btnMsExport:["📄📄 Εξαγωγή όλων","📄📄 Export all"],
     btnPitch:["🏷 Οπισθόφυλλο","🏷 Back-cover pitch"],
+    tQS:["Ξεκινήστε εδώ — 3 βήματα","Start here — 3 steps"],
+    qsHint:["Νέος εδώ; 1) Πάρτε μια ιδέα · 2) Διαλέξτε φωνή (το προφίλ σας ή έναν δάσκαλο) · 3) Αντιγράψτε το prompt σε κάθε ΑΙ και μετά επικολλήστε τα κεφάλαια στο 📚 Χειρόγραφο. Πλήρης οδηγός: το κουμπί 📘 πάνω.","New here? 1) Get an idea · 2) Choose a voice (your profile or a master) · 3) Copy the prompt into any AI, then paste chapters into 📚 Manuscript. Full guide: 📘 button up top."],
+    advCo:["👥 Συν-συγγραφείς — δύο POV, εναλλαγή (προαιρετικό)","👥 Co-author — two POVs, alternating (optional)"],
+    ckCoTxt:["Ενεργοποίηση εναλλαγής συν-συγγραφέων","Enable co-author rotation"],
+    ckCoSub:["τα κεφάλαια εναλλάσσονται μεταξύ δύο αφηγητών με πρόγραμμα","chapters alternate between two narrators on a schedule"],
+    lblPovA:["Αφηγητής Α","Narrator A"],
+    lblPovB:["Αφηγητής Β","Narrator B"],
+    lblAlt:["Εναλλαγή κάθε N κεφάλαια","Alternate every N chapters"],
+    lblChart:["Λέξεις ανά κεφάλαιο","Words per chapter"],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
     lblChText:["Κείμενο κεφαλαίου","Chapter text"],
     btnAddCh:["+ Κεφάλαιο","+ Chapter"],
@@ -1820,6 +1877,7 @@
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
+    bookName:"My Book", coAuth:false, povA:"pov1", povB:"pov3c", altEvery:1, qsHidden:false,
     toolChapter:1, toolGoal:"", reviewDraft:"", reviewFull:true, indRev:true, focus:false
   };
   // merge defaults so new fields always exist
@@ -1844,6 +1902,7 @@
           : "Ο αποθηκευτικός χώρος γέμισε — εξάγετε 💾 .json για αντίγραφο ασφαλείας");
       }
     }
+    saveBookSlot();
     var ind = $("savedInd");
     if(ind){
       ind.textContent = "✓ " + (S.lang==="en" ? "saved" : "αποθήκευση");
@@ -2089,6 +2148,121 @@
     toast(EN ? "Blog-style bundle generated — tune it, then generate the brief" : "Γεννήθηκε πακέτο στυλ blog — προσαρμόστε το και μετά φτιάξτε το brief");
   }
 
+  /* ============================================================
+     MULTI-BOOK, CHART, DICTATION, QUICK-START
+     ============================================================ */
+  var BOOKS_KEY = "cws-books-v15";
+  function bookNames(){
+    try{ return JSON.parse(localStorage.getItem(BOOKS_KEY) || "[]"); }catch(e){ return []; }
+  }
+  function saveBookSlot(){
+    try{
+      var b = S.bookName || "My Book";
+      localStorage.setItem("cws-book-" + b, JSON.stringify(S));
+      var idx = bookNames();
+      if(idx.indexOf(b) === -1){ idx.push(b); localStorage.setItem(BOOKS_KEY, JSON.stringify(idx)); }
+    }catch(e){}
+  }
+  function loadBookSlot(name){
+    try{
+      var raw = localStorage.getItem("cws-book-" + name);
+      if(!raw) return false;
+      S = normState(JSON.parse(raw));
+      S.bookName = name;
+      return true;
+    }catch(e){ return false; }
+  }
+  function renderBooks(){
+    var sel = $("bookSel"); if(!sel) return;
+    sel.innerHTML = "";
+    var names = bookNames();
+    if(!names.length){ names = [S.bookName || "My Book"]; }
+    if(names.indexOf(S.bookName) === -1){ names.push(S.bookName); }
+    names.forEach(function(nm){
+      var o = document.createElement("option"); o.value = nm; o.textContent = nm; sel.appendChild(o);
+    });
+    sel.value = S.bookName;
+  }
+  function refreshAll(){
+    syncInputs(); applyStatic(); renderLangSeg(); renderThemeSeg(); applyTheme();
+    renderFormats(); renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings();
+    renderTenses(); renderModes(); renderCoPovs(); renderThemes(); renderTitleSug(); renderStorySug();
+    renderCharSug(); renderLevels(); renderWords(); renderAuthorDetail(); renderModeSeg();
+    renderDensity(); renderModel(); renderRhythm(); renderPreview(); usageText();
+    renderTabs(); renderBunnyList(); renderManuscript(); renderBooks(); renderLayoutSeg(); applyCompact();
+    applyFocus(); renderQuote(); render();
+  }
+  function switchBook(name){
+    saveLS();
+    if(loadBookSlot(name)){
+      saveLS(); refreshAll();
+      toast(S.lang==="en" ? "Book switched: "+name : "Εναλλαγή βιβλίου: "+name);
+    }
+  }
+  function newBook(){
+    var nm = (window.prompt && window.prompt(S.lang==="en" ? "New book name:" : "Όνομα νέου βιβλίου:", "")) || "";
+    nm = nm.trim();
+    if(!nm){ return; }
+    saveLS();
+    var fresh = normState({});
+    fresh.bookName = nm;
+    S = fresh;
+    saveLS(); refreshAll();
+    toast(S.lang==="en" ? "New book created: "+nm : "Νέο βιβλίο: "+nm);
+  }
+  function renderChart(){
+    var el = $("chChart"); if(!el) return;
+    var chs = S.chapters || [];
+    var wpc = wpcFor();
+    if(!chs.length){ el.innerHTML = '<span class="hint">' + (S.lang==="en" ? "Add a chapter to see the chart." : "Προσθέστε ένα κεφάλαιο για να δείτε το διάγραμμα.") + '</span>'; return; }
+    var html = "";
+    chs.forEach(function(ch, idx){
+      var w = chWords(ch);
+      var pct = wpc ? Math.min(100, Math.round(w/wpc*100)) : 0;
+      html += '<div class="chbar-row"><span class="chbar-lbl">' + (S.lang==="en" ? "Ch " : "Κεφ. ") + (idx+1) + '</span>'
+            + '<div class="chbar"><i style="width:'+pct+'%"></i></div>'
+            + '<span class="chbar-val">'+w.toLocaleString(S.lang==="en"?"en-US":"el-GR")+'</span></div>';
+    });
+    el.innerHTML = html;
+  }
+  function applyQS(){
+    var c = $("qsCard"); if(!c) return;
+    c.style.display = S.qsHidden ? "none" : "";
+  }
+  function toggleDictate(){
+    var btn = $("btnMic");
+    var SR = (typeof window !== "undefined") && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    if(!SR){
+      toast(S.lang==="en" ? "Dictation not supported in this browser (try Chrome/Edge)" : "Η υπαγόρευση δεν υποστηρίζεται σε αυτό το πρόγραμμα (δοκιμάστε Chrome/Edge)");
+      return;
+    }
+    if(S._dictating){
+      try{ S._dictating.stop(); }catch(e){}
+      S._dictating = null;
+      if(btn){ btn.textContent = "🎤 Dictate"; btn.classList.remove("on"); }
+      toast(S.lang==="en" ? "Dictation stopped" : "Η υπαγόρευση σταμάτησε");
+      return;
+    }
+    var rec = new SR();
+    rec.lang = S.lang === "en" ? "en-US" : "el-GR";
+    rec.continuous = true;
+    rec.interimResults = true;
+    var startText = ($("inChText").value || "").trim();
+    rec.onresult = function(ev){
+      var t = "";
+      for(var i = ev.resultIndex; i < ev.results.length; i++){
+        t += ev.results[i][0].transcript;
+      }
+      $("inChText").value = startText ? startText + " " + t.trim() : t.trim();
+      msSaveCur($("inChTitle").value, $("inChText").value);
+    };
+    rec.onend = function(){
+      if(S._dictating){ S._dictating = null; if(btn){ btn.textContent = "🎤 Dictate"; btn.classList.remove("on"); } }
+    };
+    rec.onerror = function(){ if(btn){ btn.textContent = "🎤 Dictate"; btn.classList.remove("on"); } S._dictating = null; };
+    try{ rec.start(); S._dictating = rec; if(btn){ btn.textContent = "● 🎤 Stop"; btn.classList.add("on"); } }catch(e){ toast(S.lang==="en" ? "Could not start dictation" : "Δεν ήταν δυνατή η έναρξη υπαγόρευσης"); }
+  }
+
   /* ---------- manuscript ---------- */
   function chWords(ch){
     return ch && ch.text ? ch.text.trim().split(/\s+/).length : 0;
@@ -2123,6 +2297,7 @@
         x.value = chs[cur].text || "";
       } else { t.value = ""; x.value = ""; }
     }
+    renderChart();
     var st = $("msStats");
     if(st){
       var total = 0; chs.forEach(function(ch){ total += chWords(ch); });
@@ -2144,6 +2319,7 @@
     }
     renderManuscript();
   }
+  function renderManuscriptChart(){ renderChart(); }
 
   /* ---------- tabbed tools ---------- */
   var TAB_LABELS = [
@@ -2342,7 +2518,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v14.0";
+    $("pillVer").textContent = "v15.0";
   }
 
   function applyStatic(){
@@ -2409,6 +2585,23 @@
       var o = document.createElement("option"); o.value = p[0]; o.textContent = S.lang==="en"?p[2]:p[1]; sel.appendChild(o);
     });
   }
+  function povLabel(id){
+    var p = POVS[id] || POVS.pov1;
+    return S.lang==="en" ? p.en : p.el;
+  }
+  function renderCoPovs(){
+    var a = $("inPovA"), b = $("inPovB");
+    if(!a || !b) return;
+    [a, b].forEach(function(sel){
+      sel.innerHTML = "";
+      POV_LABELS.forEach(function(p){
+        var o = document.createElement("option"); o.value = p[0]; o.textContent = S.lang==="en"?p[2]:p[1]; sel.appendChild(o);
+      });
+    });
+    a.value = S.povA || "pov1";
+    b.value = S.povB || "pov3c";
+  }
+
   function renderTones(){
     var sel = $("inTone"); sel.innerHTML = "";
     TONES.forEach(function(t){
@@ -2985,6 +3178,16 @@
         ? "If the recap is empty, derive continuity from the brief and current story; flag your assumptions in one caveman line — never refuse."
         : "Αν η περίληψη είναι άδεια, συνέχισε από το brief και την τρέχουσα ιστορία· σημείωσε τις παραδοχές σου σε μία σπηλαιώδη γραμμή — ποτέ μην αρνηθείς.");
     }
+    if(S.coAuth){
+      var slot = (Math.ceil(n / Math.max(1, S.altEvery||1)) % 2) === 1;
+      var povNow = slot ? S.povA : S.povB;
+      P.push(EN
+        ? "- Narration this chapter (co-author rotation): "+povLabel(povNow)+"."
+        : "- Αφήγηση αυτού του κεφαλαίου (εναλλαγή συν-συγγραφέων): "+povLabel(povNow)+".");
+      P.push(EN
+        ? "- Voice rules: Narrator A must sound distinct from Narrator B (word choice, rhythm, what they notice). Switch cleanly at chapter start."
+        : "- Κανόνες φωνής: ο Αφηγητής Α πρέπει να ακούγεται διαφορετικός από τον Β (λεξιλόγιο, ρυθμός, τι προσέχουν). Άλλαξε καθαρά στην αρχή του κεφαλαίου.");
+    }
     var recap = (S.contSummary||"").trim();
     if(recap){ P.push(EN ? "**Recap so far:** "+recap : "**Τι προηγήθηκε:** "+recap); }
     var note = (S.contNote||"").trim();
@@ -3311,6 +3514,11 @@
       ? "Write Chapter 1 of the continuation (~"+wpc.toLocaleString(loc)+" words, full literary Modern Greek), picking up exactly where the seed ends, matching the seed's voice and the house style."
       : "Γράψε το Κεφάλαιο 1 της συνέχειας (~"+wpc.toLocaleString(loc)+" λέξεις, πλήρη λογοτεχνικά ελληνικά), αρχίζοντας ακριβώς από εκεί που τελειώνει το seed, ταιριάζοντας τη φωνή του seed και το house style.");
     if(S.myStyle){ P.push(EN ? "- House style (George Derventlis) applies to the continuation." : "- Το house style (Γιώργος Δερβεντλής) ισχύει στη συνέχεια."); }
+    if(S.coAuth){
+      P.push(EN
+        ? "- Co-author rotation: chapters alternate Narrator A / Narrator B every "+(S.altEvery||1)+" chapter(s), starting with A. A = "+povLabel(S.povA)+", B = "+povLabel(S.povB)+"."
+        : "- Εναλλαγή συν-συγγραφέων: τα κεφάλαια εναλλάσσονται Αφηγητής Α / Β κάθε "+(S.altEvery||1)+" κεφάλαιο(α), ξεκινώντας από τον Α. Α = "+povLabel(S.povA)+", Β = "+povLabel(S.povB)+".");
+    }
     P.push("");
     P.push(EN ? "## CAVEMAN PROTOCOL (LEVEL: "+lvl.label.toUpperCase()+")" : "## ΣΠΗΛΑΙΩΔΕΣ ΠΡΩΤΟΚΟΛΛΟ (ΕΠΙΠΕΔΟ: "+lvl.label.toUpperCase()+")");
     protocolLines().forEach(function(r){ P.push("- "+r); });
@@ -3700,6 +3908,10 @@
     $("ckIndRev").checked = S.indRev !== false;
     $("inWeekly").value = S.weekly || 2;
     $("ckBlog").checked = S.blogOn === true;
+    $("ckCo").checked = S.coAuth === true;
+    $("inPovA").value = S.povA || "pov1";
+    $("inPovB").value = S.povB || "pov3c";
+    $("inAltEvery").value = S.altEvery || 1;
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
     $("inHero").value = S.hero;
@@ -3755,6 +3967,20 @@
     $("ckAntiLLM").addEventListener("change", function(){ S.antiLLM = this.checked; render(); });
     $("ckCritique").addEventListener("change", function(){ S.reviewCritique = this.checked; });
     $("ckIndRev").addEventListener("change", function(){ S.indRev = this.checked; });
+    $("ckCo").addEventListener("change", function(){ S.coAuth = this.checked; render(); saveLS(); });
+    $("inPovA").addEventListener("change", function(){ S.povA = this.value; render(); saveLS(); });
+    $("inPovB").addEventListener("change", function(){ S.povB = this.value; render(); saveLS(); });
+    $("inAltEvery").addEventListener("input", function(){ S.altEvery = parseInt(this.value,10)||1; saveLS(); });
+    $("bookSel").addEventListener("change", function(){ if(this.value && this.value !== S.bookName){ switchBook(this.value); } });
+    $("btnNewBook").addEventListener("click", newBook);
+    $("btnGuide").addEventListener("click", function(){
+      var g = $("guide"); if(g){ g.setAttribute("open", ""); g.scrollIntoView({behavior:"smooth", block:"start"}); }
+    });
+    $("qsSpark").addEventListener("click", randomStarter);
+    $("qsVoice").addEventListener("click", loadProfile);
+    $("qsCopy").addEventListener("click", function(){ $("btnCopy").click(); });
+    $("qsHide").addEventListener("click", function(){ S.qsHidden = true; applyQS(); saveLS(); });
+    $("btnMic").addEventListener("click", toggleDictate);
     $("ckBlog").addEventListener("change", function(){
       S.blogOn = this.checked;
       var b = $("btnBlogGen");
@@ -4017,6 +4243,7 @@
     renderTabs(); renderBunnyList(); renderManuscript();
     renderDensity(); renderModel(); renderRhythm(); renderPreview(); usageText();
     var bb = $("btnBlogGen"); if(bb){ bb.disabled = !(S.blogOn === true); }
+    renderBooks(); renderCoPovs(); applyQS();
     applyFocus();
     renderQuote();
     renderFormats(); renderWords(); renderAuthors(); renderThemes(); renderLevels(); renderAuthorDetail();
