@@ -55,6 +55,6 @@ What's the one thing your writing workflow is missing? I read every comment. �
 | Profile README card | ✅ | featured on github.com/Mylittlestories |
 | Roadmap issues #3–#8 | ✅ | created (cloud backend, EPUB/PDF, diff, co-author voice, multi-book, chapter map) |
 | Topics · homepage · OG/SEO · deploy badge | ✅ | all live |
-| **GitHub Project board** | ⚠️ 30s UI | Repo → **Projects** → New project → add issues #3–#8 as cards (API needs `project` scope, not in this token) |
+| **GitHub Project board** | ✅ done | [github.com/users/Mylittlestories/projects/1](https://github.com/users/Mylittlestories/projects/1) — issues #3–#8 as cards (Todo/In Progress/Done) |
 | Social preview image | ⚠️ manual | Repo → Settings → Social preview → `assets/og-image.jpg` |
 | External posts (X / LinkedIn / Reddit) | ⏳ manual | LinkedIn copy above; X/Reddit on request |

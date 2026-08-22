@@ -162,7 +162,7 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 - [ ] Multi-book editing refinements · [#7](https://github.com/Mylittlestories/caveman-writer-studio/issues/7)
 - [ ] Chapter map / navigation sidebar · [#8](https://github.com/Mylittlestories/caveman-writer-studio/issues/8)
 
-> 📋 Track progress on the **GitHub Project board** (repo → Projects tab → New project; add issues #3–#8 as cards).
+> 📋 Track progress on the **GitHub Project board** → [github.com/users/Mylittlestories/projects/1](https://github.com/users/Mylittlestories/projects/1) (issues #3–#8, with Todo / In Progress / Done).
 
 ---
 
