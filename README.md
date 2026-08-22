@@ -154,7 +154,15 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 - [x] Dictation (Web Speech)
 - [x] Co-author (two-POV rotation)
 - [x] Cloud sync (link-based, offline — no server)
-- [ ] Cloud sync with real backend (optional, opt-in)
+- [x] CI — the 59-check suite auto-runs on every push
+- [ ] Cloud sync with real backend (optional, opt-in) · [#3](https://github.com/Mylittlestories/caveman-writer-studio/issues/3)
+- [ ] Export to EPUB / PDF · [#4](https://github.com/Mylittlestories/caveman-writer-studio/issues/4)
+- [ ] Revision-diff view (old vs corrected) · [#5](https://github.com/Mylittlestories/caveman-writer-studio/issues/5)
+- [ ] Co-author distinct-voice check · [#6](https://github.com/Mylittlestories/caveman-writer-studio/issues/6)
+- [ ] Multi-book editing refinements · [#7](https://github.com/Mylittlestories/caveman-writer-studio/issues/7)
+- [ ] Chapter map / navigation sidebar · [#8](https://github.com/Mylittlestories/caveman-writer-studio/issues/8)
+
+> 📋 Track progress on the **GitHub Project board** (repo → Projects tab → New project; add issues #3–#8 as cards).
 
 ---
 
