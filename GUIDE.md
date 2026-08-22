@@ -83,6 +83,14 @@ Two narrators, alternating on a schedule:
 - **🔁 Re-brief the whole book** — one click builds a full-context prompt: story bible + glossary + character sheet + story state + **every chapter so far**. Paste it into your AI whenever it seems to have "forgotten" the book or you want to resume after a break.
 - **Keyboard** — press **Alt+1…6** to jump between the six tool tabs.
 
+## 🎯 Word goals + chapter search (v18)
+- **Goal (words)** field in 📚 Manuscript — set a per-chapter target (default: your format's chapter size). The chart bars and the stats line use it (`words / goal`).
+- **Search chapters** field above the chapter list — filters instantly by title/text.
+
+## 🛡 Reliability
+- The app is hardened so it **never breaks**: if a control is ever missing it becomes a no-op instead of crashing; unexpected errors show a friendly notice (your work is always autosaved); storage-full shows a clear warning.
+- Developers: run `node tests/bullet.js` — 59 checks across 5 angles (syntax, structure, functional, robustness, regression).
+
 ## 🎨 Comfort settings
 
 - **Theme** — 🌙 Night (dark) · 📜 Parchment (light, default) · 🌲 Forest (muted dark)

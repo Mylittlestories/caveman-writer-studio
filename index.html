@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v17.0</title>
+<title>Caveman Writer Studio — v18.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -375,7 +375,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v17.0</span>
+    <span class="pill" id="pillVer">v18.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -776,6 +776,11 @@
           <label class="lbl" id="lblChTitle" for="inChTitle">Chapter title (optional)</label>
           <input type="text" id="inChTitle">
         </div>
+        <div class="field" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="lbl" id="lblChGoal" for="inChGoal" style="margin:0">Goal (words)</label>
+          <input type="number" id="inChGoal" min="100" step="100" style="max-width:110px">
+          <span class="hint" id="chGoalHint"></span>
+        </div>
         <div class="field">
           <label class="lbl" id="lblChText" for="inChText">Chapter text</label>
           <textarea id="inChText" style="min-height:220px"></textarea>
@@ -790,6 +795,9 @@
           <button class="btn ghost" id="btnChDone" title="Log to story state + weekly count">&#10003; Done &#8594; story state</button>
           <button class="btn ghost" id="btnChDel" title="Delete chapter">&#10005; Delete</button>
           <button class="btn ghost" id="btnFocus" title="Full-screen writing (Esc to exit)">&#10530; Focus</button>
+        </div>
+        <div class="field" style="margin-top:6px">
+          <input type="text" id="inChSearch">
         </div>
         <div class="chips" id="chList"></div>
         <div class="chips" id="chStatusRow" style="margin-top:6px"></div>
@@ -1666,6 +1674,8 @@
     lblPovB:["Αφηγητής Β","Narrator B"],
     lblAlt:["Εναλλαγή κάθε N κεφάλαια","Alternate every N chapters"],
     lblChart:["Λέξεις ανά κεφάλαιο","Words per chapter"],
+    lblChGoal:["Στόχος (λέξεις)","Goal (words)"],
+
     btnSync:["🔗 Κοινή χρήση βιβλίου με σύνδεσμο","🔗 Share book via link"],
     syncHint:["Συγχρονισμός μέσω συνδέσμου: κωδικοποιεί όλο το βιβλίο σε ένα URL — ανοίξτε το σε άλλη συσκευή για να φορτωθεί. Χωρίς server, εντελώς ιδιωτικό. Πολύ μεγάλα βιβλία (όριο URL) → χρησιμοποιήστε 💾 Αποθήκευση βιβλίου (.json).","Link-based sync: encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json)."],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
@@ -1717,6 +1727,7 @@
     inSeedNote:["π.χ. η ιστορία πρέπει να γίνει μυθιστόρημα, ο ήρωας να αντιμετωπίσει τον δήμαρχο, η γέφυρα να αποκαλυφθεί…","e.g. the story must become a novel, the hero must face the mayor, the bridge must be revealed…"],
     inState:["π.χ. Ο Δημήτρης βρήκε το Αρχείο· ο δήμαρχος έμαθε τα πάντα· η γέφυρα ψιθύρισε τρεις φορές…","e.g. Dimitris found the Archive; the mayor learned everything; the bridge whispered three times…"],
     inChTitle:["π.χ. Η πόρτα","e.g. The Door"],
+    inChSearch:["αναζήτηση κεφαλαίων…","search chapters…"],
     inChText:["γράψτε ή επικολλήστε εδώ το κεφάλαιο…","write or paste the chapter here…"],
     inBunny:["μια σπίθα ιδέας που θέλετε να κρατήσετε για αργότερα…","a spark of an idea you want to keep for later…"],
     inContSummary:["π.χ. «ήρωας βρήκε την πόρτα· κάτι κινήθηκε μέσα»","e.g. “hero found the door; something moved inside”"],
@@ -1892,7 +1903,7 @@
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
-    statuses:{},
+    statuses:{}, chGoals:{}, chSearch:"",
     bookName:"My Book", coAuth:false, povA:"pov1", povB:"pov3c", altEvery:1, qsHidden:false,
     toolChapter:1, toolGoal:"", reviewDraft:"", reviewFull:true, indRev:true, focus:false
   };
@@ -1903,7 +1914,17 @@
   }
   S = S0;
 
-  var $ = function(id){ return document.getElementById(id); };
+  /* $ is resilience-hardened: if an element is ever missing, return a safe no-op
+     stub so no code path can crash the app. Real elements behave normally. */
+  var _safeEl = function(){
+    return { style:{}, classList:{ add:function(){}, remove:function(){}, toggle:function(){}, contains:function(){ return false; } },
+      setAttribute:function(){}, getAttribute:function(){ return null; }, addEventListener:function(){}, removeEventListener:function(){},
+      appendChild:function(){}, focus:function(){}, select:function(){}, remove:function(){}, click:function(){},
+      querySelector:function(){ return null; }, querySelectorAll:function(){ return []; }, scrollIntoView:function(){},
+      set innerHTML(v){}, get innerHTML(){ return ""; }, set value(v){}, get value(){ return ""; },
+      textContent:"", checked:false, hidden:false, disabled:false, onclick:null };
+  };
+  var $ = function(id){ var el = document.getElementById(id); return el || _safeEl(); };
   var lsKey = "caveman-writer-studio-v12";
 
   var _quotaWarned = false;
@@ -2229,15 +2250,15 @@
   function renderChart(){
     var el = $("chChart"); if(!el) return;
     var chs = S.chapters || [];
-    var wpc = wpcFor();
     if(!chs.length){ el.innerHTML = '<span class="hint">' + (S.lang==="en" ? "Add a chapter to see the chart." : "Προσθέστε ένα κεφάλαιο για να δείτε το διάγραμμα.") + '</span>'; return; }
     var html = "";
     chs.forEach(function(ch, idx){
       var w = chWords(ch);
-      var pct = wpc ? Math.min(100, Math.round(w/wpc*100)) : 0;
+      var g = chGoal(idx);
+      var pct = g ? Math.min(100, Math.round(w/g*100)) : 0;
       html += '<div class="chbar-row"><span class="chbar-lbl">' + (S.lang==="en" ? "Ch " : "Κεφ. ") + (idx+1) + '</span>'
             + '<div class="chbar"><i style="width:'+pct+'%"></i></div>'
-            + '<span class="chbar-val">'+w.toLocaleString(S.lang==="en"?"en-US":"el-GR")+'</span></div>';
+            + '<span class="chbar-val">'+w.toLocaleString(S.lang==="en"?"en-US":"el-GR")+'/'+g.toLocaleString(S.lang==="en"?"en-US":"el-GR")+'</span></div>';
     });
     el.innerHTML = html;
   }
@@ -2385,6 +2406,10 @@
   }
 
   /* ---------- manuscript ---------- */
+  function chGoal(idx){
+    var g = (S.chGoals || {})[idx];
+    return g && g > 0 ? g : wpcFor();
+  }
   function chWords(ch){
     return ch && ch.text ? ch.text.trim().split(/\s+/).length : 0;
   }
@@ -2418,6 +2443,18 @@
         x.value = chs[cur].text || "";
       } else { t.value = ""; x.value = ""; }
     }
+    var g = $("inChGoal"), gh = $("chGoalHint");
+    if(g){ g.value = chs.length ? chGoal(cur) : ""; }
+    if(gh){ gh.textContent = S.lang==="en" ? "default ~"+wpcFor().toLocaleString("en-US") : "προεπιλογή ~"+wpcFor().toLocaleString("el-GR"); }
+    var sf = (S.chSearch||"").trim().toLowerCase();
+    var list = $("chList");
+    if(list && sf){
+      var rows = Array.prototype.slice.call(list.querySelectorAll ? list.querySelectorAll(".chip") : []);
+      rows.forEach(function(rc){
+        var match = (rc.textContent||"").toLowerCase().indexOf(sf) !== -1;
+        rc.style.display = match ? "" : "none";
+      });
+    }
     renderChart();
     renderStatusRow();
     var st = $("msStats");
@@ -2426,10 +2463,11 @@
       var target = S.words || 0;
       var wpc = wpcFor();
       var pctBook = target ? Math.round(total/target*100) : 0;
-      var chPct = wpc ? Math.round((chs[cur]?chWords(chs[cur]):0)/wpc*100) : 0;
+      var curG = chs[cur] ? chGoal(cur) : 0;
+      var chPct = curG ? Math.round((chs[cur]?chWords(chs[cur]):0)/curG*100) : 0;
       st.innerHTML = (S.lang==="en"
-        ? "<b>"+total.toLocaleString("en-US")+"</b> words · "+(target?pctBook+"% of "+target.toLocaleString("en-US")+"-word target":"no target")+" · this ch "+chPct+"% of ~"+wpc.toLocaleString("en-US")
-        : "<b>"+total.toLocaleString("el-GR")+"</b> λέξεις · "+(target?pctBook+"% του στόχου "+target.toLocaleString("el-GR")+" λέξεων":"χωρίς στόχο")+" · αυτό το κεφ. "+chPct+"% των ~"+wpc.toLocaleString("el-GR"));
+        ? "<b>"+total.toLocaleString("en-US")+"</b> words · "+(target?pctBook+"% of "+target.toLocaleString("en-US")+"-word target":"no target")+" · this ch "+chPct+"% of "+curG.toLocaleString("en-US")+"-word goal"
+        : "<b>"+total.toLocaleString("el-GR")+"</b> λέξεις · "+(target?pctBook+"% του στόχου "+target.toLocaleString("el-GR")+" λέξεων":"χωρίς στόχο")+" · αυτό το κεφ. "+chPct+"% του στόχου "+curG.toLocaleString("el-GR")+" λέξεων");
     }
   }
   function msCur(){ return (S.chapters||[])[S.curCh||0]; }
@@ -2441,7 +2479,6 @@
     }
     renderManuscript();
   }
-  function renderManuscriptChart(){ renderChart(); }
 
   /* ---------- tabbed tools ---------- */
   var TAB_LABELS = [
@@ -2642,7 +2679,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v17.0";
+    $("pillVer").textContent = "v18.0";
   }
 
   function applyStatic(){
@@ -3902,7 +3939,7 @@
       add(EN ? "### Chapter "+(idx+1)+(ch.title ? " — "+ch.title : "") : "### Κεφάλαιο "+(idx+1)+(ch.title ? " — "+ch.title : ""));
       var st = (S.statuses || {})[idx] || "draft";
       add((EN ? "Status: " : "Status: ") + (STATUS_LABELS[st] ? STATUS_LABELS[st][EN?1:0] : st));
-      add("("+chWords(ch).toLocaleString(loc)+(EN?" words":" λέξεις")+")");
+      add("(goal "+chGoal(idx).toLocaleString(loc)+" · "+chWords(ch).toLocaleString(loc)+(EN?" words":" λέξεις")+")");
       add(ch.text || (EN ? "(empty)" : "(κενό)"));
     });
     var fname = ((S.title||"").trim() || "book").replace(/[^\w\u0370-\u03FF]+/g,"-").replace(/^-+|-+$/g,"") + "-book-bible.md";
@@ -4197,6 +4234,13 @@
     $("inSeedNote").addEventListener("input", function(){ S.seedNote = this.value; });
     $("inState").addEventListener("input", function(){ S.storyState = this.value; });
     $("inChTitle").addEventListener("input", function(){ msSaveCur(this.value, $("inChText").value); });
+    $("inChGoal").addEventListener("input", function(){
+      var v = parseInt(this.value,10)||0;
+      S.chGoals = S.chGoals || {};
+      S.chGoals[S.curCh||0] = v > 0 ? v : 0;
+      renderManuscript(); saveLS();
+    });
+    $("inChSearch").addEventListener("input", function(){ S.chSearch = this.value; renderManuscript(); });
     $("inChText").addEventListener("input", function(){ msSaveCur($("inChTitle").value, this.value); });
     $("btnAddCh").addEventListener("click", function(){
       S.chapters = S.chapters || [];
@@ -4374,6 +4418,11 @@
      INIT
      ============================================================ */
   function init(){
+    if(typeof window !== "undefined" && window.addEventListener){
+      window.addEventListener("error", function(ev){
+        try{ toast((S && S.lang === "en" ? "Unexpected error — your work is autosaved ✓ " : "Απρόσμενο σφάλμα — η εργασία σας αποθηκεύεται αυτόματα ✓ ") + ((ev && ev.message) || "")); }catch(e){}
+      });
+    }
     $("rockA").innerHTML = rockSVG(42);
     var loaded = loadLS();
     if(loaded && S.words === 0){ S.words = FORMATS[S.format].defWords; }

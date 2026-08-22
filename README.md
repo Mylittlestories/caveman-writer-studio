@@ -10,13 +10,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v17.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v18.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square" alt="Zero dependencies">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml/badge.svg" alt="Pages deploy"></a>
   <img src="https://img.shields.io/badge/build-single%20HTML-27ae60?style=flat-square" alt="Single HTML">
+  <img src="https://img.shields.io/badge/tests-59%20passed-8fbc8f?style=flat-square" alt="59 tests passing">
   <img src="https://img.shields.io/badge/languages-EN%20%E2%80%A2%20%CE%95%CE%9B-e8b46a?style=flat-square" alt="Bilingual">
 </p>
 
@@ -76,6 +77,8 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - ☁️ **Full-book backup** — 💾 Save book (.json) exports brief + chapters + memory; 📂 Load book restores
 - 🎤 **Dictation** — speak your chapter (Chrome/Edge), Greek or English
 - 👥 **Co-author mode** — two narrators, alternating every N chapters, with distinct voices
+- 🎯 **Per-chapter word goal** — set a goal per chapter (default from format); chart & stats use it
+- 🔍 **Chapter search** — filter the chapter list instantly
 - 🔁 **Re-brief** — one click: a full-context prompt (bible + glossary + character + story state + all chapters) for a mid-book re-focus
 - 📊 **Book status mini-map** — draft / reviewed / final per chapter, click to cycle; persisted
 - 🔗 **Cloud sync (link-based)** — encode the whole book into a shareable URL, open it on any device to load it (no server, fully private); 💾 Save book (.json) for full backups
@@ -134,6 +137,10 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 *(Live app is the best screenshot — open `index.html`.)*
 
 ---
+
+## ✅ Reliability
+- Resilience-hardened: a missing element can never crash the app (safe `$` stub), global error handler, autosave + quota fallback, guarded empty-state actions.
+- **Bulletproof test suite** — `tests/bullet.js` (59 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
 
 ## 🗺 Roadmap
 
