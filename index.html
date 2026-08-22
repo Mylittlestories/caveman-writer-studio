@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v15.0</title>
+<title>Caveman Writer Studio — v16.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -370,7 +370,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v15.0</span>
+    <span class="pill" id="pillVer">v16.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -457,6 +457,7 @@
       <h2><span class="num">2</span> <span id="t2">Inspiring authors</span>
         <button type="button" class="chip" id="btnPreset" style="margin-left:auto">🧠 My profile</button></h2>
       <p class="hint" id="h2" style="margin-bottom:10px">Pick one or more. Their techniques are baked into the prompt.</p>
+      <p class="hint" style="margin-bottom:10px;color:var(--accent-soft)" id="h2rec">💡 Not sure? Start with 🧠 My profile (your own voice) — then add a master or two for flavor.</p>
       <div class="authors" id="authorGrid"></div>
     </div>
 
@@ -596,6 +597,7 @@
         <button type="button" class="chip" id="qsVoice">2 · 🧠 Pick my voice</button>
         <button type="button" class="chip" id="qsCopy">3 · ⧉ Copy prompt</button>
         <button type="button" class="chip" id="qsHide">✕ Hide</button>
+        <button type="button" class="chip" id="qsAdv">✨ Hide advanced options</button>
       </div>
       <p class="hint" id="qsHint">New here? 1) Get an idea · 2) Choose a voice (your profile or a master) · 3) Copy the prompt into any AI, then paste chapters into 📚 Manuscript. Full guide: 📘 button up top.</p>
     </div>
@@ -744,7 +746,9 @@
         </div>
         <div class="outbar">
           <button class="btn ghost" id="btnBible">&#128218; Export book bible (.md)</button>
+          <button class="btn ghost" id="btnSync">&#128279; Share book via link</button>
         </div>
+        <p class="hint" id="syncHint">Link-based "cloud sync": encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json).</p>
         <div class="divider"></div>
         <div class="field">
           <label class="lbl" id="lblBunny" for="inBunny">Idea inbox (plot bunnies)</label>
@@ -774,13 +778,13 @@
         <div id="chPreview" class="mdprev" hidden></div>
         <div class="outbar">
           <button class="btn" id="btnChCount">&#128202; Count</button>
-          <button class="btn ghost" id="btnMic">&#127908; Dictate</button>
-          <button class="btn ghost" id="btnChPrev2">&#128065; Preview</button>
-          <button class="btn ghost" id="btnChMd">&#128196; .md</button>
-          <button class="btn ghost" id="btnMsExport">&#128196;&#128196; Export all</button>
-          <button class="btn ghost" id="btnChDone">&#10003; Done &#8594; story state</button>
-          <button class="btn ghost" id="btnChDel">&#10005; Delete</button>
-          <button class="btn ghost" id="btnFocus">&#10530; Focus</button>
+          <button class="btn ghost" id="btnMic" title="Dictation (Chrome/Edge)">&#127908; Dictate</button>
+          <button class="btn ghost" id="btnChPrev2" title="Markdown preview">&#128065; Preview</button>
+          <button class="btn ghost" id="btnChMd" title="Export this chapter (.md)">&#128196; .md</button>
+          <button class="btn ghost" id="btnMsExport" title="Export whole manuscript (.md)">&#128196;&#128196; Export all</button>
+          <button class="btn ghost" id="btnChDone" title="Log to story state + weekly count">&#10003; Done &#8594; story state</button>
+          <button class="btn ghost" id="btnChDel" title="Delete chapter">&#10005; Delete</button>
+          <button class="btn ghost" id="btnFocus" title="Full-screen writing (Esc to exit)">&#10530; Focus</button>
         </div>
         <div class="chips" id="chList"></div>
 
@@ -1653,6 +1657,8 @@
     lblPovB:["Αφηγητής Β","Narrator B"],
     lblAlt:["Εναλλαγή κάθε N κεφάλαια","Alternate every N chapters"],
     lblChart:["Λέξεις ανά κεφάλαιο","Words per chapter"],
+    btnSync:["🔗 Κοινή χρήση βιβλίου με σύνδεσμο","🔗 Share book via link"],
+    syncHint:["Συγχρονισμός μέσω συνδέσμου: κωδικοποιεί όλο το βιβλίο σε ένα URL — ανοίξτε το σε άλλη συσκευή για να φορτωθεί. Χωρίς server, εντελώς ιδιωτικό. Πολύ μεγάλα βιβλία (όριο URL) → χρησιμοποιήστε 💾 Αποθήκευση βιβλίου (.json).","Link-based sync: encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json)."],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
     lblChText:["Κείμενο κεφαλαίου","Chapter text"],
     btnAddCh:["+ Κεφάλαιο","+ Chapter"],
@@ -2263,6 +2269,49 @@
     try{ rec.start(); S._dictating = rec; if(btn){ btn.textContent = "● 🎤 Stop"; btn.classList.add("on"); } }catch(e){ toast(S.lang==="en" ? "Could not start dictation" : "Δεν ήταν δυνατή η έναρξη υπαγόρευσης"); }
   }
 
+  /* ============================================================
+     CLOUD SYNC (link-based, offline) + BEGINNER MODE
+     ============================================================ */
+  function shareBook(){
+    try{
+      var data = JSON.stringify(S);
+      var enc = btoa(unescape(encodeURIComponent(data))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      if(enc.length > 30000){
+        toast(S.lang==="en" ? "Book too large for a link — use 💾 Save book (.json)" : "Το βιβλίο είναι πολύ μεγάλο για σύνδεσμο — χρησιμοποιήστε 💾 Αποθήκευση βιβλίου (.json)");
+        return;
+      }
+      var url = location.origin + location.pathname + "#book=" + enc;
+      copyText(url, S.lang==="en" ? "Link copied — open it on another device to load this book" : "Ο σύνδεσμος αντιγράφηκε — ανοίξτε τον σε άλλη συσκευή για να φορτωθεί το βιβλίο");
+    }catch(e){
+      toast(S.lang==="en" ? "Could not create link" : "Δεν ήταν δυνατή η δημιουργία συνδέσμου");
+    }
+  }
+  function restoreFromHash(){
+    try{
+      var h = location.hash || "";
+      var m = h.match(/#book=([A-Za-z0-9_-]+)/);
+      if(!m) return;
+      var enc = m[1].replace(/-/g,'+').replace(/_/g,'/');
+      while(enc.length % 4){ enc += "="; }
+      var data = decodeURIComponent(escape(atob(enc)));
+      var d = JSON.parse(data);
+      if(window.confirm && !window.confirm(S.lang==="en" ? "Load shared book \""+(d.bookName||"My Book")+"\"?" : "Να φορτωθεί το κοινόχρηστο βιβλίο «"+(d.bookName||"My Book")+"»;")){ return; }
+      S = normState(d);
+      saveLS(); refreshAll();
+      try{ history.replaceState(null,"",location.pathname); }catch(e){}
+      toast(S.lang==="en" ? "Shared book loaded ✓" : "Το κοινόχρηστο βιβλίο φορτώθηκε ✓");
+    }catch(e){}
+  }
+  function toggleAdv(){
+    var ds = document.querySelectorAll ? document.querySelectorAll("details.adv") : [];
+    var anyOpen = false;
+    ds.forEach(function(d){ if(d.getAttribute && d.getAttribute("open") !== null){ anyOpen = true; } });
+    ds.forEach(function(d){
+      if(anyOpen){ d.removeAttribute("open"); } else { d.setAttribute("open", ""); }
+    });
+    toast(anyOpen ? (S.lang==="en" ? "Advanced options hidden (beginner mode)" : "Οι προχωρημένες επιλογές κρύφτηκαν (λειτουργία αρχαρίων)") : (S.lang==="en" ? "Advanced options shown" : "Οι προχωρημένες επιλογές εμφανίστηκαν"));
+  }
+
   /* ---------- manuscript ---------- */
   function chWords(ch){
     return ch && ch.text ? ch.text.trim().split(/\s+/).length : 0;
@@ -2518,7 +2567,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v15.0";
+    $("pillVer").textContent = "v16.0";
   }
 
   function applyStatic(){
@@ -4091,6 +4140,8 @@
       toast(S.lang==="en" ? "Chapter deleted" : "Το κεφάλαιο διαγράφηκε");
     });
     $("btnBible").addEventListener("click", exportBible);
+    $("btnSync").addEventListener("click", shareBook);
+    $("qsAdv").addEventListener("click", toggleAdv);
     $("btnRevSave").addEventListener("click", function(){
       var txt = (S.reviewDraft||"").trim();
       if(!txt){ toast(S.lang==="en" ? "Paste a draft first" : "Επικολλήστε πρώτα ένα προσχέδιο"); return; }
@@ -4244,6 +4295,7 @@
     renderDensity(); renderModel(); renderRhythm(); renderPreview(); usageText();
     var bb = $("btnBlogGen"); if(bb){ bb.disabled = !(S.blogOn === true); }
     renderBooks(); renderCoPovs(); applyQS();
+    restoreFromHash();
     applyFocus();
     renderQuote();
     renderFormats(); renderWords(); renderAuthors(); renderThemes(); renderLevels(); renderAuthorDetail();

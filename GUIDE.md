@@ -53,6 +53,9 @@ The book selector in the header lets you keep **several books at once**. Each bo
 - Each book autosaves separately; export each with **💾 Save book (.json)**.
 
 ### 3 · ☁️ Backup / full-book export
+**💾 Save book (.json)** exports *everything* — brief + chapters + memory + settings. **📂 Load book** restores it. This is your real backup.
+
+**🔗 Cloud sync (link-based)** — in 🧠 Memory & ideas, **Share book via link** encodes the whole book into a URL. Open that link on another device and the book loads there (it asks for confirmation). No server, fully private — it's just a link. For very large books, use the .json export instead.
 **💾 Save book (.json)** exports *everything* — brief + chapters + memory + settings. **📂 Load book** restores it. This is your real backup (localStorage can be cleared by the browser). There is no cloud server — by design, your writing stays private.
 
 ### 4 · 🎤 Dictation (Manuscript tab)

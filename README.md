@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v15.0-8a6d3b?style=flat-square" alt="v14.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v16.0-8a6d3b?style=flat-square" alt="v14.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -76,6 +76,7 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 - ☁️ **Full-book backup** — 💾 Save book (.json) exports brief + chapters + memory; 📂 Load book restores
 - 🎤 **Dictation** — speak your chapter (Chrome/Edge), Greek or English
 - 👥 **Co-author mode** — two narrators, alternating every N chapters, with distinct voices
+- 🔗 **Cloud sync (link-based)** — encode the whole book into a shareable URL, open it on any device to load it (no server, fully private); 💾 Save book (.json) for full backups
 
 ### UX
 - Bilingual EN/ΕΛ, 3 themes (🌙 Night / 📜 Parchment / 🌲 Forest), compact mode, collapsible cards, **⛶ focus writing mode**, autosave with "✓ saved" indicator, export/import `.json`, `🩺 self-check`
@@ -141,7 +142,8 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 - [x] Full-book export/import (brief + chapters + memory)
 - [x] Dictation (Web Speech)
 - [x] Co-author (two-POV rotation)
-- [ ] Cloud sync (optional, opt-in)
+- [x] Cloud sync (link-based, offline — no server)
+- [ ] Cloud sync with real backend (optional, opt-in)
 
 ---
 
