@@ -1,0 +1,32 @@
+# Attach the single-file app to every release (the release-asset convention).
+# Runs when a release is created, or manually from the Actions tab.
+name: Release assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the app file to (defaults to the created release)"
+        required: false
+        default: ""
+  release:
+    types: [created]
+
+permissions:
+  contents: read
+  releases: write
+
+jobs:
+  attach-app-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attach caveman-writer-studio.html to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANUAL_TAG: ${{ inputs.tag }}
+        run: |
+          TAG="${MANUAL_TAG:-$GITHUB_REF_NAME}"
+          echo "Attaching app file to release tag: $TAG"
+          gh release upload "$TAG" caveman-writer-studio.html --clobber
+          echo "Done."
