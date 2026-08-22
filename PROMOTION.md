@@ -38,6 +38,23 @@ What's the one thing your writing workflow is missing? I read every comment. �
 
 ## Notes
 - **Cover image:** attach `assets/banner-1280.jpg` (wide, on-brand).
-- **Length:** long-form is fine on LinkedIn; if you want a shorter variant, say the word.
-- **Who to tag/notify:** fellow Greek authors, writer groups — tagging 2–3 real people you know boosts reach.
-- **Post at:** Tuesday–Thursday, ~10–11am or ~3–4pm your time for best reach.
+- **Length:** long-form is fine on LinkedIn; shorter variant available on request.
+- **Post at:** Tue–Thu, ~10–11am or ~3–4pm your time.
+
+---
+
+# 🗺 Campaign dashboard (current status)
+
+| Channel | Status | Notes |
+|---|---|---|
+| Repo live | ✅ | github.com/Mylittlestories/caveman-writer-studio |
+| Live site (Pages) | ✅ | mylittlestories.github.io/caveman-writer-studio — auto-deploys on push |
+| CI (59-check suite) | ✅ | .github/workflows/ci.yml — runs on every push; badge in README |
+| Releases | ✅ | v1.0.0 → v1.4.0 with `index.html` asset each |
+| Announcement issue (#1) + Discussion (Announcements) | ✅ | pinned + posted |
+| Profile README card | ✅ | featured on github.com/Mylittlestories |
+| Roadmap issues #3–#8 | ✅ | created (cloud backend, EPUB/PDF, diff, co-author voice, multi-book, chapter map) |
+| Topics · homepage · OG/SEO · deploy badge | ✅ | all live |
+| **GitHub Project board** | ⚠️ 30s UI | Repo → **Projects** → New project → add issues #3–#8 as cards (API needs `project` scope, not in this token) |
+| Social preview image | ⚠️ manual | Repo → Settings → Social preview → `assets/og-image.jpg` |
+| External posts (X / LinkedIn / Reddit) | ⏳ manual | LinkedIn copy above; X/Reddit on request |
