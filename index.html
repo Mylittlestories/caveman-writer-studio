@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v20.0</title>
+<title>Caveman Writer Studio — v20.1</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -388,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v20.0</span>
+    <span class="pill" id="pillVer">v20.1</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -2721,7 +2721,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v20.0";
+    $("pillVer").textContent = "v20.1";
   }
 
   function applyStatic(){
@@ -4527,6 +4527,13 @@
     }
     $("rockA").innerHTML = rockSVG(42);
     var loaded = loadLS();
+    /* Reset to main screen on every entry: back to the first tab, all cards
+       expanded, focus/compact off, quick-start visible. Book data is kept. */
+    S.activeTab = "scene";
+    S.focus = false;
+    S.compact = false;
+    S.qsHidden = false;
+    try{ localStorage.removeItem(COLLAPSE_KEY); }catch(e){}
     if(loaded && S.words === 0){ S.words = FORMATS[S.format].defWords; }
     if(!loaded && S.words === 0){ S.words = FORMATS[S.format].defWords; }
     renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings(); renderTenses(); renderModes();
