@@ -13,8 +13,7 @@ on:
     types: [created]
 
 permissions:
-  contents: read
-  releases: write
+  contents: write
 
 jobs:
   attach-app-file:
