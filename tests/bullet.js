@@ -98,7 +98,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v24.0 present', HTML.includes('v24.0'));
+  chk('structure', 'version v25.0 present', HTML.includes('v25.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -224,25 +224,81 @@ function boot(overrides) {
   chk('functional', 'spark load maps tone/pacing/ending', els['inTone']._val==='high' && els['inPacing']._val==='medium' && els['inEnding']._val==='bittersweet');
   chk('functional', 'spark load maps themes', (els['themeChips']._html||'').includes('Fate'));
 
-  // genre-aware naming: fantasy → invented only (no Athens, no everyday Greek names)
-  els['btnNames'].click();
+  // genre-aware naming — offline local roll (chip): fantasy → invented only (no Athens, no everyday Greek)
+  els['btnNamesLocal'].click();
   const namesFant = els['blogOut'].textContent || '';
-  chk('functional', 'fantasy genre: invented names & places (no real Greek)',
+  chk('functional', 'local roll (fantasy): invented names & places (no real Greek)',
       !/Athens|Αθήνα|Δημήτρης|Eleni|Dimitris/.test(namesFant)
       && /Marestan|Xanandou|Dyrron|Grouin|Akentrou|Valmor|Serendi|Arkana|Eldara|Thornhal|Morval|Silara|Ostrian Bay|Lithvorn Hold|The Seven-River/.test(namesFant));
-  // realistic Greek genre → everyday names & real Greek places
+  // realistic Greek genre → everyday names & real Greek places (local roll)
   els['inGenre']._val = 'horror'; els['inGenre'].dispatch('change');
-  els['btnNames'].click();
+  els['btnNamesLocal'].click();
   const namesGr = els['blogOut'].textContent || '';
-  chk('functional', 'greek genre: everyday names (no fantasy pool)',
+  chk('functional', 'local roll (greek): everyday names (no fantasy pool)',
       !/Calethir|Thandiril|Moraina|Orynthas|Velianda|Dragobel|Morncal|Thornmayr/.test(namesGr));
-  chk('functional', 'greek genre: real Greek place', /Athens|Arachovis|Mesogeia|Stone Valley|A mountain town|An island town/.test(namesGr));
+  chk('functional', 'local roll (greek): real Greek place', /Athens|Arachovis|Mesogeia|Stone Valley|A mountain town|An island town/.test(namesGr));
+  // names v2: the AI prompt flow (same spark technique)
+  els['inGenre']._val = 'fantasy'; els['inGenre'].dispatch('change');
+  els['btnNames'].click();
+  const namesPrompt = els['blogOut'].textContent || '';
+  chk('functional', 'names v2: builds a crafted prompt (not a roll)',
+      namesPrompt.includes('NAMES & PLACES') && namesPrompt.includes('NEVER real-world names'));
+  const namesAns = [
+    'HERO: Velianda Silvare, 30, cartographer — trusts paper more than people',
+    'ANTAGONIST: The lord of the last clan — wants the land only for himself',
+    'THIRD: an old watchman who has seen too much and says nothing',
+    'PLACE 1: Marestan — a city of salt and stone that remembers every visitor',
+    'PLACE 2: the Last Forest — five clans, five hearts, one tree left standing',
+    'PLACE 3: the Bridge of Five Clans — the only crossing, the only witness',
+    'OBJECT: the map of ashes — a map that burns what it remembers',
+    'GLOSSARY: Velianda Silvare · Marestan · the Last Forest · the map of ashes'
+  ].join('\n');
+  els['inNamesAns']._val = namesAns; els['inNamesAns'].dispatch('input');
+  els['btnNamesLoad'].click();
+  chk('functional', 'names v2 load: hero + antagonist',
+      (els['inHero']._val||'').includes('Velianda Silvare') && (els['inAntagonist']._val||'').includes('last clan'));
+  chk('functional', 'names v2 load: named places into world',
+      (els['inWorld']._val||'').includes('Named places') && (els['inWorld']._val||'').includes('Marestan'));
+  chk('functional', 'names v2 load: glossary merged', (els['inGlossary']._val||'').includes('Velianda Silvare'));
+  // character v2: the AI prompt flow (same spark technique)
+  els['btnCharGen'].click();
+  const charPrompt = els['charOut']._val || '';
+  chk('functional', 'character v2: builds a crafted prompt with context',
+      charPrompt.includes('CHARACTER') && charPrompt.includes('NAMING DISCIPLINE') && charPrompt.includes('SAMPLES'));
+  const charAns = [
+    'HERO: Velianda Silvare, 30, cartographer — trusts paper more than people',
+    'WANT: to map the Last Forest before it burns',
+    'FEAR: the smoke — the day the forest burns',
+    'WOUND: the summer the father forest burned — smoke and silence',
+    'ARC: from the mapper to the keeper',
+    'VOICE: short phrases, names the mountains as if they were people',
+    'SECRET: she hid a part of the map — the place where it started',
+    'ANTAGONIST: The lord of the last clan — wants the land only for himself',
+    'SAMPLES:',
+    '— "The mountain does not speak. It only knows when to be quiet."',
+    '— "Do not erase it. I do not know why yet, but do not erase it."',
+    '— "Paper does not lie. We lie to the paper."',
+    'GLOSSARY: Velianda Silvare · the Last Forest · the Bridge of Five Clans'
+  ].join('\n');
+  els['inCharAns']._val = charAns; els['inCharAns'].dispatch('input');
+  els['btnCharLoad'].click();
+  chk('functional', 'character v2 load: sheet filled (want/fear/wound/arc)',
+      (els['inCharDesire']._val||'').includes('Last Forest') && (els['inCharFear']._val||'').includes('smoke')
+      && (els['inCharWound']._val||'').includes('burned') && (els['inCharArc']._val||'').includes('keeper'));
+  chk('functional', 'character v2 load: hero + antagonist',
+      (els['inHero']._val||'').includes('Velianda Silvare') && (els['inAntagonist']._val||'').includes('last clan'));
+  chk('functional', 'character v2 load: voice samples into extra', (els['inExtra']._val||'').includes('Voice samples'));
+  chk('functional', 'character v2 load: glossary merged', (els['inGlossary']._val||'').includes('the Last Forest'));
+  // character local roll (offline fallback) still works
+  els['btnCharLocal'].click();
+  chk('functional', 'character local roll fills the sheet',
+      (els['inHero']._val||'').length > 5 && (els['inCharDesire']._val||'').length > 3);
   // build-from-ingredients: fantasy blueprint gets fantasy names (not the western pool)
   els['inIntentGenre']._val = 'fantasy'; els['inIntentGenre'].dispatch('change');
   els['btnIntentBuild'].click();
   const intentHero = els['inHero']._val || '';
   chk('functional', 'intent fantasy: hero from fantasy pool (not western)',
-      !/Jack|Suzy|Tate|Pete|Johnny|Charlie|Florence|Willie|Daria|Ramona|Helen|Lucas|Vera|Oliver|Myra|Parker|Lawrence|Anderson|Johnson|Stefanou|Clayton|Bellamy|Stone|Comy|Rudd|Leon|Crowe/.test(intentHero)
+      !/Jack|Suzy|Tate|Pete|Johnny|Charlie|Florence|Willie|Daria|Ramona|Helen|Lucas|Oliver|Myra|Parker|Lawrence|Anderson|Johnson|Stefanou|Clayton|Bellamy|Stone|Comy|Rudd|Leon|Crowe/.test(intentHero)
       && /Calethir|Thandiril|Moraina|Orynthas|Velianda|Axantheros|Nervalta|Sabrel|Kaelthis|Morniel|Altarion|Nymelis|Talvir|Elanthys|Rochanor|Veralina|Nychtarithas|Feron|Lysianta|Aeron/.test(intentHero));
 
   // bunny
@@ -374,7 +430,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v24.0', (b.els['pillVer'].textContent||'').includes('v24.0'));
+  chk('regression', 'pill shows v25.0', (b.els['pillVer'].textContent||'').includes('v25.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);

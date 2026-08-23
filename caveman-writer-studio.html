@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v24.0</title>
+<title>Caveman Writer Studio — v25.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -388,7 +388,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v24.0</span>
+    <span class="pill" id="pillVer">v25.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -559,7 +559,17 @@
           <input type="text" id="inCharVoice" placeholder="The voice" style="margin-top:6px">
           <input type="text" id="inCharSecret" placeholder="The secret" style="margin-top:6px">
           <div class="chips" style="margin-top:8px">
-            <button type="button" class="chip" id="btnCharGen">🧬 Generate protagonist + antagonist</button>
+            <button type="button" class="chip" id="btnCharGen">🧬 Character — AI prompt</button>
+            <button type="button" class="chip" id="btnCharLocal" title="offline fallback">🎲 Local roll (offline)</button>
+          </div>
+          <textarea id="charOut" readonly spellcheck="false" style="min-height:110px;margin-top:8px"></textarea>
+          <div class="field" style="margin-top:8px">
+            <label class="lbl" id="lblCharAns">AI's answer (character) — paste here, then ⤵ Load</label>
+            <textarea id="inCharAns" style="min-height:70px"></textarea>
+            <div class="outbar" style="margin-top:6px">
+              <button class="btn ghost small" id="btnCharCopy">⧉ Copy prompt</button>
+              <button class="btn ghost small" id="btnCharLoad">⤵ Load into brief</button>
+            </div>
           </div>
         </div>
       </details>
@@ -630,11 +640,19 @@
           <span><b id="ckBlogTxt">Enable blog-style generator</b><small id="ckBlogSub">a choice — not the standard flow; fill the brief with blog-flavored places/names/plots</small></span></label>
         <div class="outbar" style="margin-top:8px">
           <button class="btn ghost" id="btnBlogGen">🧠 Generate like my blog</button>
-          <button class="btn ghost" id="btnNames">🏷 Names &amp; places</button>
+          <button class="btn ghost" id="btnNames">🏷 Names &amp; places — AI prompt</button>
           <button class="btn ghost" id="btnBlogCopy">⧉ Copy</button>
         </div>
         <div id="blogOut" class="hint" style="white-space:pre-wrap;margin-top:6px;line-height:1.6"></div>
-        <p class="hint" style="margin-top:8px" id="nameHint">Imaginative names drawn from your blog's world: western & Greek pools, invented suffixes (‑ου, ‑άκι, ‑ένη, ‑ος), and place-makers (Μαρεστάν-style, Ξαναντού-style, Δυρρών-style).</p>
+        <div class="field" style="margin-top:8px">
+          <label class="lbl" id="lblNamesAns">AI's answer (names &amp; places) — paste here, then ⤵ Load</label>
+          <textarea id="inNamesAns" style="min-height:70px"></textarea>
+          <div class="outbar" style="margin-top:6px">
+            <button class="btn ghost small" id="btnNamesLoad">⤵ Load into brief</button>
+            <button class="chip" id="btnNamesLocal" title="offline fallback">🎲 Local roll (offline)</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:8px" id="nameHint">🏷 builds a crafted prompt (genre-aware naming discipline + the world's register) for your AI — 3 people, 3 places, 1 object + glossary; paste the answer back and ⤵ Load fills the brief. 🎲 Local roll = the offline fallback.</p>
       </details>
     </div>
 
@@ -1840,7 +1858,11 @@
     ckVoicesSub:["3–4 γραμμές καθαρού διαλόγου ανά κεντρικό χαρακτήρα","3–4 lines of pure dialogue per main character"],
     lblGlossary:["Γλωσσάρι / σταθερές ορθογραφίες (προαιρετικό)","Glossary / fixed spellings (optional)"],
     glossHint:["ονόματα, τόποι, όροι — το ΑΙ πρέπει να τα γράφει πάντα ακριβώς έτσι","names, places, terms — the AI must use these exact spellings every time"],
-    btnCharGen:["🧬 Δημιουργία πρωταγωνιστή + ανταγωνιστή","🧬 Generate protagonist + antagonist"],
+    btnCharGen:["🧬 Χαρακτήρας — prompt ΑΙ","🧬 Character — AI prompt"],
+    btnCharLocal:["🎲 Τοπικό ρολόι (offline)","🎲 Local roll (offline)"],
+    btnCharCopy:["⧉ Αντιγραφή prompt","⧉ Copy prompt"],
+    btnCharLoad:["⤵ Φόρτωση στο brief","⤵ Load into brief"],
+    lblCharAns:["Απάντηση του ΑΙ (χαρακτήρας) — επικολλήστε εδώ, μετά «⤵ Φόρτωση»","AI's answer (character) — paste here, then ⤵ Load"],
     tTools:["Εργαλεία σκηνής","Scene tools"],
     lblToolChapter:["Αριθμός κεφαλαίου","Chapter number"],
     lblToolGoal:["Στόχος κεφαλαίου (προαιρετικό, μία γραμμή)","Chapter goal (optional, one line)"],
@@ -1903,8 +1925,11 @@
     lblChGoal:["Στόχος (λέξεις)","Goal (words)"],
 
     btnSync:["🔗 Κοινή χρήση βιβλίου με σύνδεσμο","🔗 Share book via link"],
-    btnNames:["🏷 Ονόματα & τόποι","🏷 Names & places"],
-    nameHint:["Φανταστικά ονόματα από τον κόσμο του blog: δυτικά & ελληνικά + εφευρημένα (‑ου, ‑άκι, ‑ένη, ‑ος) και τόποι τύπου Μαρεστάν / Ξαναντού / Δυρρών.","Imaginative names from the blog's world: western & Greek + invented (‑ou, ‑aki, ‑eni, ‑os) and places like Marestan / Xanandou / Dyrron."],
+    btnNames:["🏷 Ονόματα &amp; τόποι — prompt ΑΙ","🏷 Names &amp; places — AI prompt"],
+    nameHint:["🏷 φτιάχνει ένα προσηλωμένο prompt (πειθαρχία ονομασίας ανά είδος + το ύφος του κόσμου) για το ΑΙ σας — 3 πρόσωπα, 3 τόποι, 1 αντικείμενο + γλωσσάρι· επικολλήστε την απάντηση και «⤵ Φόρτωση» γεμίζει το brief. 🎲 Τοπικό ρολόι = η offline εναλλακτική.","🏷 builds a crafted prompt (genre-aware naming discipline + the world's register) for your AI — 3 people, 3 places, 1 object + glossary; paste the answer back and ⤵ Load fills the brief. 🎲 Local roll = the offline fallback."],
+    btnNamesLoad:["⤵ Φόρτωση στο brief","⤵ Load into brief"],
+    btnNamesLocal:["🎲 Τοπικό ρολόι (offline)","🎲 Local roll (offline)"],
+    lblNamesAns:["Απάντηση του ΑΙ (ονόματα &amp; τόποι) — επικολλήστε εδώ, μετά «⤵ Φόρτωση»","AI's answer (names &amp; places) — paste here, then ⤵ Load"],
     lblMyth:["Μύθος & κοσμοπλασία","Mythos & worldbuilding"],
     lblLore:["Ιστορία / κόσμος / σημειώσεις (προαιρετικό)","Lore / history / world notes (optional)"],
     loreHint:["αρχαία γεγονότα, μύθοι, γεωγραφία, κανόνες μαγείας/τεχνολογίας — το ΑΙ χτίζει πάνω τους","ancient events, myths, geography, magic/tech rules — the AI builds on these"],
@@ -2147,7 +2172,7 @@
     seedStory:"", seedNote:"", act3:true, budget:true,
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene", lore:"",
     intentGenre:"cosmic", intentMood:"dread", intentSetting:"far", intentExtra:"",
-    sparkAns:"",
+    sparkAns:"", namesAns:"", charAns:"",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
     statuses:{}, chGoals:{}, chSearch:"",
@@ -2351,8 +2376,8 @@
     var inputs = document.querySelectorAll ? document.querySelectorAll("input,select,textarea").length : -1;
     var cards = document.querySelectorAll ? document.querySelectorAll(".card").length : -1;
     var chapters = (S.chapters||[]).length;
-    var msg = (S.lang==="en" ? "v24 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
-                             : "v24 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
+    var msg = (S.lang==="en" ? "v25 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
+                             : "v25 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
   }
 
@@ -3167,7 +3192,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v24.0";
+    $("pillVer").textContent = "v25.0";
   }
 
   function applyStatic(){
@@ -3964,7 +3989,7 @@
   /* ============================================================
      SCENE TOOLS + DEEP CHARACTER GENERATION
      ============================================================ */
-  function genDeepChar(){
+  function genCharLocal(){ // offline fallback: archetype + genre-aware name pools, no AI needed
     var EN = S.lang === "en";
     var a = ARCHETYPES[Math.floor(Math.random()*ARCHETYPES.length)];
     var np = namedPick(S.genre); // genre-aware: fantasy gets invented names, realistic gets everyday Greek
@@ -3981,7 +4006,7 @@
     S.charVoice = sh[4];
     S.charSecret = sh[5];
     syncInputs(); render();
-    toast(EN ? "Character generated 🧬" : "Χαρακτήρας δημιουργήθηκε 🧬");
+    toast(EN ? "Local roll — the offline fallback (no AI needed)" : "Τοπικό ρολόι — η offline εναλλακτική (χωρίς ΑΙ)");
   }
 
   function buildBeats(){
@@ -4700,20 +4725,246 @@
       ? "Spark prompt ready — send it to your AI, paste its answer back, then «⤵ Load» "
       : "Το prompt σπϭρτος είναι έτοιμο — στείλτέ το στο ΑΙ σας, επικολλήστε την απάντησή του, μετά «⤵ Load» 🎲");
   }
-  function parseSparkAnswer(txt){
+  /* generic labeled-answer parser (EN+EL labels; block labels collect lines until the next label) */
+  function parseLabeled(txt, pairs, blockIdx){
     var fields = {};
     var lines = String(txt || "").split(/\r?\n/);
-    SPARK_LABELS.forEach(function(pair, idx){
+    var labelRe = function(label){
+      return new RegExp("^\\s*(?:[-*•]\\s*|\\d+\\s*[.)]\\s*)?\\**\\s*" + label + "\\s*\\**\\s*[:·]\\s*(.*)$", "i");
+    };
+    var isLabelLine = function(ln){
+      for(var p = 0; p < pairs.length; p++){
+        if(labelRe(pairs[p][0]).test(ln) || labelRe(pairs[p][1]).test(ln)) return true;
+      }
+      return false;
+    };
+    pairs.forEach(function(pair, idx){
       for(var li = 0; li < lines.length && fields[idx] === undefined; li++){
-        var ln = lines[li];
-        for(var j = 0; j < 2; j++){
-          var re = new RegExp("^\\s*(?:[-*•]\\s*|\\d+\\s*[.)]\\s*)?\\**\\s*" + pair[j] + "\\s*\\**\\s*[:·]\\s*(.+)$", "i");
-          var m = ln.match(re);
-          if(m){ fields[idx] = m[1].replace(/^\*+|\*+$/g, "").trim(); break; }
+        var m0 = lines[li].match(labelRe(pair[0]));
+        var m = m0 || lines[li].match(labelRe(pair[1]));
+        if(!m) continue;
+        if(blockIdx && blockIdx.indexOf(idx) !== -1){
+          var parts = [m[1].replace(/^\*+|\*+$/g, "").trim()];
+          for(var k = li + 1; k < lines.length && !isLabelLine(lines[k]); k++){
+            if(lines[k].trim()) parts.push(lines[k].trim());
+          }
+          fields[idx] = parts.join(" · ").replace(/\*\*/g, "").trim();
+        } else {
+          fields[idx] = m[1].replace(/^\*+|\*+$/g, "").trim();
         }
       }
     });
     return fields;
+  }
+  function parseSparkAnswer(txt){ return parseLabeled(txt, SPARK_LABELS); }
+  function mergeGlossary(cur, add){
+    var base = String(cur || "").split(/[·;|]/).map(function(x){ return x.trim(); }).filter(Boolean);
+    var items = String(add || "").split(/[·;|]/).map(function(x){ return x.trim(); }).filter(Boolean);
+    items.forEach(function(it){
+      var low = it.toLowerCase();
+      if(base.every(function(o){ return o.toLowerCase() !== low; })){ base.push(it); }
+    });
+    return base.join(" · ");
+  }
+
+  /* ============================================================
+     NAMES & PLACES v2 — the same spark technique: crafted prompt →
+     your AI → paste back → ⤵ Load. (The local roll survives as an
+     offline fallback chip.)
+     ============================================================ */
+  var NAMES_LABELS = [
+    ["HERO","ΗΡΩΑΣ"],["ANTAGONIST","ΑΝΤΑΓΩΝΙΣΤΗΣ"],["THIRD","ΤΡΙΤΟΣ"],
+    ["PLACE 1","ΤΟΠΟΣ 1"],["PLACE 2","ΤΟΠΟΣ 2"],["PLACE 3","ΤΟΠΟΣ 3"],
+    ["OBJECT","ΑΝΤΙΚΕΙΜΕΝΟ"],["GLOSSARY","ΓΛΩΣΣΑΡΙΟ"]
+  ];
+  function buildNamesPrompt(){
+    var EN = S.lang === "en";
+    var profileId = namingProfileFor(S.genre);
+    var L = NAMES_LABELS.map(function(p){ return EN ? p[0] : p[1]; });
+    var P = [];
+    P.push(EN ? "# NAMES & PLACES — for " + titleOrFallback() : "# ΟΝΟΜΑΤΑ & ΤΟΠΟΙ — για " + titleOrFallback());
+    P.push("");
+    P.push(EN
+      ? "Invent the named cast and the named places of the book. People first, the world second — the names must smell of the world, not of a dictionary."
+      : "Επινόησε το ονομασμένο καστ και τους ονομασμένους τόπους του βιβλίου. Ο άνθρωπος πρώτα, ο κόσμος δεύτερα — τα ονόματα πρέπει να μυρίζουν τον κόσμο, όχι το λεξικό.");
+    P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
+    P.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose a fitting world and state it)") + "." : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ένα ταιριαστό κόσμο και δήλωσέ το)") + ".");
+    if(S.premise && S.premise.trim()){ P.push(EN ? "- Premise: " + S.premise.trim() : "- Υπόθεση: " + S.premise.trim()); }
+    if(S.world && S.world.trim()){ P.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim()); }
+    if(S.hero && S.hero.trim()){ P.push(EN ? "- Protagonist (already set — stay consistent with it): " + S.hero.trim() : "- Πρωταγωνιστής (ήδη σταθερός — βάλε σε συνέπεια μαζί του): " + S.hero.trim()); }
+    P.push("");
+    P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(sparkNamingRule(EN, profileId));
+    P.push(EN
+      ? "- Every name carries language and history: same world, same register, same era — the reader must hear them and feel the world."
+      : "- Κάθε όνομα κουβαλά γλώσσα και ιστορία: ίδιος κόσμος, ίδιο ύφος, ίδια εποχή — ο αναγνώστης να τα ακούει και να νιώθει τον κόσμο.");
+    P.push(EN
+      ? "- Write all names in the book's language: " + (dlEn() ? "the book is in English → Latin script." : "the book is in Modern Greek → Greek script.")
+      : "- Γράψε όλα τα ονόματα στη γλώσσα του βιβλίου: " + (dlEn() ? "το βιβλίο είναι στα αγγλικά → λατινικά γράμματα." : "το βιβλίο είναι στα ελληνικά → ελληνικά γράμματα."));
+    P.push("");
+    P.push(EN ? "## THE JOB" : "## Η ΕΡΓΑΣΙΑ");
+    P.push(EN
+      ? "- HERO: a human, not a symbol — a flaw that is a door (people first, monster after)."
+      : "- ΗΡΩΑΣ: άνθρωπος, όχι σύμβολο — μια αδυναμία που είναι πόρτα (ο άνθρωπος πρώτα, το τέρας μετά).");
+    P.push(EN
+      ? "- ANTAGONIST: a person (or force) with a face and a reason — never a cardboard villain."
+      : "- ΑΝΤΑΓΩΝΙΣΤΗΣ: πρόσωπο (ή δύναμη) με πρόσωπο και λόγο — ποτέ χαρτονένιος.");
+    P.push(EN
+      ? "- THIRD: the witness/secondary through whose small life the story passes (the old man, the neighbor, the apprentice)."
+      : "- ΤΡΙΤΟΣ: ο μάρτυρας/δευτερεύων μέσα από τη μικρή ζωή του περνά η ιστορία (ο γέρος, ο γείτονας, ο μαθητής).");
+    P.push(EN
+      ? "- PLACES: the mundane is the threshold — the wrong thing can live INSIDE the everyday (horror/weird) · for fantasy: every place has a name with weight (a stone that remembers, a hill that watches)."
+      : "- ΤΟΠΟΙ: το συνηθισμένο είναι το κατώφλι — το λάθος μπορεί να ζει ΜΕΣΑ στο καθημερινό (τρόμος/παράξενα) · για φαντασία: κάθε τόπος έχει όνομα με βάρος (μια πέτρα που θυμάται, ένας λόφος που κοιτά).");
+    P.push(EN
+      ? "- OBJECT: one object with weight — the thing that starts (or ends) the story."
+      : "- ΑΝΤΙΚΕΙΜΕΝΟ: ένα αντικείμενο με βάρος — αυτό που ξεκινά (ή τελειώνει) την ιστορία.");
+    P.push(EN
+      ? "- Each entry: name + ONE evocative line (a concrete image, not a description). A place must smell."
+      : "- Κάθε είσοδος: όνομα + ΜΙΑ υποβλητική γραμμή (συγκεκριμένη εικόνα, όχι περιγραφή). Ο τόπος πρέπει να μυρίζει.");
+    P.push("");
+    P.push(EN ? "## OUTPUT — exactly these lines, one per line, no numbering, no commentary:" : "## ΕΞΟΔΟΣ — ακριβώς αυτές οι γραμμές, μία την γραμμή, χωρίς αρίθμηση, χωρίς σχόλια:");
+    P.push(L[0] + (EN ? ": (name, age, occupation, the flaw that is a door — one line)" : ": (όνομα, ηλικία, επάγγελμα, η αδυναμία που είναι πόρτα — μία γραμμή)"));
+    P.push(L[1] + (EN ? ": (who/what they are and why — one line)" : ": (ποιος/τι είναι και γιατί — μία γραμμή)"));
+    P.push(L[2] + (EN ? ": (who they are + one small concrete detail — one line)" : ": (ποιος είναι + μία μικρή συγκεκριμένη λεπτομέρεια — μία γραμμή)"));
+    P.push(L[3] + (EN ? ": (the main place — name + one evocative line)" : ": (ο κύριος τόπος — όνομα + μία υποβλητική γραμμή)"));
+    P.push(L[4] + (EN ? ": (the second place — name + one line)" : ": (ο δεύτερος τόπος — όνομα + μία γραμμή)"));
+    P.push(L[5] + (EN ? ": (the third place — name + one line)" : ": (ο τρίτος τόπος — όνομα + μία γραμμή)"));
+    P.push(L[6] + (EN ? ": (name + what it carries — one line)" : ": (όνομα + τι κουβαλά — μία γραμμή)"));
+    P.push(L[7] + (EN ? ": (6–10 fixed spellings — people + places + object — separated by “ · ”)" : ": (6–10 σταθερές ορθογραφίες — πρόσωπα + τόποι + αντικείμενο — χωρισμένες με « · »)"));
+    return P.join("\n");
+  }
+  function genNames(){
+    var out = $("blogOut"); if(out){ out.textContent = buildNamesPrompt(); }
+    toast(S.lang==="en" ? "Names & places prompt ready — send it to your AI, paste the answer back 🏷" : "Το prompt ονομάτων & τόπων είναι έτοιμο — στείλτέ το στο ΑΙ, επικολλήστε την απάντηση 🏷");
+  }
+  function genNamesLocal(){
+    var EN = S.lang === "en";
+    var pv = function(p){ return EN ? p[1] : p[0]; };
+    var np = namedPick(S.genre); // offline fallback: follows the selected genre
+    var person = (EN ? np.last[1] + ", " + np.first[1] : np.first[0] + " " + np.last[0]);
+    var lines = [
+      (EN ? "🏷 LOCAL ROLL (offline): " : "🏷 ΤΟΠΙΚΟ ΡΟΛΟΙ (offline): ") + pv(NAMEDATA[np.profile].label)
+        + (S.genre ? (EN ? " — because genre is " : " — επειδή είδος είναι ") + genreLabel(S.genre)
+                   : (EN ? " (no genre set — rolled freely)" : " (χωρίς είδος — ελεύθερο ρολόι)")),
+      (EN ? "👤 PERSON: " : "👤 Πρόσωπο: ") + person,
+      (EN ? "🏞 PLACE: " : "🏞 Τόπος: ") + pv(np.place),
+      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + pv(np.obj)
+    ];
+    var out = $("blogOut"); if(out){ out.textContent = lines.join("\n"); }
+    toast(EN ? "Local roll — the offline fallback (no AI needed)" : "Τοπικό ρολόι — η offline εναλλακτική (χωρίς ΑΙ)");
+  }
+  function loadNames(){
+    var EN = S.lang === "en";
+    var ans = (S.namesAns || "").trim();
+    if(!ans){ toast(EN ? "Paste the AI's answer first" : "Επικολλήστε πρώτα την απάντηση του ΑΙ"); return; }
+    var f = parseLabeled(ans, NAMES_LABELS);
+    var got = 0;
+    if(f[0]){ S.hero = f[0]; got++; }
+    if(f[1]){ S.antagonist = f[1]; got++; }
+    var places = [f[3], f[4], f[5]].filter(function(x){ return x && x.trim(); });
+    var placesTxt = places.join(" · ");
+    if(f[6]){ placesTxt += (placesTxt ? " · " : "") + (EN ? "Object: " : "Αντικείμενο: ") + f[6]; }
+    if(placesTxt){
+      var pre = (EN ? "Named places: " : "Ονομασμένοι τόποι: ");
+      S.world = (S.world || "").trim() ? (S.world.trim() + "\n" + pre + placesTxt) : (pre + placesTxt);
+      got++;
+    }
+    if(f[7]){ S.glossary = mergeGlossary(S.glossary, f[7]); got++; }
+    if(!got){
+      toast(EN ? "No named lines found — check the labels (HERO / PLACE 1 / GLOSSARY…)" : "Δεν βρέθηκαν γραμμές — ελέγξτε τις ετικέτες (ΗΡΩΑΣ / ΤΟΠΟΣ 1 / ΓΛΩΣΣΑΡΙΟ…)");
+      return;
+    }
+    S.namesAns = "";
+    syncInputs(); render();
+    toast(EN ? "Names & places loaded into the brief 🏷 (" + got + " fields)" : "Ονόματα & τόποι φορτώθηκαν στο brief 🏷 (" + got + " πεδία)");
+  }
+
+  /* ============================================================
+     CHARACTER v2 — the same spark technique for the character
+     sheet: crafted prompt (context-aware) → your AI → paste back
+     → ⤵ Load fills the sheet + glossary + voice samples.
+     ============================================================ */
+  var CHAR_LABELS = [
+    ["HERO","ΗΡΩΑΣ"],["WANT","ΘΕΛΩ"],["FEAR","ΦΟΒΟΣ"],["WOUND","ΠΛΗΓΗ"],["ARC","ΤΟΞΟ"],
+    ["VOICE","ΦΩΝΗ"],["SECRET","ΜΥΣΤΙΚΟ"],["ANTAGONIST","ΑΝΤΑΓΩΝΙΣΤΗΣ"],
+    ["SAMPLES","ΔΕΙΓΜΑΤΑ ΦΩΝΗΣ"],["GLOSSARY","ΓΛΩΣΣΑΡΙΟ"]
+  ];
+  function buildCharPrompt(){
+    var EN = S.lang === "en";
+    var profileId = namingProfileFor(S.genre);
+    var L = CHAR_LABELS.map(function(p){ return EN ? p[0] : p[1]; });
+    var P = [];
+    P.push(EN ? "# CHARACTER — protagonist + antagonist for " + titleOrFallback() : "# ΧΑΡΑΚΤΗΡΑΣ — πρωταγωνιστής + ανταγωνιστής για " + titleOrFallback());
+    P.push("");
+    P.push(EN
+      ? "Build the protagonist and the antagonist the way the author builds people: a human first — a flaw that is a door, an everyday life the reader can smell."
+      : "Φτιάξε τον πρωταγωνιστή και τον ανταγωνιστή όπως ο συγγραφέας φτιάχνει ανθρώπους: άνθρωπος πρώτα — μια αδυναμία που είναι πόρτα, μια καθημερινή ζωή που μυρίζεται ο αναγνώστης.");
+    P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
+    P.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose a fitting world and state it)") + "." : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ένα ταιριαστό κόσμο και δήλωσέ το)") + ".");
+    if(S.premise && S.premise.trim()){ P.push(EN ? "- Premise: " + S.premise.trim() : "- Υπόθεση: " + S.premise.trim()); }
+    if(S.world && S.world.trim()){ P.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim()); }
+    P.push(EN
+      ? "- The character must FIT this story — same era, same register, same world. If the premise already has a name, stay consistent with it."
+      : "- Ο χαρακτήρας ΠΡΕΠΕΙ να ταιριάζει σ' αυτή την ιστορία — ίδια εποχή, ίδιο ύφος, ίδιος κόσμος. Αν η υπόθεση έχει ήδη όνομα, βάλε σε συνέπεια μαζί του.");
+    P.push("");
+    P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(sparkNamingRule(EN, profileId));
+    P.push(EN
+      ? "- Write all names in the book's language: " + (dlEn() ? "the book is in English → Latin script." : "the book is in Modern Greek → Greek script.")
+      : "- Γράψε όλα τα ονόματα στη γλώσσα του βιβλίου: " + (dlEn() ? "το βιβλίο είναι στα αγγλικά → λατινικά γράμματα." : "το βιβλίο είναι στα ελληνικά → ελληνικά γράμματα."));
+    P.push("");
+    P.push(EN ? "## THE JOB" : "## Η ΕΡΓΑΣΙΑ");
+    P.push(EN ? "- HERO: name, age, occupation, and one human flaw — the flaw is the door the story walks through." : "- ΗΡΩΑΣ: όνομα, ηλικία, επάγγελμα και μία ανθρώπινη αδυναμία — η αδυναμία είναι η πόρτα από την οποία περνά η ιστορία.");
+    P.push(EN ? "- WOUND: the loss that left a mark — a SCENE, not an adjective (who, what, what was left behind)." : "- ΠΛΗΓΗ: η απώλεια που άφησε σημάδι — ΜΙΑ ΣΚΗΝΗ, όχι επίθετο (ποιος, τι, τι έμεινε πίσω).");
+    P.push(EN ? "- WANT / FEAR: concrete and physical — something the body can feel, not a slogan." : "- ΘΕΛΩ / ΦΟΒΟΣ: συγκεκριμένα και σωματικά — κάτι που μπορεί να νιώσει το σώμα, όχι σύνθημα.");
+    P.push(EN ? "- ARC: from X to Y, one line — the change the story forces." : "- ΤΟΞΟ: από το Χ στο Ψ, μία γραμμή — η αλλαγή που επιβάλλει η ιστορία.");
+    P.push(EN ? "- VOICE: how they talk — rhythm, the words they repeat, the thing they never say." : "- ΦΩΝΗ: πώς μιλούν — ρυθμός, οι λέξεις που επαναλαμβάνουν, το πράγμα που ποτέ δεν λένε.");
+    P.push(EN ? "- SECRET: the thing they would rather die than say — the engine of the character." : "- ΜΥΣΤΙΚΟ: το πράγμα που θα προτιμούσαν να πεθάνουν παρά να το πουν — ο κινητήρας του χαρακτήρα.");
+    P.push(EN ? "- ANTAGONIST: a face, not a function — one line with a reason." : "- ΑΝΤΑΓΩΝΙΣΤΗΣ: πρόσωπο, όχι λειτουργία — μία γραμμή με λόγο.");
+    P.push(EN
+      ? "- SAMPLES: 3–4 lines of PURE dialogue for the hero (one per line, no tags, no narration) — the voice must be different from anyone else in the book."
+      : "- ΔΕΙΓΜΑΤΑ ΦΩΝΗΣ: 3–4 γραμμές ΚΑΘΑΡΟΥ διαλόγου για τον ήρωα (μία την γραμμή, χωρίς tags, χωρίς αφήγηση) — η φωνή να διαφέρει από κανέναν άλλο στο βιβλίο.");
+    P.push("");
+    P.push(EN ? "## OUTPUT — exactly these lines, no numbering, no commentary:" : "## ΕΞΟΔΟΣ — ακριβώς αυτές οι γραμμές, χωρίς αρίθμηση, χωρίς σχόλια:");
+    P.push(L[0] + (EN ? ": (name, age, occupation, the flaw that is a door — one line)" : ": (όνομα, ηλικία, επάγγελμα, η αδυναμία που είναι πόρτα — μία γραμμή)"));
+    P.push(L[1] + (EN ? ": (one line)" : ": (μία γραμμή)"));
+    P.push(L[2] + (EN ? ": (one line)" : ": (μία γραμμή)"));
+    P.push(L[3] + (EN ? ": (the scene, one line)" : ": (η σκηνή, μία γραμμή)"));
+    P.push(L[4] + (EN ? ": (from X to Y — one line)" : ": (από το Χ στο Ψ — μία γραμμή)"));
+    P.push(L[5] + (EN ? ": (one line)" : ": (μία γραμμή)"));
+    P.push(L[6] + (EN ? ": (one line)" : ": (μία γραμμή)"));
+    P.push(L[7] + (EN ? ": (one line)" : ": (μία γραμμή)"));
+    P.push(L[8] + (EN ? ": (3–4 lines of pure dialogue, one per line, no tags)" : ": (3–4 γραμμές καθαρού διαλόγου, μία την γραμμή, χωρίς tags)"));
+    P.push(L[9] + (EN ? ": (fixed spellings for hero + antagonist — separated by “ · ”)" : ": (σταθερές ορθογραφίες για ήρωα + ανταγωνιστή — χωρισμένες με « · »)"));
+    return P.join("\n");
+  }
+  function genChar(){
+    $("charOut").value = buildCharPrompt();
+    toast(S.lang==="en" ? "Character prompt ready — send it to your AI, paste the answer back 🧬" : "Το prompt χαρακτήρα είναι έτοιμο — στείλτέ το στο ΑΙ, επικολλήστε την απάντηση 🧬");
+  }
+  function loadChar(){
+    var EN = S.lang === "en";
+    var ans = (S.charAns || "").trim();
+    if(!ans){ toast(EN ? "Paste the AI's answer first" : "Επικολλήστε πρώτα την απάντηση του ΑΙ"); return; }
+    var f = parseLabeled(ans, CHAR_LABELS, [8]);
+    var got = 0;
+    if(f[0]){ S.hero = f[0]; got++; }
+    if(f[1]){ S.charDesire = f[1]; got++; }
+    if(f[2]){ S.charFear = f[2]; got++; }
+    if(f[3]){ S.charWound = f[3]; got++; }
+    if(f[4]){ S.charArc = f[4]; got++; }
+    if(f[5]){ S.charVoice = f[5]; got++; }
+    if(f[6]){ S.charSecret = f[6]; got++; }
+    if(f[7]){ S.antagonist = f[7]; got++; }
+    if(f[8]){ S.extra = ((S.extra || "").trim() ? S.extra.trim() + "\n" : "") + (EN ? "Voice samples (from character generation): " : "Δείγματα φωνής (από τη δημιουργία χαρακτήρα): ") + f[8]; got++; }
+    if(f[9]){ S.glossary = mergeGlossary(S.glossary, f[9]); got++; }
+    if(!got){
+      toast(EN ? "No character lines found — check the labels (HERO / WOUND / ANTAGONIST…)" : "Δεν βρέθηκαν γραμμές χαρακτήρα — ελέγξτε τις ετικέτες (ΗΡΩΑΣ / ΠΛΗΓΗ / ΑΝΤΑΓΩΝΙΣΤΗΣ…)");
+      return;
+    }
+    S.charAns = "";
+    syncInputs(); render();
+    toast(EN ? "Character loaded into the brief 🧬 (" + got + " fields)" : "Ο χαρακτήρας φορτώθηκε στο brief 🧬 (" + got + " πεδία)");
   }
   function greekBase(s){
     return String(s).replace(/[άΆ]/g,"α").replace(/[έΈ]/g,"ε").replace(/[ήΉ]/g,"η")
@@ -4908,6 +5159,8 @@
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
     $("inSparkAns").value = S.sparkAns || "";
+    $("inNamesAns").value = S.namesAns || "";
+    $("inCharAns").value = S.charAns || "";
     $("inHero").value = S.hero;
     $("inAntagonist").value = S.antagonist;
     $("inCharDesire").value = S.charDesire;
@@ -4998,6 +5251,9 @@
       genBlogStyle();
     });
     $("btnNames").addEventListener("click", genNames);
+    $("btnNamesLoad").addEventListener("click", loadNames);
+    $("inNamesAns").addEventListener("input", function(){ S.namesAns = this.value; });
+    $("btnNamesLocal").addEventListener("click", genNamesLocal);
     $("inIntentGenre").addEventListener("change", function(){ S.intentGenre = this.value; saveLS(); });
     $("inIntentMood").addEventListener("change", function(){ S.intentMood = this.value; saveLS(); });
     $("inIntentSetting").addEventListener("change", function(){ S.intentSetting = this.value; saveLS(); });
@@ -5196,7 +5452,13 @@
     $("btnDemo").addEventListener("click", loadDemo);
     $("btnReset").addEventListener("click", resetAll);
     $("btnDice").addEventListener("click", sparkIdea);
-    $("btnCharGen").addEventListener("click", genDeepChar);
+    $("btnCharGen").addEventListener("click", genChar);
+    $("btnCharCopy").addEventListener("click", function(){
+      copyText($("charOut").value, S.lang==="en" ? "Character prompt copied 🧬" : "Το prompt χαρακτήρα αντιγράφηκε 🧬");
+    });
+    $("btnCharLoad").addEventListener("click", loadChar);
+    $("inCharAns").addEventListener("input", function(){ S.charAns = this.value; });
+    $("btnCharLocal").addEventListener("click", genCharLocal);
     $("btnBeats").addEventListener("click", function(){
       $("toolsOut").value = buildBeats();
       toast(S.lang==="en" ? "Beat sheet generated 🎬" : "Beat sheet δημιουργήθηκε 🎬");
