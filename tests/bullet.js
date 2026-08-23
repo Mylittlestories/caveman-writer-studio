@@ -63,6 +63,7 @@ function boot(overrides) {
   };
   const ctx = {
     document: doc, navigator: {}, localStorage: storage,
+    TextEncoder: TextEncoder, TextDecoder: TextDecoder,
     Blob: function(){}, URL:{ createObjectURL(){ return 'x'; }, revokeObjectURL(){} },
     FileReader: function(){}, setTimeout: (f)=>{}, clearTimeout(){}, console,
     window:{ addEventListener(){}, confirm(){ return true; }, prompt(){ return 'Test Book'; } },
@@ -71,7 +72,7 @@ function boot(overrides) {
   };
   vm.createContext(ctx);
   vm.runInContext(JS, ctx);
-  return { els, created, docL, doc, store };
+  return { els, created, docL, doc, store, ctx: ctx };
 }
 
 /* ============ ANGLE 1 · SYNTAX ============ */
@@ -98,7 +99,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v25.0 present', HTML.includes('v25.0'));
+  chk('structure', 'version v26.0 present', HTML.includes('v26.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -135,6 +136,34 @@ function boot(overrides) {
   els['btnDemo'].click();
   chk('functional', 'demo switch loads bridge', (els['inTitle']._val||'').includes('Γέφυρα'));
   els['inDemoSel']._val = 'park';
+  // v26: short story format
+  var storyBtn = b.created.find(function(e){ return (e.innerHTML||'').indexOf('Short story') !== -1; });
+  chk('functional', 'story format renders in format picker', !!storyBtn);
+  if (storyBtn){
+    storyBtn.onclick();
+    chk('functional', 'story format: acts hint + act structure in prompt',
+        (els['wordsHint'].textContent||'').indexOf('acts') !== -1 &&
+        (els['promptOut']._val||'').indexOf('Act structure') !== -1);
+  }
+  // v26: EPUB + PDF export (no-crash + valid EPUB bytes via the debug hook)
+  chk('functional', 'epub export no-crash (with a chapter)', function(){ els['btnEpub'].click(); return true; }());
+  chk('functional', 'pdf export no-crash', function(){ els['btnPdf'].click(); return true; }());
+  var cws = (b.ctx && b.ctx.window && b.ctx.window.__cws) || null;
+  if (cws){
+    var files = cws.buildEpubFiles({ title:'Δοκιμή', chapters:[{title:'', text:'Πρώτη παράγραφος.\nΔεύτερη παράγραφος.'}] });
+    chk('functional', 'epub: mimetype first + opf/nav/chapter present',
+        files[0].name === 'mimetype' &&
+        files.some(function(f){ return f.name === 'OEBPS/content.opf'; }) &&
+        files.some(function(f){ return f.name === 'OEBPS/nav.xhtml'; }) &&
+        files.some(function(f){ return f.name === 'OEBPS/ch-1.xhtml'; }));
+    var bytes = cws.zipStore(files);
+    var eocdOk = bytes.length > 22 &&
+        bytes[bytes.length-22] === 0x50 && bytes[bytes.length-21] === 0x4b &&
+        bytes[bytes.length-20] === 0x05 && bytes[bytes.length-19] === 0x06;
+    chk('functional', 'epub: valid ZIP (PK sig + EOCD)', bytes[0] === 0x50 && bytes[1] === 0x4b && eocdOk);
+  } else {
+    chk('functional', 'epub: debug hook exposed (zip/epub builders)', false);
+  }
 
   // profile
   els['btnPreset'].click();
@@ -430,7 +459,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v25.0', (b.els['pillVer'].textContent||'').includes('v25.0'));
+  chk('regression', 'pill shows v26.0', (b.els['pillVer'].textContent||'').includes('v26.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);

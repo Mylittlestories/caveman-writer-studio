@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v25.0</title>
+<title>Caveman Writer Studio — v26.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -509,7 +509,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill" id="pillSkill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v25.0</span>
+    <span class="pill" id="pillVer">v26.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -538,7 +538,7 @@
       <div class="field">
         <label class="lbl" id="lblWords" for="inWords">Word count target</label>
         <div class="rangewrap">
-          <input type="range" id="inWords" min="5000" max="160000" step="1000">
+          <input type="range" id="inWords" min="3000" max="160000" step="1000">
           <output id="outWords"></output>
         </div>
         <div class="hint" id="wordsHint"></div>
@@ -1016,6 +1016,8 @@
           <button class="btn ghost" id="btnChPrev2" title="Markdown preview">&#128065; Preview</button>
           <button class="btn ghost" id="btnChMd" title="Export this chapter (.md)">&#128196; .md</button>
           <button class="btn ghost" id="btnMsExport" title="Export whole manuscript (.md)">&#128196;&#128196; Export all</button>
+          <button class="btn ghost" id="btnEpub" title="Export manuscript as an EPUB e-book">📖 EPUB</button>
+          <button class="btn ghost" id="btnPdf" title="Print-ready layout → Save as PDF">🖨️ PDF</button>
           <button class="btn ghost" id="btnChDone" title="Log to story state + weekly count">&#10003; Done &#8594; story state</button>
           <button class="btn ghost" id="btnChDel" title="Delete chapter">&#10005; Delete</button>
           <button class="btn ghost" id="btnFocus" title="Full-screen writing (Esc to exit)">&#10530; Focus</button>
@@ -1610,6 +1612,12 @@
       art:"μιας σειριακής ιστορίας", artEn:"a serial story", adj:"γραμμένης", adjEn:"written",
       el:"Σειρά σε κεφάλαια των ~2.000 λέξεων, με ρυθμό ανάρτησης. {CH} κεφάλαια. Κάθε κεφάλαιο κλείνει με μικρό cliffhanger· η κεντρική σύγκρουση εξελίσσεται σταδιακά· η συνέπεια (ονόματα, γεγονότα, χρονολόγιο) είναι ιερή.",
       en:"Serialized in ~2,000-word chapters at your posting rhythm. {CH} chapters. Each chapter ends on a small cliffhanger; the central conflict develops gradually; consistency (names, facts, timeline) is sacred."
+    },
+    story: {
+      label:"Διήγηση", labelEn:"Short story", sub:"3.000–12.000 λέξεις · 3–7 πράξεις", subEn:"3,000–12,000 words · 3–7 acts", defWords:6000,
+      art:"μιας διήγησης", artEn:"a short story", adj:"γραμμένης", adjEn:"written",
+      el:"Δομή σε πράξεις: {CH} πράξεις (κεφάλαια) των ~1.200 λέξεων. Κάθε πράξη είναι ένα beat — έναρξη, στροφή, επίσκεδο — και κλείνει σε αγκίστρι. Ένας κόσμος, ένα καστ, μία γραμμή: κόβετε ό,τι δεν σερβίρει τη στροφή. Τέλος-εικόνα: η τελευταία πρόταση αναδιατυπώνει ολόκληρη την ιστορία.",
+      en:"Act structure: {CH} acts of ~1,200 words. Each act is one beat — set-up, turn, aftertaste — and ends on a hook. One world, one cast, one thread: cut anything that doesn't serve the turn. Image-ending: the last sentence reframes the whole story."
     }
   };
 
@@ -1985,6 +1993,8 @@
     lblGlossary:["Γλωσσάρι / σταθερές ορθογραφίες (προαιρετικό)","Glossary / fixed spellings (optional)"],
     glossHint:["ονόματα, τόποι, όροι — το ΑΙ πρέπει να τα γράφει πάντα ακριβώς έτσι","names, places, terms — the AI must use these exact spellings every time"],
     btnCharGen:["🧬 Χαρακτήρας — prompt ΑΙ","🧬 Character — AI prompt"],
+    btnEpub:["📖 Εξαγωγή EPUB (ηλεκτρονικό βιβλίο)","📖 EPUB (e-book)"],
+    btnPdf:["🖨️ PDF (εκτύπωση / αποθήκευση)","🖨️ PDF (print / save)"],
     btnCharLocal:["🎲 Τοπικό ρολόι (offline)","🎲 Local roll (offline)"],
     btnCharCopy:["⧉ Αντιγραφή prompt","⧉ Copy prompt"],
     btnCharLoad:["⤵ Φόρτωση στο brief","⤵ Load into brief"],
@@ -2504,8 +2514,8 @@
     var inputs = document.querySelectorAll ? document.querySelectorAll("input,select,textarea").length : -1;
     var cards = document.querySelectorAll ? document.querySelectorAll(".card").length : -1;
     var chapters = (S.chapters||[]).length;
-    var msg = (S.lang==="en" ? "v25 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
-                             : "v25 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
+    var msg = (S.lang==="en" ? "v26 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
+                             : "v26 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
   }
 
@@ -3320,7 +3330,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v25.0";
+    $("pillVer").textContent = "v26.0";
   }
 
   function applyStatic(){
@@ -3357,11 +3367,13 @@
   }
 
   function chCount(w){
+    if(S.format==="story") return Math.max(3, Math.min(7, Math.round(w/1500)));
     return S.format==="novel" ? Math.max(20, Math.round(w/3500))
       : S.format==="serial" ? Math.max(4, Math.round(w/2000))
       : Math.max(7, Math.round(w/2500));
   }
   function wpcFor(){
+    if(S.format==="story") return 1200;
     return S.format==="novel" ? 3500 : S.format==="serial" ? 2000 : 2500;
   }
 
@@ -3370,9 +3382,10 @@
     $("outWords").textContent = w.toLocaleString(S.lang==="en"?"en-US":"el-GR") + (S.lang==="en"?" words":" λέξεις");
     var ch = chCount(w);
     var wpc = Math.round(w/ch);
+    var act = S.format==="story";
     $("wordsHint").textContent = S.lang==="en"
-      ? "≈ "+ch+" chapters · ~"+wpc.toLocaleString("en-US")+" words/chapter"
-      : "≈ "+ch+" κεφάλαια · ~"+wpc.toLocaleString("el-GR")+" λέξεις/κεφάλαιο";
+      ? "≈ "+ch+(act?" acts":" chapters")+" · ~"+wpc.toLocaleString("en-US")+(act?" words/act":" words/chapter")
+      : "≈ "+ch+(act?" πράξεις":" κεφάλαια")+" · ~"+wpc.toLocaleString("el-GR")+(act?" λέξεις/πράξη":" λέξεις/κεφάλαιο");
   }
 
   function renderGenres(){
@@ -4643,6 +4656,227 @@
     downloadBlob(L.join("\n"), fname, "text/markdown;charset=utf-8");
     toast(EN ? "Manuscript exported 📚" : "Το χειρόγραφο εξήχθη 📚");
   }
+
+  /* ============================================================
+     EPUB EXPORT — dependency-free (store-only ZIP writer + EPUB3)
+     One file, offline, no libraries — the contract holds.
+     ============================================================ */
+  var _crcTable = (function(){
+    var t = new Array(256);
+    for(var n=0;n<256;n++){
+      var c = n;
+      for(var k=0;k<8;k++){ c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); }
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+  function crc32(data){
+    var c = 0xFFFFFFFF;
+    for(var i=0;i<data.length;i++){ c = _crcTable[(c ^ data[i]) & 0xFF] ^ (c >>> 8); }
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  /* files: [{name, data:Uint8Array}] → Uint8Array (store method, no compression) */
+  function zipStore(files){
+    var enc = new TextEncoder();
+    var parts = [], central = [], offset = 0;
+    files.forEach(function(f){
+      var nameB = enc.encode(f.name);
+      var data = f.data, crc = crc32(data);
+      var lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true);
+      lh.setUint16(4, 20, true);
+      lh.setUint32(14, crc, true);
+      lh.setUint32(18, data.length, true);
+      lh.setUint32(22, data.length, true);
+      lh.setUint16(26, nameB.length, true);
+      parts.push(new Uint8Array(lh.buffer), nameB, data);
+      var ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true);
+      ch.setUint16(4, 20, true);
+      ch.setUint16(6, 20, true);
+      ch.setUint32(16, crc, true);
+      ch.setUint32(20, data.length, true);
+      ch.setUint32(24, data.length, true);
+      ch.setUint16(28, nameB.length, true);
+      ch.setUint32(42, offset, true);
+      central.push(new Uint8Array(ch.buffer), nameB);
+      offset += 30 + nameB.length + data.length;
+    });
+    var cdSize = central.reduce(function(s,c){ return s + c.length; }, 0);
+    var eocd = new DataView(new ArrayBuffer(22));
+    eocd.setUint32(0, 0x06054b50, true);
+    eocd.setUint16(8, files.length, true);
+    eocd.setUint16(10, files.length, true);
+    eocd.setUint32(12, cdSize, true);
+    eocd.setUint32(16, offset, true);
+    parts = parts.concat(central);
+    parts.push(new Uint8Array(eocd.buffer));
+    var total = parts.reduce(function(s,c){ return s + c.length; }, 0);
+    var out = new Uint8Array(total), pos = 0;
+    parts.forEach(function(c){ out.set(c, pos); pos += c.length; });
+    return out;
+  }
+  function xmlEsc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function simpleUuid(){
+    var h = "0123456789abcdef", s = "";
+    for(var i=0;i<32;i++){ s += h[Math.floor(Math.random()*16)]; if(i===7||i===11||i===15||i===19){ s += "-"; } }
+    return s;
+  }
+  function chToParagraphs(text){
+    var out = [];
+    String(text || "").split(/\r?\n+/).forEach(function(ln){
+      ln = ln.trim();
+      if(ln) out.push("<p>" + xmlEsc(ln) + "</p>");
+    });
+    return out.join("\n");
+  }
+  function buildEpubFiles(book){
+    var enc = new TextEncoder();
+    var lang = (S.deliverLang === "en") ? "en" : "el";
+    var EN = S.lang === "en";
+    var title = (book.title || "Untitled").trim();
+    var chs = (book.chapters || []).filter(function(c){ return c && (c.text||"").trim(); });
+    var today = new Date();
+    var ymd = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0") + "-" + String(today.getDate()).padStart(2,"0");
+    var mod = ymd + "T00:00:00Z";
+    var uuid = simpleUuid();
+    var files = [];
+    files.push({ name:"mimetype", data: enc.encode("application/epub+zip") });
+    files.push({ name:"META-INF/container.xml", data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">' +
+      '<rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles>' +
+      '</container>') });
+    var items = ['<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>',
+                 '<item id="tp" href="titlepage.xhtml" media-type="application/xhtml+xml"/>'];
+    var spine = ['<itemref idref="tp"/>'];
+    chs.forEach(function(c, i){
+      var id = "ch" + (i+1);
+      items.push('<item id="'+id+'" href="'+id+'.xhtml" media-type="application/xhtml+xml"/>');
+      spine.push('<itemref idref="'+id+'"/>');
+    });
+    files.push({ name:"OEBPS/content.opf", data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="pub-id" xml:lang="'+lang+'">' +
+      '<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">' +
+      '<dc:identifier id="pub-id">urn:uuid:'+uuid+'</dc:identifier>' +
+      '<dc:title>'+xmlEsc(title)+'</dc:title>' +
+      '<dc:language>'+lang+'</dc:language>' +
+      '<dc:date>'+ymd+'</dc:date>' +
+      '<meta property="dcterms:modified">'+mod+'</meta>' +
+      '</metadata><manifest>' + items.join("") + '</manifest><spine toc="nav">' + spine.join("") + '</spine></package>') });
+    var navItems = chs.map(function(c, i){
+      var label = (c.title || "").trim() || ((EN?"Chapter ":"Κεφάλαιο ") + (i+1));
+      return '<li><a href="ch-'+(i+1)+'.xhtml">'+xmlEsc(label)+'</a></li>';
+    }).join("\n");
+    files.push({ name:"OEBPS/nav.xhtml", data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<!DOCTYPE html>\n' +
+      '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="'+lang+'">' +
+      '<head><title>'+xmlEsc(EN?"Contents":"Περιεχόμενα")+'</title></head><body>' +
+      '<nav epub:type="toc" id="toc"><h1>'+xmlEsc(EN?"Contents":"Περιεχόμενα")+'</h1><ol>\n' + navItems + '\n</ol></nav>' +
+      '</body></html>') });
+    files.push({ name:"OEBPS/titlepage.xhtml", data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<!DOCTYPE html>\n' +
+      '<html xmlns="http://www.w3.org/1999/xhtml" lang="'+lang+'">' +
+      '<head><title>'+xmlEsc(title)+'</title>' +
+      '<style>body{font-family:Georgia,serif;text-align:center;padding-top:35vh}h1{font-size:2em;font-weight:normal}p{color:#555}</style>' +
+      '</head><body><h1>'+xmlEsc(title)+'</h1><p>—</p><p>'+ymd+'</p></body></html>') });
+    chs.forEach(function(c, i){
+      var chTitle = (c.title || "").trim() || ((EN?"Chapter ":"Κεφάλαιο ") + (i+1));
+      files.push({ name:"OEBPS/ch-"+(i+1)+".xhtml", data: enc.encode(
+        '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<!DOCTYPE html>\n' +
+        '<html xmlns="http://www.w3.org/1999/xhtml" lang="'+lang+'">' +
+        '<head><title>'+xmlEsc(chTitle)+'</title>' +
+        '<style>body{font-family:Georgia,serif;line-height:1.7}h2{font-weight:normal;text-align:center;font-size:1.5em}p{text-align:justify}</style>' +
+        '</head><body><h2>'+xmlEsc(chTitle)+'</h2>\n' + chToParagraphs(c.text) + '\n</body></html>') });
+    });
+    return files;
+  }
+  function downloadBytes(bytes, fname, mime){
+    var blob = new Blob([bytes], {type: mime});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 300);
+  }
+  function exportEpub(){
+    var EN = S.lang === "en";
+    var chs = S.chapters || [];
+    if(!chs.some(function(c){ return c && (c.text||"").trim(); })){
+      toast(EN ? "Add at least one chapter first" : "Προσθέστε τουλάχιστον ένα κεφάλαιο πρώτα");
+      return;
+    }
+    try{
+      var files = buildEpubFiles({ title: S.title || S.bookName || "Untitled", chapters: chs });
+      var bytes = zipStore(files);
+      var fname = ((S.title||"").trim() || "book").replace(/[^\w\u0370-\u03FF]+/g,"-").replace(/^-+|-+$/g,"") + ".epub";
+      downloadBytes(bytes, fname, "application/epub+zip");
+      toast(EN ? "EPUB exported 📖" : "Εξήχθη το EPUB 📖");
+    }catch(e){
+      toast(EN ? "EPUB export failed in this browser" : "Η εξαγωγή EPUB απέτυχε σε αυτόν τον browser");
+    }
+  }
+  /* PDF via the browser's print engine — a print-ready manuscript layout.
+     No dependencies: build a print HTML document, open it in a hidden
+     iframe, and let the user "Save as PDF" from the print dialog. */
+  function buildPrintHtml(){
+    var EN = S.lang === "en";
+    var chs = (S.chapters || []).filter(function(c){ return c && (c.text||"").trim(); });
+    var title = (S.title || S.bookName || "Untitled").trim();
+    var today = new Date();
+    var ymd = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0") + "-" + String(today.getDate()).padStart(2,"0");
+    var body = '<div class="tp"><h1>'+xmlEsc(title)+'</h1><p class="rule">&mdash;</p><p>'+ymd+'</p></div>';
+    chs.forEach(function(c, i){
+      var chTitle = (c.title || "").trim() || ((EN?"Chapter ":"Κεφάλαιο ") + (i+1));
+      body += '<section class="ch"><h2>'+xmlEsc(chTitle)+'</h2>\n' + chToParagraphs(c.text) + '\n</section>';
+    });
+    return '<!DOCTYPE html><html lang="'+(S.deliverLang==="en"?"en":"el")+'"><head><meta charset="utf-8"><title>'+xmlEsc(title)+'</title>' +
+      '<style>' +
+      '@page{size:A4;margin:22mm 20mm}' +
+      'body{font-family:Georgia,"Times New Roman",serif;font-size:11.5pt;line-height:1.75;color:#111;margin:0}' +
+      '.tp{text-align:center;padding-top:38vh;page-break-after:always}' +
+      '.tp h1{font-weight:normal;font-size:26pt;letter-spacing:.5px}' +
+      '.tp .rule{color:#888;letter-spacing:6px}' +
+      '.ch{page-break-before:always}' +
+      '.ch h2{font-weight:normal;text-align:center;font-size:17pt;margin:0 0 20pt}' +
+      'p{margin:0 0 9pt;text-align:justify}' +
+      '</style></head><body>' + body + '</body></html>';
+  }
+  function exportPdf(){
+    var EN = S.lang === "en";
+    var chs = S.chapters || [];
+    if(!chs.some(function(c){ return c && (c.text||"").trim(); })){
+      toast(EN ? "Add at least one chapter first" : "Προσθέστε τουλάχιστον ένα κεφάλαιο πρώτα");
+      return;
+    }
+    try{
+      var f = document.createElement("iframe");
+      f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
+      document.body.appendChild(f);
+      var d = f.contentWindow && f.contentWindow.document;
+      if(!d || typeof d.open !== "function"){
+        try{ f.remove(); }catch(e2){}
+        toast(EN ? "Print not available in this browser" : "Η εκτύπωση δεν διατίθεται σε αυτόν τον browser");
+        return;
+      }
+      d.open(); d.write(buildPrintHtml()); d.close();
+      var cleanup = function(){ try{ f.remove(); }catch(e){} };
+      try{ if(f.contentWindow.onafterprint) f.contentWindow.onafterprint = cleanup; }catch(e){}
+      setTimeout(function(){
+        try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){}
+        setTimeout(cleanup, 4000);
+      }, 350);
+      toast(EN ? "In the print dialog choose “Save as PDF” 🖨️" : "Στον διαλόγο εκτύπωσης επιλέξτε «Αποθήκευση ως PDF» 🖨️");
+    }catch(e){
+      toast(EN ? "Print not available in this browser" : "Η εκτύπωση δεν διατίθεται σε αυτόν τον browser");
+    }
+  }
   function buildPitch(){
     var EN = S.lang === "en";
     var P = [];
@@ -5415,6 +5649,8 @@
     $("btnUsageReset").addEventListener("click", function(){ S.usageTokens = 0; usageText(); saveLS(); toast(S.lang==="en"?"Usage reset":"Η χρήση επαναφέρθηκε"); });
     $("btnChPrev2").addEventListener("click", function(){ var p = $("chPreview"); if(!p) return; p.hidden = !p.hidden; renderPreview(); });
     $("btnMsExport").addEventListener("click", exportManuscript);
+    $("btnEpub").addEventListener("click", exportEpub);
+    $("btnPdf").addEventListener("click", exportPdf);
     $("btnRebrief").addEventListener("click", function(){
       var rb = buildRebrief();
       $("promptOut").value = rb;
@@ -5715,6 +5951,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", init);
+  /* test/debug hook (harmless in the browser) */
+  try{ window.__cws = { zipStore: zipStore, crc32: crc32, buildEpubFiles: buildEpubFiles, buildPrintHtml: buildPrintHtml, chCount: chCount, wpcFor: wpcFor }; }catch(e){}
 })();
 
 </script>

@@ -89,7 +89,7 @@ Two narrators, alternating on a schedule:
 
 ## 🛡 Reliability
 - The app is hardened so it **never breaks**: if a control is ever missing it becomes a no-op instead of crashing; unexpected errors show a friendly notice (your work is always autosaved); storage-full shows a clear warning.
-- Developers: run `node tests/bullet.js` — 84 checks across 5 angles (syntax, structure, functional, robustness, regression).
+- Developers: run `node tests/bullet.js` — 90 checks across 5 angles (syntax, structure, functional, robustness, regression).
 
 ## 🔍 Finding a master + writing in English (v19)
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.
@@ -101,6 +101,8 @@ At the top of the left column: pick **what kind of story** (cosmic horror · hig
 ## 🏷 Imaginative naming + Mythos (v21)
 - **🏷 Names & places** (Blog-style card) — **v2**: one click builds a crafted prompt for your AI with the genre's naming discipline (high fantasy / dark fantasy / mythic / fairy tale → invented, internally consistent names (Calethir, Orynthas…) and places (Marestan, Xanandou, Dyrron, Eldara…); realistic Greek genres → everyday Greek names (Δημήτρης, Νεφέλη…) and real places (Athens, Arachovis st., a mountain town); sci-fi / post-apocalyptic → western + invented). Paste the answer back → **⤵ Load**. The **🎲 Local roll (offline)** chip keeps the old no-AI roll (same genre-aware register, no genre set → rolls freely and tells you which style it used).
 - **🏷 Names & places v2 + 🧬 Character v2** — the spark technique for cast & world: 🏷 builds a crafted prompt (genre-aware naming + the world's register) → your AI returns 3 people, 3 places, 1 object + glossary → paste back, **⤵ Load** (places go to *World*, cast to *Hero/Antagonist*, glossary merges). 🧬 does the same for the character sheet (wound/want/fear/arc/voice/secret + 3–4 lines of pure dialogue, which land in *Extra* as voice samples). Both keep a **🎲 Local roll (offline)** chip as the no-AI fallback.
+- **📖 EPUB / 🖨️ PDF** (Manuscript tab) — the whole manuscript as a real EPUB e-book (dependency-free, opens in any e-book reader), or a print-ready A4 manuscript layout → “Save as PDF” from the print dialog. The way you hand a book to an editor now.
+- **📓 Short story format** (card 1) — 3–7 acts × ~1,200 words for the standalones (Μύηση, Ο Δυρρών, Μαρεστάν territory); the brief says “one world, one cast, one thread” and closes on an image-ending.
 - **🌍 Expand mythos & world** (Memory tab) — a prompt that expands ancient history, 5 named places, institutions, the rules of the strange, and the unspoken secret. Feeds from the new **Lore** field, which is also injected into every brief.
 - **Character background** — every brief now asks for a solid origin: family, the day that changed everything, livelihood, a keepsake, the line they'd never cross.
 
