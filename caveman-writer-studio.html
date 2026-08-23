@@ -375,7 +375,128 @@
   .st-reviewed{color:var(--accent)}
   .st-final{color:var(--ok)}
   .chips .st-draft.on,.chips .st-reviewed.on,.chips .st-final.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-</style>
+
+  /* ============================================================
+     STONE & FIRE — signature identity (theme-adaptive)
+     Cards are stone tablets, accents are ember, the savings bar
+     is a tally stick. Everything uses the existing theme vars so
+     Night / Parchment / Forest all adapt.
+     ============================================================ */
+  :root{
+    --ember:var(--accent);
+    --stone-edge:rgba(255,255,255,.05);
+    --stone-shade:rgba(0,0,0,.28);
+    --grain:rgba(255,255,255,.022);
+  }
+  html[data-theme="parchment"]{ --stone-edge:rgba(255,255,255,.55); --stone-shade:rgba(90,70,40,.20); --grain:rgba(90,60,20,.045); }
+  html[data-theme="forest"]{ --stone-edge:rgba(220,255,220,.06); --stone-shade:rgba(0,0,0,.30); }
+
+  /* stone tablet cards: bevel top edge, grain, chiselled corners */
+  .card{
+    position:relative;
+    background-image:
+      radial-gradient(120% 60% at 50% -20%, var(--stone-edge), transparent 60%),
+      repeating-linear-gradient(115deg, var(--grain) 0 2px, transparent 2px 5px);
+    box-shadow:0 1px 0 var(--stone-edge) inset, 0 -14px 26px -20px var(--stone-shade) inset, 0 8px 24px rgba(0,0,0,.18);
+  }
+  .card::before{ /* chisel notch top-left */
+    content:""; position:absolute; top:0; left:14px; width:26px; height:3px;
+    background:linear-gradient(90deg, var(--accent), transparent);
+    opacity:.5; border-radius:0 0 3px 3px; pointer-events:none;
+  }
+  /* engraved card headings + carved number seal */
+  .card h2{
+    letter-spacing:.6px; text-transform:uppercase; font-size:13.5px;
+    text-shadow:0 1px 0 var(--stone-edge), 0 -1px 1px var(--stone-shade);
+  }
+  .card h2 .num{
+    border-radius:5px;
+    background:linear-gradient(180deg, var(--surface2), var(--surface));
+    box-shadow:0 1px 0 var(--stone-edge) inset, 0 -1px 2px var(--stone-shade) inset, 0 0 0 1px var(--border);
+    text-shadow:0 1px 1px rgba(0,0,0,.4);
+  }
+  /* carved-in inputs (recessed into stone) */
+  input[type=text],input[type=number],select,textarea{
+    box-shadow:0 1px 3px rgba(0,0,0,.28) inset;
+  }
+  input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{
+    box-shadow:0 1px 3px rgba(0,0,0,.28) inset, 0 0 0 3px var(--focus);
+  }
+  /* ember primary buttons + torch focus */
+  .btn:not(.ghost){
+    background:linear-gradient(180deg, var(--accent), var(--accent-soft));
+    box-shadow:0 1px 0 var(--stone-edge) inset, 0 3px 10px -4px var(--accent);
+  }
+  .btn:not(.ghost):hover{ box-shadow:0 1px 0 var(--stone-edge) inset, 0 0 16px -2px var(--accent); }
+  /* stone chips: subtle bevel */
+  .chip{ box-shadow:0 1px 0 var(--stone-edge) inset, 0 -1px 2px var(--stone-shade) inset; }
+  .chip.on{ box-shadow:0 0 0 1px var(--accent) inset, 0 0 12px -4px var(--accent); }
+  /* tally-stick savings bar: carved ticks instead of a flat fill */
+  .savbar{ background:var(--stone-shade); box-shadow:0 1px 2px rgba(0,0,0,.3) inset; }
+  .savbar i{
+    background:
+      repeating-linear-gradient(90deg, transparent 0 6px, rgba(0,0,0,.30) 6px 8px),
+      linear-gradient(180deg, var(--accent), var(--accent-soft));
+    box-shadow:0 1px 0 var(--stone-edge) inset;
+  }
+  /* quick-start hero: a carved stone tablet */
+  #qsCard{
+    background-image:
+      radial-gradient(140% 70% at 50% -30%, var(--stone-edge), transparent 55%),
+      repeating-linear-gradient(115deg, var(--grain) 0 2px, transparent 2px 5px),
+      linear-gradient(180deg, var(--surface2), var(--surface));
+    box-shadow:0 1px 0 var(--stone-edge) inset, 0 -20px 30px -22px var(--stone-shade) inset, 0 10px 28px rgba(0,0,0,.22);
+    border-width:1px;
+  }
+  /* torch focus ring on keyboard nav */
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; box-shadow:0 0 0 4px var(--focus); }
+  /* carved divider: a chiselled groove */
+  .divider{
+    height:1px; background:linear-gradient(90deg, transparent, var(--border2) 20%, var(--border2) 80%, transparent);
+    box-shadow:0 1px 0 var(--stone-edge);
+  }
+  /* summary rows: chisel caret marker */
+  details.adv>summary::marker{ color:var(--accent); }
+  details.adv>summary{ text-shadow:0 1px 0 var(--stone-edge); }
+
+  /* stone header with an ember hairline + a lit rock */
+  header{
+    background-image:linear-gradient(180deg, var(--stone-edge), transparent 40%);
+    box-shadow:0 1px 0 var(--stone-edge) inset, 0 6px 18px -14px rgba(0,0,0,.6);
+  }
+  header::after{ /* ember hairline */
+    content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+    background:linear-gradient(90deg, transparent, var(--accent) 18%, var(--accent-soft) 50%, var(--accent) 82%, transparent);
+    opacity:.55;
+  }
+  .logo-rock{ position:relative; }
+  .logo-rock::before{ /* ember glow behind the rock */
+    content:""; position:absolute; inset:-8px; z-index:0;
+    background:radial-gradient(closest-side, var(--focus), transparent 72%);
+    opacity:.7; pointer-events:none;
+  }
+  .logo-rock svg{ position:relative; z-index:1; }
+  .brand h1{
+    letter-spacing:.8px;
+    text-shadow:0 1px 0 var(--stone-edge), 0 2px 6px rgba(0,0,0,.35);
+  }
+  /* version + theme pills: carved stone */
+  .pill{ box-shadow:0 1px 0 var(--stone-edge) inset, 0 -1px 2px var(--stone-shade) inset; }
+  .pill b{ text-shadow:0 1px 0 var(--stone-edge); }
+  /* header segmented controls: chiselled slots */
+  .hdrseg{ box-shadow:0 1px 0 var(--stone-edge) inset, 0 -1px 2px var(--stone-shade) inset; }
+  .hdrseg button.on{ box-shadow:0 0 12px -3px var(--accent); }
+  /* scrollbars carved like stone channels */
+  ::-webkit-scrollbar{ width:12px; height:12px; }
+  ::-webkit-scrollbar-track{ background:var(--bg2); }
+  ::-webkit-scrollbar-thumb{ background:var(--border2); border-radius:8px; border:3px solid var(--bg2); box-shadow:0 1px 0 var(--stone-edge) inset; }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--accent-soft); }
+  /* selection like warm stone dust */
+  ::selection{ background:var(--focus); }
+  /* de-cluttered header: the duplicate pills hide (their controls stay) */
+  #pillSkill,#pillTheme,#pillLang{ display:none; }
+
+
 </head>
 <body>
 
@@ -387,7 +508,7 @@
   </div>
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
-    <span class="pill">Skill: <b>caveman v2.2</b></span>
+    <span class="pill" id="pillSkill">Skill: <b>caveman v2.2</b></span>
     <span class="pill" id="pillVer">v25.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
@@ -472,7 +593,6 @@
     </div>
 
     <div class="card">
-      <div class="card">
       <h2><span class="num">&#10024;</span> <span id="tIntent">Build from ingredients — no idea yet?</span></h2>
       <p class="hint" id="intentHint">Tell me what you want to write (genre, mood, setting, elements). The app builds a full brief for you — title, world, hero, plot, names — from the author's vocabulary.</p>
       <div class="field">
@@ -499,6 +619,7 @@
       <div id="intentOut" class="hint" style="white-space:pre-wrap;margin-top:6px;line-height:1.6"></div>
     </div>
 
+    <div class="card">
       <h2><span class="num">2</span> <span id="t2">Inspiring authors</span>
         <button type="button" class="chip" id="btnPreset" style="margin-left:auto">🧠 My profile</button></h2>
       <p class="hint" id="h2" style="margin-bottom:10px">Pick one or more. Their techniques are baked into the prompt.</p>
@@ -581,23 +702,25 @@
         <label class="lbl" id="lblThemes">Themes (multiple)</label>
         <div class="chips" id="themeChips"></div>
       </div>
-      <div class="field">
-        <label class="lbl" id="lblStruct" for="inStruct">Structure / Chapters (optional)</label>
-        <input type="text" id="inStruct">
-      </div>
-      <div class="field">
-        <label class="lbl" id="lblExtra" for="inExtra">Extra instructions (optional)</label>
-        <textarea id="inExtra"></textarea>
-      </div>
       <details class="adv">
-        <summary id="advBible">Story bible (locked facts)</summary>
+        <summary id="advExtras">✍️ Structure &amp; story extras</summary>
         <div class="field" style="margin-top:8px">
-          <textarea id="inBible"></textarea>
-          <div class="hint" id="bibleHint">timeline, character relations, world rules, locked events — the AI must never contradict these</div>
+          <label class="lbl" id="lblStruct" for="inStruct">Structure / Chapters (optional)</label>
+          <input type="text" id="inStruct">
         </div>
-      </details>
-      <label class="check"><input type="checkbox" id="ckPlan" checked>
-        <span><b id="ckPlanTxt">Start with plot plan + chapter list</b><small id="ckPlanSub">before writing the first chapter</small></span></label>
+        <div class="field">
+          <label class="lbl" id="lblExtra" for="inExtra">Extra instructions (optional)</label>
+          <textarea id="inExtra"></textarea>
+        </div>
+        <details class="adv">
+          <summary id="advBible">Story bible (locked facts)</summary>
+          <div class="field" style="margin-top:8px">
+            <textarea id="inBible"></textarea>
+            <div class="hint" id="bibleHint">timeline, character relations, world rules, locked events — the AI must never contradict these</div>
+          </div>
+        </details>
+        <label class="check"><input type="checkbox" id="ckPlan" checked>
+          <span><b id="ckPlanTxt">Start with plot plan + chapter list</b><small id="ckPlanSub">before writing the first chapter</small></span></label>
       <label class="check"><input type="checkbox" id="ckAlt" checked>
         <span><b id="ckAltTxt">Alternatives for stuck scenes</b><small id="ckAltSub">when a scene doesn't work, suggest 2–3 options</small></span></label>
       <label class="check"><input type="checkbox" id="ckClich" checked>
@@ -608,8 +731,10 @@
         <label class="check"><input type="checkbox" id="ckEpi">
           <span><b id="ckEpiTxt">Epilogue</b><small id="ckEpiSub">closure after the resolution</small></span></label>
       </div>
-      <div class="divider"></div>
-      <p class="suglabel" id="lblLangQuality">Language quality</p>
+      </details>
+      <details class="adv">
+        <summary id="advQuality">🛡 Voice &amp; quality guards (on by default)</summary>
+        <p class="suglabel" id="lblLangQuality">Language quality</p>
       <label class="check"><input type="checkbox" id="ckGreek" checked>
         <span><b id="ckGreekTxt">Greek language guard</b><small id="ckGreekSub">flawless orthography, tonics, grammar and natural flow — no inconsistencies</small></span></label>
       <label class="check"><input type="checkbox" id="ckProof" checked>
@@ -618,8 +743,9 @@
         <span><b id="ckVoicesTxt">Voice samples before Chapter 1</b><small id="ckVoicesSub">3–4 lines of pure dialogue per main character</small></span></label>
       <label class="check"><input type="checkbox" id="ckStyle">
         <span><b id="ckStyleTxt">House style — your own voice</b><small id="ckStyleSub">techniques distilled from your writing on the blog “My little stories” go into the brief</small></span></label>
+      </details>
       <details class="adv">
-        <summary id="advLang">🎙 Voice & quality (voice sample · glossary · anti-LLM)</summary>
+        <summary id="advLang">🎙 Voice sample · glossary · anti-LLM</summary>
         <div class="field" style="margin-top:8px">
           <label class="lbl" id="lblGlossary" for="inGlossary">Glossary / fixed spellings (optional)</label>
           <input type="text" id="inGlossary">
@@ -1903,6 +2029,8 @@
     ckBudgetTxt:["Προϋπολογισμός λέξεων ανά κεφάλαιο","Chapter word budget"],
     ckBudgetSub:["στόχοι λέξεων ανά κεφάλαιο σε πίνακα","per-chapter word targets as a table"],
     advChar:["Καρτέλα ήρωα (προαιρετικό)","Character sheet (optional)"],
+    advExtras:["✍️ Δομή & επιπλέον στοιχεία ιστορίας","✍️ Structure & story extras"],
+    advQuality:["🛡 Φωνή & φρουροί ποιότητας (ενεργοί από προεπιλογή)","🛡 Voice & quality guards (on by default)"],
     advBible:["Story bible (κλειδωμένα γεγονότα)","Story bible (locked facts)"],
     advLang:["Λεπτομέρειες γλώσσας (γλωσσάρι, αντι-LLM, φωνή)","Language details (glossary, anti-LLM, voice sample)"],
     advBlog:["🪶 Δημιουργός στυλ blog — τόποι, σκηνές, ονόματα, πλοκές (προαιρετικό)","🪶 Blog-style generator — places, scenes, names, plots (optional)"],
@@ -5552,13 +5680,15 @@
     }
     $("rockA").innerHTML = rockSVG(42);
     var loaded = loadLS();
-    /* Reset to main screen on every entry: back to the first tab, all cards
-       expanded, focus/compact off, quick-start visible. Book data is kept. */
+    /* Guided first view on every entry: back to the first tab, focus/compact
+       off, quick-start visible, core loop open (format, masters, story,
+       prompt, tools) and the deep-dive cards collapsed (protocol explainer,
+       masters techniques, checklist, build-from-ingredients). Book data kept. */
     S.activeTab = "scene";
     S.focus = false;
     S.compact = false;
     S.qsHidden = false;
-    try{ localStorage.removeItem(COLLAPSE_KEY); }catch(e){}
+    try{ localStorage.setItem(COLLAPSE_KEY, JSON.stringify({ t6:1, t8:1, t9:1, tIntent:1 })); }catch(e){}
     if(loaded && S.words === 0){ S.words = FORMATS[S.format].defWords; }
     if(!loaded && S.words === 0){ S.words = FORMATS[S.format].defWords; }
     renderGenres(); renderPovs(); renderTones(); renderPacings(); renderEndings(); renderTenses(); renderModes();
