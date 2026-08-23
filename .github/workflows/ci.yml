@@ -20,5 +20,5 @@ jobs:
         run: |
           node -e "const fs=require('fs');const s=fs.readFileSync('caveman-writer-studio.html','utf8');const m=s.match(/<script>([\\s\\S]*?)<\\/script>/);fs.writeFileSync('/tmp/app.js',m[1]);"
           node --check /tmp/app.js
-      - name: Run bulletproof test suite (95 checks · 5 angles)
+      - name: Run bulletproof test suite (98 checks · 5 angles)
         run: node tests/bullet.js

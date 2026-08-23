@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v27.0-8a6d3b?style=flat-square" alt="v27.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v28.0-8a6d3b?style=flat-square" alt="v28.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
@@ -149,12 +149,13 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 
 ## ✅ Reliability
 - Resilience-hardened: a missing element can never crash the app (safe `$` stub), global error handler, autosave + quota fallback, guarded empty-state actions.
-- **Bulletproof test suite** — `tests/bullet.js` (95 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
+- **Bulletproof test suite** — `tests/bullet.js` (98 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
 - **CI (GitHub Actions)** — every push runs the suite automatically (see [.github/workflows/ci.yml](.github/workflows/ci.yml)); the badge above shows the latest result.
 
 ## 📦 Releases
 | Version | What's new |
 |---|---|
+| v28.0 | **Naming canon**: the names and places you dictate are canon — the naming register (greek / western / invented) is detected from your dictated protagonist & antagonist, the local roll and every naming prompt (names, character, main brief, mythos) follow it, and your dictated places (glossary / world / premise) are reused instead of the fixed pools — the genre rule becomes the default. **Plus: commission strength meter** (a craft rubric, not a field count — clickable diagnostics focus the missing piece), **dramatic question** (the book's engine), **craft locks** (must include / must never / comps → a CONSTRAINTS section in every prompt), **character need & the lie they believe**, and **stage packs** (5 self-contained stage prompts: commission → world → souls → voice → chapter 1). Byte-level fixes for Greek typos (double tonics, tonic placement, broken verb). Test suite: 98 + 64 + 30 checks |
 | v27.0 | **Spark v3 — segment sparks**: ✨ next to Title / Story / Character suggestions builds genuine, morphology-matched AI prompts (never reuses existing suggestions or famous works; the blog's DNA or the selected masters' rhythm); ⤵ Load auto-detects the answer type and fills the matching segment
 | v26.0 | **Short story format** (3–7 acts × ~1,200 words — standalones) + **EPUB export** (dependency-free EPUB3, real e-book file) + **PDF export** (print-ready manuscript layout → Save as PDF) — the manuscript tab now ships a book to an editor
 | v25.0 | **UI: “stone & fire” identity + guided first view** (carved stone-tablet cards, ember buttons, tally-stick savings bar, de-cluttered header; deep-dive cards start collapsed so the 3-step loop leads) + **Names & places v2 + Character v2** — the spark technique for cast & world: crafted AI prompts (genre-aware naming + context + your craft), paste-back **⤵ Load** into the brief (places → world, cast → sheet, glossary merge, dialogue samples → extra); 🎲 local roll kept as offline fallback |

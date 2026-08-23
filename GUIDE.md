@@ -89,7 +89,7 @@ Two narrators, alternating on a schedule:
 
 ## 🛡 Reliability
 - The app is hardened so it **never breaks**: if a control is ever missing it becomes a no-op instead of crashing; unexpected errors show a friendly notice (your work is always autosaved); storage-full shows a clear warning.
-- Developers: run `node tests/bullet.js` — 95 checks across 5 angles (syntax, structure, functional, robustness, regression).
+- Developers: run `node tests/bullet.js` — 98 checks across 5 angles (syntax, structure, functional, robustness, regression).
 
 ## 🔍 Finding a master + writing in English (v19)
 - **Author search** — above the masters grid, type a name or a technique (e.g. "lovecraft", "διάλογος", "voice") to filter the 19 cards instantly. The counter shows how many match and how many are selected; **✕ Clear all** empties the selection.

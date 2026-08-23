@@ -104,7 +104,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v27.0 present', HTML.includes('v27.0'));
+  chk('structure', 'version v28.0 present', HTML.includes('v28.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -278,14 +278,31 @@ function boot(overrides) {
   const namesFant = els['blogOut'].textContent || '';
   chk('functional', 'local roll (fantasy): invented names & places (no real Greek)',
       !/Athens|Αθήνα|Δημήτρης|Eleni|Dimitris/.test(namesFant)
-      && /Marestan|Xanandou|Dyrron|Grouin|Akentrou|Valmor|Serendi|Arkana|Eldara|Thornhal|Morval|Silara|Ostrian Bay|Lithvorn Hold|The Seven-River/.test(namesFant));
-  // realistic Greek genre → everyday names & real Greek places (local roll)
+      && /Marestan|Xanandou|Dyrron|Grouin|Akentrou|Valmor|Serendi|Arkana|Eldara|Thornhal|Morval|Silara|Ostrian Bay|Lithvorn Hold|The Seven-River|Unwritten/.test(namesFant));
+  // the dictation beats the genre: hero Talvir Lithvorn (invented) + glossary place Marestan
+  chk('functional', 'local roll: follows the dictated invented hero (anchor, not genre)',
+      /matching your dictated names/.test(namesFant));
+  // realistic Greek genre → everyday names & real Greek places (when the dictation agrees)
+  els['inHero']._val = 'Δημήτρης Σεραφείμ, 41, βιβλιοθηκάριος'; els['inHero'].dispatch('input');
+  els['inGlossary']._val = ''; els['inGlossary'].dispatch('input');
+  els['inWorld']._val = ''; els['inWorld'].dispatch('input');
+  els['inBible']._val = ''; els['inBible'].dispatch('input');
+  els['inPremise']._val = ''; els['inPremise'].dispatch('input');
   els['inGenre']._val = 'horror'; els['inGenre'].dispatch('change');
   els['btnNamesLocal'].click();
   const namesGr = els['blogOut'].textContent || '';
   chk('functional', 'local roll (greek): everyday names (no fantasy pool)',
       !/Calethir|Thandiril|Moraina|Orynthas|Velianda|Dragobel|Morncal|Thornmayr/.test(namesGr));
   chk('functional', 'local roll (greek): real Greek place', /Athens|Arachovis|Mesogeia|Stone Valley|A mountain town|An island town/.test(namesGr));
+  chk('functional', 'local roll: anchored to the dictated Greek hero', /Δημήτρης/.test(namesGr));
+  // an invented hero in a greek genre → the roll follows the hero, not the genre
+  els['inHero']._val = 'Talvir Lithvorn, 34, cartographer'; els['inHero'].dispatch('input');
+  els['btnNamesLocal'].click();
+  const namesAnch = els['blogOut'].textContent || '';
+  const personLine = (namesAnch.split('\n').find(l => l.indexOf('PERSON') !== -1) || '');
+  chk('functional', 'local roll: invented hero beats the greek genre (anchor)',
+      /matching your dictated names: «Talvir/.test(namesAnch)
+      && !/Dimitris|Eleni|Anna|Markos|Ilias|Phaedra|Homer|Lefteris|Kalliopi|Thodoris|Nefeli|Orestis|Melina|Zoi|Alexandra/.test(personLine));
   // names v2: the AI prompt flow (same spark technique)
   els['inGenre']._val = 'fantasy'; els['inGenre'].dispatch('change');
   els['btnNames'].click();
@@ -479,7 +496,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v27.0', (b.els['pillVer'].textContent||'').includes('v27.0'));
+  chk('regression', 'pill shows v28.0', (b.els['pillVer'].textContent||'').includes('v28.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);

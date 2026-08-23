@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v27.0</title>
+<title>Caveman Writer Studio — v28.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -497,7 +497,15 @@
   #pillSkill,#pillTheme,#pillLang{ display:none; }
   /* segment spark chips (✨ next to the suggestion labels) */
   .sparkchip{ padding:1px 7px; font-size:11px; min-height:18px; line-height:1.2; }
-
+  /* commission strength: clickable diagnostics */
+  .strength-diag{
+    display:block; width:100%; text-align:left; background:transparent; border:none;
+    color:var(--muted); font-size:11.5px; padding:2px 2px; cursor:pointer; font-family:var(--sans);
+    line-height:1.45;
+  }
+  .strength-diag:hover{ color:var(--accent); }
+  .strength-diag .pts{ opacity:.55; }
+  .strength-diag.ok{ color:var(--ok); cursor:default; }
 </style>
 </head>
 <body>
@@ -511,7 +519,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill" id="pillSkill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v27.0</span>
+    <span class="pill" id="pillVer">v28.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -659,6 +667,11 @@
         <div class="chips" id="storySug"></div>
       </div>
       <div class="field">
+        <label class="lbl" id="lblDramQ" for="inDramQ">Dramatic question (the engine)</label>
+        <input type="text" id="inDramQ">
+        <div class="hint" id="dramQHint">The book's engine in one line — the question the whole book answers. Leave it empty if the premise already carries it.</div>
+      </div>
+      <div class="field">
         <label class="lbl" id="lblInspo" for="inInspo">Inspiration (music / art / film)</label>
         <input type="text" id="inInspo">
       </div>
@@ -676,8 +689,10 @@
         <summary id="advChar">Character sheet (optional)</summary>
         <div class="field" style="margin-top:8px">
           <input type="text" id="inCharDesire" placeholder="What the hero wants">
+          <input type="text" id="inCharNeed" placeholder="What the book will force them to become — the need" style="margin-top:6px">
           <input type="text" id="inCharFear" placeholder="What he fears" style="margin-top:6px">
           <input type="text" id="inCharWound" placeholder="The wound" style="margin-top:6px">
+          <input type="text" id="inCharLie" placeholder="The lie they believe" style="margin-top:6px">
           <input type="text" id="inCharArc" placeholder="The arc" style="margin-top:6px">
           <input type="text" id="inCharVoice" placeholder="The voice" style="margin-top:6px">
           <input type="text" id="inCharSecret" placeholder="The secret" style="margin-top:6px">
@@ -700,6 +715,22 @@
         <label class="lbl" id="lblWorld" for="inWorld">World / Setting</label>
         <textarea id="inWorld"></textarea>
       </div>
+      <details class="adv">
+        <summary id="advLocks">🎯 Craft locks (what the book must / must not do)</summary>
+        <div class="field" style="margin-top:8px">
+          <label class="lbl" id="lblMustInclude" for="inMustInclude">Must include</label>
+          <textarea id="inMustInclude" style="min-height:54px"></textarea>
+        </div>
+        <div class="field">
+          <label class="lbl" id="lblMustAvoid" for="inMustAvoid">Must never do</label>
+          <textarea id="inMustAvoid" style="min-height:54px"></textarea>
+        </div>
+        <div class="field">
+          <label class="lbl" id="lblComps" for="inComps">Comparable titles (spirit, not imitation)</label>
+          <input type="text" id="inComps">
+        </div>
+        <div class="hint" id="locksHint">These become a CONSTRAINTS section in every prompt — the trap named, the ban named. Comps calibrate craft, never content: no characters, settings or plots from them may appear.</div>
+      </details>
       <div class="field">
         <label class="lbl" id="lblThemes">Themes (multiple)</label>
         <div class="chips" id="themeChips"></div>
@@ -817,6 +848,14 @@
 
     <div class="card">
       <h2><span class="num">5</span> <span id="t5">Your prompt (ready to copy)</span></h2>
+      <div id="strengthBox" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:13px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <p class="suglabel" id="lblStrength" style="margin:0;white-space:nowrap">Commission strength</p>
+          <div class="savbar" style="flex:1;margin:0"><i id="strengthBar"></i></div>
+          <span class="stat" id="strengthLbl" style="white-space:nowrap">—</span>
+        </div>
+        <div id="strengthDiag" style="margin-top:6px"></div>
+      </div>
       <div class="field">
         <label class="lbl" id="modeLbl" for="modeSeg">Deliverable mode</label>
         <div class="seg two" id="modeSeg" style="max-width:330px"></div>
@@ -836,6 +875,7 @@
         <button class="btn" id="btnCopy">⧉ Copy prompt</button>
         <button class="btn ghost" id="btnCopyProto">🪨 Copy protocol only</button>
         <button class="btn ghost" id="btnDownload">⇩ Download .md</button>
+        <button class="btn ghost" id="btnStagePack" title="Self-contained stage prompts: commission → world → souls → voice → chapter 1">📦 Stage pack</button>
         <button class="btn ghost" id="btnSaveJson">💾 Save .json</button>
         <button class="btn ghost" id="btnLoadJson">📂 Load</button>
         <input type="file" id="inJson" accept="application/json,.json" style="display:none">
@@ -1875,6 +1915,660 @@
     return { profile:prof, first:ri(P.first), last:ri(P.last),
              place:ri(P.places), obj:ri(P.objects), job:ri(P.jobs) };
   }
+  var ANCHOR_EN = "- Naming (canon): the author has fixed {NAMES}. Every new name follows their register ({REG}) \u2014 never mix registers (no {CONTRA} in a {REG} cast).";
+  var ANCHOR_EL = "- \u039f\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1 (\u03ba\u03b1\u03bd\u03cc\u03bd\u03b1\u03c2): \u03bf \u03c3\u03c5\u03b3\u03b3\u03c1\u03b1\u03c6\u03ad\u03b1\u03c2 \u03ad\u03c7\u03b5\u03b9 \u03bf\u03c1\u03af\u03c3\u03b5\u03b9 \u03c4\u03b1 \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1 {NAMES}. \u039a\u03ac\u03b8\u03b5 \u03bd\u03ad\u03bf \u03cc\u03bd\u03bf\u03bc\u03b1 \u03b1\u03ba\u03bf\u03bb\u03bf\u03c5\u03b8\u03b5\u03b9 \u03c4\u03bf \u03cd\u03c6\u03cc\u03c2 \u03c4\u03bf\u03c5\u03c2 ({REG}) \u2014 \u03c0\u03cc\u03c4\u03b5 \u03bc\u03b5\u03af\u03b3\u03bc\u03b1 \u03c5\u03c6\u03ce\u03bd (\u03c7\u03cf\u03c1\u03af\u03c2 {CONTRA} \u03c3\u03b5 \u03ba\u03b1\u03c3\u03c4 {REG}).";
+  var ANCHOR_PL_EN = " New places stay in the same world as the dictated ones ({LIST}) \u2014 never import places from another world or register.";
+  var ANCHOR_PL_EL = " \u039d\u03ad\u03bf\u03b9 \u03c4\u03cc\u03c0\u03bf\u03b9 \u03c3\u03c4\u03bf\u03bd \u03af\u03b4\u03b9\u03bf \u03ba\u03cc\u03c3\u03bc\u03bf \u03bc\u03b5 \u03c4\u03b1 \u03bf\u03c1\u03b9\u03c3\u03bc\u03ad\u03bd\u03b1 ({LIST}) \u2014 \u03c0\u03cc\u03c4\u03b5 \u03c4\u03cc\u03c0\u03bf\u03b9 \u03b1\u03c0\u03cc \u03ac\u03bb\u03bb\u03bf \u03ba\u03cc\u03c3\u03bc\u03bf \u03ae \u03cd\u03c6\u03bf\u03c2.";
+  var CANON_HDR_EN = "## CANON \u2014 dictated by the author (overrides the genre default below)";
+  var CANON_HDR_EL = "## \u039a\u0391\u039d\u03a9\u039d \u2014 \u03c4\u03b1 \u03bf\u03c1\u03af\u03b6\u03b5\u03b9 \u03bf \u03c3\u03c5\u03b3\u03b3\u03c1\u03b1\u03c6\u03ad\u03b1\u03c2 (\u03c0\u03b5\u03c1\u03bd\u03ac\u03b5\u03b9 \u03c0\u03ac\u03bd\u03cf \u03b1\u03c0\u03cc \u03c4\u03bf \u03c0\u03c1\u03bf\u03b5\u03c0\u03b9\u03bb\u03b5\u03b3\u03bc\u03ad\u03bd\u03bf \u03c4\u03bf\u03c5 \u03b5\u03af\u03b4\u03bf\u03c5\u03c2)";
+  var CANON_NAMES_EN = "- Fixed names: {NAMES}. Every new name must be in the same linguistic/cultural register as these names. Never mix registers: a Western cast never gets a Dimitris or Eleni; a Greek cast never gets a Leopold or Jack; an invented world never gets real-world names.";
+  var CANON_NAMES_EL = "- \u03a3\u03c4\u03b1\u03b8\u03b5\u03c1\u03ac \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1: {NAMES}. \u039a\u03ac\u03b8\u03b5 \u03bd\u03ad\u03bf \u03cc\u03bd\u03bf\u03bc\u03b1 \u03c0\u03c1\u03ad\u03c0\u03b5\u03b9 \u03bd\u03b1 \u03ad\u03b9\u03bd\u03b1\u03b9 \u03c3\u03c4\u03bf \u03af\u03b4\u03b9\u03bf \u03b3\u03bb\u03cf\u03c3\u03b9\u03ba\u03cc/\u03c0\u03bf\u03bb\u03b9\u03c4\u03b9\u03c2\u03bc\u03b9\u03ba\u03cc \u03cd\u03c6\u03bf\u03c2 \u03bc\u03b5 \u03b1\u03c5\u03c4\u03ac. \u03a0\u03cc\u03c4\u03ad \u03bc\u03b5\u03af\u03b3\u03bc\u03b1 \u03c5\u03c6\u03ce\u03bd: \u03c3\u03b5 \u03b4\u03c5\u03c4\u03b9\u03ba\u03cc \u03ba\u03b1\u03c3\u03c4 \u03c0\u03cc\u03c4\u03b5 \u0394\u03b7\u03bc\u03ae\u03c4\u03c1\u03b7\u03c2 \u03ae \u0395\u03bb\u03ad\u03bd\u03b7\u00b7 \u03c3\u03b5 \u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03cc \u03ba\u03b1\u03c3\u03c4 \u03c0\u03cc\u03c4\u03b5 Leopold \u03ae Jack\u00b7 \u03c3\u03b5 \u03b5\u03c6\u03b5\u03c5\u03c1\u03b7\u03bc\u03ad\u03bd\u03bf \u03ba\u03cc\u03c3\u03bc\u03bf \u03c0\u03cc\u03c4\u03b5 \u03b1\u03bb\u03b7\u03b8\u03b9\u03bd\u03bf\u03af \u03cc\u03c1\u03bf\u03b9.";
+  var CANON_PL_EN = "- Fixed places: {LIST}. New places must live in the same world as these \u2014 same region, era and naming style. Never import places from another world or register.";
+  var CANON_PL_EL = "- \u03a3\u03c4\u03b1\u03b8\u03b5\u03c1\u03bf\u03af \u03c4\u03cc\u03c0\u03bf\u03b9: {LIST}. \u039f\u03b9 \u039d\u03ad\u03bf\u03b9 \u03c4\u03cc\u03c0\u03bf\u03b9 \u03b6\u03bf\u03c5\u03bd \u03c3\u03c4\u03bf\u03bd \u03af\u03b4\u03b9\u03bf \u03ba\u03cc\u03c3\u03bc\u03bf \u03bc\u03b5 \u03b1\u03c5\u03c4\u03bf\u03cd\u03c2 \u2014 \u03af\u03b4\u03b9\u03b1 \u03c0\u03b5\u03c1\u03b9\u03bf\u03c7\u03ae, \u03b5\u03c0\u03bf\u03c7\u03ae \u03ba\u03b1\u03b9 \u03cd\u03c6\u03bf\u03c2 \u03bf\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1\u03c2.";
+  var DEFAULT_EN = "- The genre rule below is the DEFAULT: it applies only where the author has not dictated names or places (see CANON above).";
+  var DEFAULT_EL = "- \u03bf \u03ba\u03b1\u03bd\u03cc\u03bd\u03b1\u03c2 \u03c4\u03bf\u03c5 \u03b5\u03af\u03b4\u03bf\u03c5\u03c2 \u03c0\u03bf\u03c5 \u03b1\u03ba\u03bf\u03bb\u03bf\u03c5\u03b8\u03b5\u03b9 \u03ad\u03b9\u03bd\u03b1\u03b9 \u03a0\u03a1\u039f\u0395\u03a0\u0399\u039b\u039f\u0393\u0397: \u03b9\u03c3\u03c7\u03cd\u03b5\u03b9 \u03bc\u03cc\u03bd\u03bf \u03b5\u03ba\u03ad\u03b9 \u03c0\u03bf\u03c5 \u03bf \u03c3\u03c5\u03b3\u03b3\u03c1\u03b1\u03c6\u03ad\u03b1\u03c2 \u03b4\u03b5\u03bd \u03ad\u03c7\u03b5\u03b9 \u03bf\u03c1\u03af\u03c3\u03b5\u03b9 \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1 \u03ae \u03c4\u03cc\u03c0\u03bf\u03c5\u03c2 (\u03b2\u03bb. \u039a\u0391\u039d\u03a9\u039d \u03c0\u03ac\u03bd\u03cf).";
+  var CLAUSE_EN = "Names or places the author has already fixed are canon and override this default \u2014 new names follow the register of the fixed ones, never mix it. ";
+  var CLAUSE_EL = "\u039f\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1 \u03ae \u03c4\u03cc\u03c0\u03bf\u03b9 \u03c0\u03bf\u03c5 \u03bf \u03c3\u03c5\u03b3\u03b3\u03c1\u03b1\u03c6\u03ad\u03b1\u03c2 \u03ad\u03c7\u03b5\u03b9 \u03ae\u03b4\u03b7 \u03bf\u03c1\u03af\u03c3\u03b5\u03b9 \u03ad\u03b9\u03bd\u03b1\u03b9 \u03ba\u03b1\u03bd\u03cc\u03bd\u03b1\u03c2 \u03ba\u03b1\u03b9 \u03b5\u03c0\u03b9\u03ba\u03b1\u03bb\u03cd\u03c0\u03c4\u03bf\u03c5\u03bd \u03b1\u03c5\u03c4\u03cc \u03c4\u03bf \u03c0\u03c1\u03bf\u03b5\u03c0\u03b9\u03bb\u03b5\u03b3\u03bc\u03ad\u03bd\u03bf \u2014 \u03c4\u03b1 \u03bd\u03ad\u03b1 \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1 \u03b1\u03ba\u03bf\u03bb\u03bf\u03c5\u03b8\u03bf\u03c5\u03bd \u03c4\u03bf \u03cd\u03c6\u03bf\u03c2 \u03c4\u03cf\u03bd \u03c3\u03c4\u03b1\u03b8\u03b5\u03c1\u03ce\u03bd, \u03c0\u03cc\u03c4\u03b5 \u03bc\u03b5\u03af\u03b3\u03bc\u03b1. ";
+  var HERO_LINE_EL = " - \u03a0\u03c1\u03cf\u03c4\u03b1\u03b3\u03cf\u03bd\u03b9\u03c3\u03c4\u03ae\u03c2 (\u03ae\u03b4\u03b7 \u03c3\u03c4\u03b1\u03b8\u03b5\u03c1\u03cc\u03c2 \u2014 \u03ba\u03c1\u03ac\u03c4\u03b1 \u03c3\u03c5\u03bd\u03b5\u03c0\u03ae \u03c4\u03b7\u03bd \u03bf\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1 \u03bc\u03b1\u03b6\u03af \u03c4\u03bf\u03c5): ";
+  var MYTH_PL_EL = "- \u039f\u03c1\u03b9\u03c3\u03bc\u03ad\u03bd\u03bf\u03b9 \u03c4\u03cc\u03c0\u03bf\u03b9 (\u03ba\u03b1\u03bd\u03cc\u03bd\u03b1\u03c2): {LIST} \u2014 \u039f\u03b9 \u039d\u03ad\u03bf\u03b9 \u03c4\u03cc\u03c0\u03bf\u03b9 \u03bc\u03ad\u03bd\u03bf\u03c5\u03bd \u03c3\u03b5 \u03b1\u03c5\u03c4\u03cc\u03bd \u03c4\u03bf\u03bd \u03ba\u03cc\u03c3\u03bc\u03bf (\u03af\u03b4\u03b9\u03b1 \u03c0\u03b5\u03c1\u03b9\u03bf\u03c7\u03ae, \u03b5\u03c0\u03bf\u03c7\u03ae, \u03cd\u03c6\u03bf\u03c2 \u03bf\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1\u03c2).";
+  var REASON_EL_ANCHOR = "\u03c3\u03c4\u03b1 \u03c4\u03b1\u03b9\u03c1\u03b9\u03ac\u03b6\u03b5\u03b9 \u03c3\u03c4\u03b1 \u03bf\u03c1\u03b9\u03c3\u03bc\u03ad\u03bd\u03b1 \u03c3\u03b1\u03c2 \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1: \u201c";
+  var PLACE_CANON_EL = "\u03a4\u039f\u03a0\u039f\u03a3 (\u03ba\u03b1\u03bd\u03cc\u03bd\u03b1\u03c2 \u2014 \u03b1\u03c0\u03cc \u03c4\u03bf \u03c3\u03c7\u03ad\u03b4\u03b9\u03cc \u03c3\u03b1\u03c2): ";
+  var PLACE_STOP = {
+    "\u039f": 1,
+    "\u0397": 1,
+    "\u03a4\u03bf": 1,
+    "\u039f\u03b9": 1,
+    "\u039a\u03b1\u03b9": 1,
+    "\u0391\u03bb\u03bb\u03ac": 1,
+    "\u038c\u03bc\u03c9\u03c2": 1,
+    "\u0395\u03c0\u03b5\u03b9\u03b4\u03ae": 1,
+    "\u038c\u03c0\u03c9\u03c2": 1,
+    "\u038c\u03c4\u03b1\u03bd": 1,
+    "\u03a0\u03bf\u03c5": 1,
+    "\u038c\u03c4\u03b9": 1,
+    "\u0391\u03c6\u03bf\u03cd": 1,
+    "\u0393\u03b9\u03b1\u03c4\u03af": 1,
+    "\u03a0\u03ce\u03c2": 1,
+    "\u03a0\u03bf\u03cd": 1,
+    "\u03a0\u03cc\u03c4\u03b5": 1,
+    "\u03a0\u03cc\u03c3\u03bf": 1,
+    "\u038a\u03c3\u03c9\u03c2": 1,
+    "\u039c\u03ae\u03c0\u03c9\u03c2": 1,
+    "\u0392\u03ad\u03b2\u03b1\u03b9\u03b1": 1,
+    "\u03a6\u03c5\u03c3\u03b9\u03ba\u03ac": 1,
+    "\u03a3\u03af\u03b3\u03bf\u03c5\u03c1\u03b1": 1,
+    "\u0391\u03ba\u03c1\u03b9\u03b2\u03ce\u03c2": 1,
+    "\u039c\u03cc\u03bd\u03bf": 1,
+    "\u039c\u03cc\u03bb\u03b9\u03c2": 1,
+    "\u0391\u03ba\u03cc\u03bc\u03b1": 1,
+    "\u0391\u03ba\u03cc\u03bc\u03b7": 1,
+    "\u038c\u03bb\u03bf\u03b9": 1,
+    "\u038c\u03bb\u03b5\u03c2": 1,
+    "\u038c\u03bb\u03b1": 1,
+    "\u039a\u03ac\u03b8\u03b5": 1,
+    "\u039a\u03ac\u03c4\u03b9": 1,
+    "\u039a\u03ac\u03c0\u03bf\u03b9\u03bf": 1,
+    "\u039a\u03ac\u03c0\u03bf\u03b9\u03b1": 1,
+    "\u039a\u03ac\u03c0\u03bf\u03b9\u03bf\u03b9": 1,
+    "\u039a\u03ac\u03c0\u03bf\u03b9\u03b5\u03c2": 1,
+    "\u039a\u03b1\u03bd\u03b5\u03af\u03c2": 1,
+    "\u039a\u03b1\u03bd\u03ad\u03bd\u03b1": 1,
+    "\u039a\u03b1\u03bd\u03ad\u03bd\u03b1\u03c2": 1,
+    "\u039a\u03b1\u03bd\u03ad\u03bd\u03b7": 1,
+    "\u039d\u03ad\u03bf": 1,
+    "\u039d\u03ad\u03b1": 1,
+    "\u039d\u03ad\u03bf\u03c2": 1,
+    "\u039d\u03ad\u03bf\u03c5\u03c2": 1,
+    "\u039d\u03ad\u03b5\u03c2": 1,
+    "\u03a0\u03b1\u03bb\u03b9\u03cc\u03c2": 1,
+    "\u03a0\u03b1\u03bb\u03b9\u03ac": 1,
+    "\u039c\u03b9\u03ba\u03c1\u03cc\u03c2": 1,
+    "\u039c\u03b9\u03ba\u03c1\u03ae": 1,
+    "\u039c\u03b5\u03b3\u03ac\u03bb\u03bf\u03c2": 1,
+    "\u039c\u03b5\u03b3\u03ac\u03bb\u03b7": 1,
+    "\u0386\u03bb\u03bb\u03bf\u03c2": 1,
+    "\u0386\u03bb\u03bb\u03b7": 1,
+    "\u0386\u03bb\u03bb\u03bf": 1,
+    "\u0386\u03bb\u03bb\u03bf\u03b9": 1,
+    "\u0386\u03bb\u03bb\u03b5\u03c2": 1,
+    "\u0386\u03bb\u03bb\u03b1": 1,
+    "\u038a\u03b4\u03b9\u03bf\u03c2": 1,
+    "\u038a\u03b4\u03b9\u03b1": 1,
+    "\u039f\u03c0\u03bf\u03af\u03bf\u03c2": 1,
+    "\u039f\u03c0\u03bf\u03af\u03b1": 1,
+    "\u039f\u03c0\u03bf\u03b9\u03bf\u03af": 1,
+    "\u039f\u03c0\u03bf\u03b9\u03bf": 1,
+    "\u0391\u03c5\u03c4\u03cc": 1,
+    "\u0391\u03c5\u03c4\u03ae": 1,
+    "\u0391\u03c5\u03c4\u03bf\u03af": 1,
+    "\u0391\u03c5\u03c4\u03ad\u03c2": 1,
+    "\u0395\u03ba\u03b5\u03af\u03bd\u03bf\u03c2": 1,
+    "\u0395\u03ba\u03b5\u03af\u03bd\u03b7": 1,
+    "\u0395\u03ba\u03b5\u03af\u03bd\u03bf\u03b9": 1,
+    "\u0395\u03ba\u03b5\u03af\u03bd\u03b5\u03c2": 1,
+    "\u0388\u03bd\u03b1": 1,
+    "\u039c\u03af\u03b1": 1,
+    "\u039c\u03b9\u03b1": 1,
+    "\u0394\u03cd\u03bf": 1,
+    "\u03a4\u03c1\u03b5\u03b9\u03c2": 1,
+    "\u03a4\u03ad\u03c3\u03c3\u03b5\u03c1\u03b9\u03c2": 1,
+    "\u03a0\u03ad\u03bd\u03c4\u03b5": 1,
+    "\u0388\u03be\u03b9": 1,
+    "\u0395\u03c0\u03c4\u03ac": 1,
+    "\u039f\u03c7\u03c4\u03ce": 1,
+    "\u0395\u03bd\u03bd\u03b9\u03ac": 1,
+    "\u0394\u03ad\u03ba\u03b1": 1,
+    "\u0395\u03ba\u03b1\u03c4\u03cc": 1,
+    "\u03a7\u03af\u03bb\u03b9\u03b1": 1,
+    "\u03a0\u03c1\u03ce\u03c4\u03bf": 1,
+    "\u0394\u03b5\u03cd\u03c4\u03b5\u03c1\u03bf": 1,
+    "\u03a4\u03c1\u03af\u03c4\u03bf": 1,
+    "\u03a4\u03ad\u03bb\u03bf\u03c2": 1,
+    "\u0386\u03c1\u03c7\u03b7": 1,
+    "\u039c\u03ad\u03c3\u03b1": 1,
+    "\u0395\u03ba\u03c4\u03cc\u03c2": 1,
+    "\u03a0\u03ac\u03bd\u03c9": 1,
+    "\u039a\u03ac\u03c4\u03c9": 1,
+    "\u039c\u03c0\u03c1\u03bf\u03c3\u03c4\u03ac": 1,
+    "\u03a0\u03af\u03c3\u03c9": 1,
+    "\u0388\u03c4\u03c3\u03b9": 1,
+    "\u03a9\u03c2": 1,
+    "\u03a7\u03c9\u03c1\u03af\u03c2": 1,
+    "\u039d\u03b1\u03b9": 1,
+    "\u038c\u03c7\u03b9": 1,
+    "\u03a0\u03c1\u03ac\u03b3\u03bc\u03b1\u03c4\u03b9": 1,
+    "\u03a9\u03c3\u03c4\u03cc\u03c3\u03bf": 1,
+    "\u0395\u03c0\u03bf\u03bc\u03ad\u03bd\u03c9\u03c2": 1,
+    "\u0386\u03c1\u03b1": 1,
+    "\u0395\u03bd\u03ce": 1,
+    "\u0395\u03bd\u03cc\u03c4\u03b9": 1,
+    "\u0394\u03b9\u03cc\u03c4\u03b9": 1,
+    "\u039f\u03c0\u03cc\u03c4\u03b5": 1,
+    "\u03a4\u03ad\u03c4\u03bf\u03b9\u03bf\u03c2": 1,
+    "\u03a4\u03ad\u03c4\u03bf\u03b9\u03b1": 1,
+    "\u03a0\u03b9\u03bf": 1,
+    "\u03a0\u03b5\u03c1\u03b9\u03c3\u03c3\u03cc\u03c4\u03b5\u03c1\u03bf": 1,
+    "\u039b\u03b9\u03b3\u03cc\u03c4\u03b5\u03c1\u03bf": 1,
+    "\u03a4\u03cc\u03c3\u03bf": 1,
+    "\u03a4\u03cc\u03c3\u03b7": 1,
+    "\u03a0\u03bf\u03bb\u03cd": 1,
+    "\u03a0\u03bf\u03bb\u03cd\u03c2": 1,
+    "\u03a0\u03bf\u03bb\u03bb\u03ac": 1,
+    "\u03a0\u03bf\u03bb\u03bb\u03bf\u03af": 1,
+    "\u03a0\u03bf\u03bb\u03bb\u03ad\u03c2": 1,
+    "\u039b\u03af\u03b3\u03bf": 1,
+    "\u039b\u03af\u03b3\u03b7": 1,
+    "\u039b\u03af\u03b3\u03bf\u03b9": 1,
+    "\u039b\u03af\u03b3\u03b5\u03c2": 1,
+    "\u03a3\u03b7\u03bc\u03b5\u03af\u03bf": 1,
+    "\u0393\u03c1\u03b1\u03bc\u03bc\u03ae": 1,
+    "\u039a\u03b5\u03af\u03bc\u03b5\u03bd\u03bf": 1,
+    "\u0392\u03b9\u03b2\u03bb\u03af\u03bf": 1,
+    "\u03a3\u03ba\u03b7\u03bd\u03ae": 1,
+    "\u03a4\u03cc\u03c0\u03bf\u03c2": 1,
+    "\u03a4\u03cc\u03c0\u03bf\u03b9": 1,
+    "\u038c\u03bd\u03bf\u03bc\u03b1": 1,
+    "\u038c\u03bd\u03bf\u03bc\u03b1\u03c4\u03b1": 1,
+    "\u03a7\u03b1\u03c1\u03b1\u03ba\u03c4\u03ae\u03c1\u03b1\u03c2": 1,
+    "\u03a7\u03b1\u03c1\u03b1\u03ba\u03c4\u03ae\u03c1\u03b5\u03c2": 1,
+    "\u039a\u03b5\u03c6\u03ac\u03bb\u03b1\u03b9\u03bf": 1,
+    "\u03a4\u03af\u03c4\u03bb\u03bf\u03c2": 1,
+    "\u03a5\u03c0\u03cc\u03b8\u03b5\u03c3\u03b7": 1,
+    "\u0395\u03af\u03b4\u03bf\u03c2": 1,
+    "\u03a4\u03cc\u03bd\u03bf\u03c2": 1,
+    "\u03a1\u03c5\u03b8\u03bc\u03cc\u03c2": 1,
+    "\u0391\u03b3\u03ba\u03af\u03c3\u03c4\u03c1\u03b9": 1,
+    "\u0393\u03bb\u03c9\u03c3\u03c3\u03ac\u03c1\u03b9": 1,
+    "\u03a3\u03b7\u03bc\u03b5\u03af\u03c9\u03c3\u03b7": 1,
+    "\u03a0\u03c1\u03bf\u03c3\u03bf\u03c7\u03ae": 1,
+    "\u03a0\u03b5\u03c1\u03b9\u03b3\u03c1\u03b1\u03c6\u03ae": 1,
+    "\u03a0\u03bb\u03b1\u03af\u03c3\u03b9\u03bf": 1,
+    "\u0395\u03c1\u03b3\u03b1\u03c3\u03af\u03b1": 1,
+    "\u0388\u03be\u03bf\u03b4\u03bf\u03c2": 1,
+    "\u0391\u03c0\u03ac\u03bd\u03c4\u03b7\u03c3\u03b7": 1,
+    "\u0395\u03c1\u03ce\u03c4\u03b7\u03c3\u03b7": 1,
+    "\u03a3\u03c5\u03bc\u03b2\u03ac\u03bd": 1,
+    "\u0393\u03b5\u03b3\u03bf\u03bd\u03cc\u03c2": 1,
+    "\u03a3\u03cd\u03bc\u03c0\u03c4\u03c9\u03c3\u03b7": 1,
+    "\u03a0\u03b5\u03c1\u03af\u03c3\u03c4\u03b1\u03c3\u03b7": 1,
+    "\u039a\u03b1\u03c4\u03ac\u03c3\u03c4\u03b1\u03c3\u03b7": 1,
+    "\u0386\u03bd\u03b8\u03c1\u03c9\u03c0\u03bf\u03c2": 1,
+    "\u0386\u03bd\u03b8\u03c1\u03c9\u03c0\u03bf\u03b9": 1,
+    "\u0393\u03c5\u03bd\u03b1\u03af\u03ba\u03b1": 1,
+    "\u0386\u03bd\u03b4\u03c1\u03b1\u03c2": 1,
+    "\u039a\u03cc\u03c3\u03bc\u03bf\u03c2": 1,
+    "\u03a7\u03ce\u03c1\u03b1": 1,
+    "\u03a0\u03cc\u03bb\u03b7": 1,
+    "\u03a7\u03c9\u03c1\u03b9\u03cc": 1,
+    "\u039d\u03b7\u03c3\u03af": 1,
+    "\u0394\u03c1\u03cc\u03bc\u03bf\u03c2": 1,
+    "\u03a0\u03bb\u03b1\u03c4\u03b5\u03af\u03b1": 1,
+    "\u0393\u03ad\u03c6\u03c5\u03c1\u03b1": 1,
+    "\u039b\u03b9\u03bc\u03ac\u03bd\u03b9": 1,
+    "\u03a3\u03c0\u03af\u03c4\u03b9": 1,
+    "\u0394\u03c9\u03bc\u03ac\u03c4\u03b9\u03bf": 1,
+    "\u03a6\u03c9\u03c4\u03b9\u03ac": 1,
+    "\u039d\u03cd\u03c7\u03c4\u03b1": 1,
+    "\u0397\u03bc\u03ad\u03c1\u03b1": 1,
+    "\u03a0\u03c1\u03c9\u03af": 1,
+    "\u0392\u03c1\u03ac\u03b4\u03c5": 1,
+    "\u03a7\u03c1\u03cc\u03bd\u03bf\u03c2": 1,
+    "\u0395\u03c0\u03bf\u03c7\u03ae": 1,
+    "\u0394\u03b5\u03bd": 1,
+    "\u0388\u03c7\u03b5\u03b9": 1,
+    "\u0395\u03af\u03bc\u03b1\u03b9": 1,
+    "\u0395\u03af\u03bd\u03b1\u03b9": 1,
+    "\u0398\u03b1": 1,
+    "\u039d\u03b1": 1,
+    "\u039c\u03b7\u03bd": 1,
+    "\u0394\u03ce\u03c3\u03b5": 1,
+    "\u03a0\u03b5\u03c2": 1,
+    "\u0393\u03c1\u03ac\u03c8\u03b5": 1,
+    "\u03a3\u03c4\u03b5\u03af\u03bb\u03b5": 1,
+    "\u0392\u03c1\u03b5\u03c2": 1,
+    "\u039a\u03c1\u03ac\u03c4\u03b1": 1,
+    "\u0391\u03c6\u03ae\u03c3\u03b5": 1,
+    "\u03a7\u03c1\u03b7\u03c3\u03b9\u03bc\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b5": 1,
+    "\u0395\u03c6\u03ac\u03c1\u03bc\u03bf\u03c3\u03b5": 1,
+    "\u03a3\u03b7\u03bc\u03b5\u03af\u03c9\u03c3\u03b5": 1,
+    "\u0395\u03c0\u03ad\u03ba\u03c4\u03b5\u03b9\u03bd\u03b5": 1,
+    "\u03a0\u03b5\u03c1\u03b9\u03ad\u03c7\u03b5\u03b9": 1,
+    "\u03a0\u03b5\u03c1\u03b9\u03bb\u03b1\u03bc\u03b2\u03ac\u03bd\u03b5\u03b9": 1,
+    "\u0391\u03bd\u03b1\u03c6\u03ad\u03c1\u03b5\u03b9": 1,
+    "\u03a0\u03c1\u03bf\u03c3\u03ad\u03be\u03c4\u03b5": 1,
+    "\u0394\u03b9\u03b1\u03b2\u03ac\u03c3\u03c4\u03b5": 1,
+    "\u0395\u03c0\u03b9\u03ba\u03bf\u03bb\u03bb\u03ae\u03c3\u03c4\u03b5": 1,
+    "\u0394\u03b9\u03b1\u03bb\u03ad\u03be\u03c4\u03b5": 1,
+    "\u03a3\u03c5\u03bc\u03c0\u03bb\u03b7\u03c1\u03ce\u03c3\u03c4\u03b5": 1,
+    "\u03a0\u03b1\u03c4\u03ae\u03c3\u03c4\u03b5": 1,
+    "\u039a\u03ac\u03bd\u03c4\u03b5": 1,
+    "The": 1,
+    "A": 1,
+    "An": 1,
+    "In": 1,
+    "On": 1,
+    "At": 1,
+    "And": 1,
+    "But": 1,
+    "Or": 1,
+    "Of": 1,
+    "To": 1,
+    "It": 1,
+    "Its": 1,
+    "This": 1,
+    "That": 1,
+    "These": 1,
+    "Those": 1,
+    "There": 1,
+    "Here": 1,
+    "When": 1,
+    "Where": 1,
+    "Why": 1,
+    "How": 1,
+    "If": 1,
+    "As": 1,
+    "By": 1,
+    "For": 1,
+    "From": 1,
+    "With": 1,
+    "About": 1,
+    "After": 1,
+    "Before": 1,
+    "Between": 1,
+    "Under": 1,
+    "Over": 1,
+    "Again": 1,
+    "Once": 1,
+    "Now": 1,
+    "Then": 1,
+    "So": 1,
+    "Such": 1,
+    "No": 1,
+    "Yes": 1,
+    "Not": 1,
+    "All": 1,
+    "Any": 1,
+    "Both": 1,
+    "Each": 1,
+    "Few": 1,
+    "More": 1,
+    "Most": 1,
+    "Other": 1,
+    "Some": 1,
+    "Still": 1,
+    "Very": 1,
+    "Just": 1,
+    "Also": 1,
+    "Even": 1,
+    "Only": 1,
+    "Own": 1,
+    "Same": 1,
+    "Than": 1,
+    "Too": 1,
+    "Up": 1,
+    "Out": 1,
+    "Off": 1,
+    "Down": 1,
+    "She": 1,
+    "He": 1,
+    "They": 1,
+    "We": 1,
+    "You": 1,
+    "I": 1,
+    "Me": 1,
+    "Him": 1,
+    "Her": 1,
+    "Us": 1,
+    "Them": 1,
+    "My": 1,
+    "Your": 1,
+    "His": 1,
+    "Their": 1,
+    "Our": 1,
+    "Whose": 1,
+    "Which": 1,
+    "Who": 1,
+    "What": 1,
+    "While": 1,
+    "During": 1,
+    "Within": 1,
+    "Without": 1,
+    "Since": 1,
+    "Until": 1,
+    "Whereas": 1,
+    "Therefore": 1,
+    "However": 1,
+    "Although": 1,
+    "Because": 1,
+    "Whether": 1,
+    "Thus": 1,
+    "Hence": 1,
+    "Yet": 1,
+    "One": 1,
+    "Two": 1,
+    "Three": 1,
+    "Four": 1,
+    "Five": 1,
+    "Six": 1,
+    "Seven": 1,
+    "Eight": 1,
+    "Nine": 1,
+    "Ten": 1,
+    "First": 1,
+    "Second": 1,
+    "Third": 1,
+    "Last": 1,
+    "New": 1,
+    "Old": 1,
+    "Big": 1,
+    "Small": 1,
+    "Good": 1,
+    "Bad": 1,
+    "Great": 1,
+    "Little": 1,
+    "Much": 1,
+    "Many": 1,
+    "Another": 1,
+    "Every": 1,
+    "None": 1,
+    "Note": 1,
+    "Text": 1,
+    "Story": 1,
+    "Book": 1,
+    "World": 1,
+    "Scene": 1,
+    "Name": 1,
+    "Names": 1,
+    "Place": 1,
+    "Places": 1,
+    "Character": 1,
+    "Characters": 1,
+    "Chapter": 1,
+    "Title": 1,
+    "Premise": 1,
+    "Genre": 1,
+    "Tone": 1,
+    "Pacing": 1,
+    "Ending": 1,
+    "Hook": 1,
+    "Glossary": 1,
+    "Bible": 1,
+    "Person": 1,
+    "People": 1,
+    "Man": 1,
+    "Woman": 1,
+    "Child": 1,
+    "City": 1,
+    "Town": 1,
+    "Village": 1,
+    "Country": 1,
+    "Sea": 1,
+    "River": 1,
+    "Mountain": 1,
+    "House": 1,
+    "Room": 1,
+    "Street": 1,
+    "Road": 1,
+    "Bridge": 1,
+    "Harbor": 1,
+    "Island": 1,
+    "Fire": 1,
+    "Night": 1,
+    "Day": 1,
+    "Morning": 1,
+    "Evening": 1,
+    "Time": 1,
+    "Era": 1,
+    "Keep": 1,
+    "Write": 1,
+    "Paste": 1,
+    "Choose": 1,
+    "Fill": 1,
+    "Click": 1,
+    "Send": 1,
+    "Use": 1,
+    "Follow": 1,
+    "Match": 1,
+    "Invent": 1,
+    "Expand": 1,
+    "Generate": 1,
+    "Output": 1,
+    "Input": 1,
+    "Context": 1,
+    "Discipline": 1,
+    "Default": 1,
+    "Canon": 1,
+    "Section": 1,
+    "Part": 1,
+    "Line": 1,
+    "Item": 1,
+    "Entry": 1,
+    "Word": 1,
+    "Words": 1,
+    "Sentence": 1,
+    "Paragraph": 1,
+    "Page": 1,
+    "List": 1,
+    "Label": 1,
+    "Format": 1,
+    "Style": 1,
+    "Register": 1,
+    "Tense": 1,
+    "Voice": 1,
+    "Mood": 1,
+    "Theme": 1,
+    "Themes": 1,
+    "Idea": 1,
+    "Ideas": 1,
+    "Spark": 1,
+    "Brief": 1,
+    "Prompt": 1,
+    "Answer": 1,
+    "Response": 1,
+    "Result": 1,
+    "Draft": 1,
+    "Plot": 1,
+    "Plan": 1,
+    "Goal": 1,
+    "Target": 1,
+    "Limit": 1,
+    "Maximum": 1,
+    "Minimum": 1,
+    "Estimated": 1,
+    "Actual": 1,
+    "Total": 1,
+    "Current": 1,
+    "Next": 1,
+    "Previous": 1,
+    "Full": 1,
+    "Half": 1,
+    "Double": 1,
+    "Single": 1,
+    "Main": 1,
+    "Secondary": 1,
+    "Primary": 1,
+    "Important": 1,
+    "Essential": 1,
+    "Required": 1,
+    "Optional": 1,
+    "Available": 1,
+    "Missing": 1,
+    "Fixed": 1,
+    "Locked": 1,
+    "Open": 1,
+    "Closed": 1,
+    "Real": 1,
+    "Realistic": 1,
+    "Imaginary": 1,
+    "Invented": 1,
+    "Everyday": 1,
+    "Common": 1,
+    "Rare": 1,
+    "Strange": 1,
+    "Weird": 1,
+    "Dark": 1,
+    "Light": 1,
+    "Heavy": 1,
+    "Fast": 1,
+    "Slow": 1,
+    "Quick": 1,
+    "Long": 1,
+    "Short": 1,
+    "High": 1,
+    "Low": 1,
+    "Deep": 1,
+    "Shallow": 1,
+    "Wide": 1,
+    "Narrow": 1,
+    "Near": 1,
+    "Far": 1,
+    "Young": 1,
+    "Alive": 1,
+    "Dead": 1,
+    "Safe": 1,
+    "Dangerous": 1,
+    "Secret": 1,
+    "Hidden": 1,
+    "Visible": 1,
+    "Known": 1,
+    "Unknown": 1
+  };
+  /* ============================================================
+     NAMING ANCHOR — what the author dictated beats the genre default.
+     registerFromUser(): the naming register (greek / western /
+     invented) of the names the author already set (hero, antagonist).
+     planPlaces(): the places the author already fixed in the
+     glossary / world / bible / premise — those are canon.
+     namingAnchorLine(): one line for the main prompt.
+     namingCanonBlock(): the CANON block for the names & places prompt.
+     ============================================================ */
+  var NAMES_EXTRA_W = ["leopold", "james", "henry", "edward", "charles", "william", "george", "richard", "thomas", "robert", "john", "joseph", "michael", "david", "daniel", "peter", "paul", "martin", "francis", "alfred", "arthur", "walter", "harold", "ronald", "douglas", "bernard", "cecil", "gustav", "viktor", "anton", "friedrich", "hans", "karl", "otto", "rudolf", "wolfgang", "maximilian", "ludwig", "frederick", "sebastian", "matthias", "nicholas", "stephen", "patrick", "lawrence", "vincent", "herbert", "eugene", "raymond", "reginald", "geoffrey", "godfrey", "nigel", "rupert", "stanley", "desmond", "edmund", "augustus", "theodore", "wilbur", "gordon", "clarence", "harvey", "ingram", "alfonso", "benedict", "cornelius", "dexter", "everett", "felix", "giles", "hugo", "ivan", "jasper", "kenneth", "leon", "marcus", "nicolas", "oscar", "phillip", "quentin", "ralph", "simon", "tobias", "ulysses", "victor", "wendell", "xavier", "yves", "zachary", "maria", "mary", "elizabeth", "sarah", "margaret", "catherine", "katherine", "anne", "ann", "alice", "eleanor", "victoria", "sophia", "isabella", "charlotte", "amelia", "clara", "grace", "rose", "lily", "lucy", "emily", "emma", "olivia", "helen", "elena", "elisa", "marie", "claire", "sophie", "margot", "rita", "rosa", "lucia", "carmen", "giulia", "francesca", "beatrice", "agnes", "ethel", "flora", "ivy", "mabel", "nora", "pearl", "ruby", "stella", "tessa", "veronica", "wilhelmina", "adelaide", "bess", "cordelia", "edith", "florence", "greta", "helena", "ingrid", "josephine", "katrina", "louisa", "matilda", "odette", "prudence", "quinn", "rebecca", "theodora", "ursula", "violet", "wendy", "yvonne", "zo"];
+  var NAMES_EXTRA_W_L = ["smith", "johnson", "williams", "brown", "jones", "garcia", "miller", "davis", "wilson", "anderson", "taylor", "moore", "jackson", "martin", "thomas", "lee", "walker", "hall", "allen", "young", "king", "wright", "scott", "green", "baker", "adams", "nelson", "hill", "clark", "lewis", "roberts", "perez", "white", "hansen", "schmidt", "mueller", "schneider", "fischer", "weiss", "wolf", "bauer", "becker", "schultz", "hoffmann", "klein", "steele", "harding", "ashford", "blackwood", "calvert", "marlow", "oswalt", "brook", "brooks", "kramer", "bacon", "harvey", "ellis", "fletcher", "granger", "holt", "jennings", "kirk", "lockwood", "morris", "hartmann", "hartman", "ashley", "mercer", "pemberton", "sinclair", "tremaine", "underwood", "wexley", "york", "zeller", "bellamy", "clayton", "stefanou", "comy", "rudd", "leon", "crowe", "parker", "lawrence", "stone", "anderson"];
+  var NAMES_EXTRA_W_EL = ["\u03bb\u03b5\u03bf\u03c0\u03cc\u03bb\u03bd\u03c4", "\u03c4\u03b6\u03ad\u03b9\u03bc\u03c2", "\u03c7\u03ad\u03bd\u03c1\u03b9", "\u03ad\u03bd\u03c4\u03bf\u03c5\u03b1\u03c1\u03bd\u03c4", "\u03c4\u03c3\u03ac\u03c1\u03bb\u03b5\u03c2", "\u03bf\u03c5\u03af\u03bb\u03b9\u03b1\u03bc", "\u03c4\u03b6\u03cc\u03c1\u03c4\u03b6", "\u03c1\u03af\u03c4\u03c3\u03b1\u03c1\u03bd\u03c4", "\u03c4\u03b6\u03cc\u03bc\u03c2", "\u03c1\u03cc\u03bc\u03c0\u03b5\u03c1\u03c4", "\u03c4\u03b6\u03bf\u03bd", "\u03bc\u03ac\u03b9\u03ba\u03bb", "\u03bd\u03c4\u03ad\u03b9\u03b2\u03b9\u03bd\u03c4", "\u03bd\u03c4\u03ad\u03bd\u03b9\u03b5\u03bb", "\u03c0\u03ad\u03c4\u03b5\u03c1", "\u03bc\u03ac\u03c1\u03c4\u03b9\u03bd", "\u03b1\u03bb\u03c6\u03c1\u03ad\u03bd\u03c4", "\u03ac\u03c1\u03b8\u03bf\u03c5\u03c1", "\u03bf\u03c5\u03cc\u03bb\u03c4\u03b5\u03c1", "\u03c7\u03ac\u03c1\u03bf\u03bb\u03bd\u03c4", "\u03bd\u03c4\u03cc\u03bd\u03b1\u03bb\u03bd\u03c4", "\u03bc\u03c0\u03b5\u03c1\u03bd\u03ac\u03c1\u03bd\u03c4", "\u03b3\u03ba\u03cd\u03c3\u03c4\u03b1\u03b2", "\u03b2\u03af\u03ba\u03c4\u03c9\u03c1", "\u03ac\u03bd\u03c4\u03bf\u03bd", "\u03c6\u03c1\u03b9\u03bd\u03c4\u03c1\u03af\u03c7", "\u03c7\u03b1\u03bd\u03c2", "\u03ba\u03b1\u03c1\u03bd\u03c4", "\u03cc\u03c4\u03bf", "\u03c1\u03bf\u03cd\u03bd\u03c4\u03bf\u03bb\u03c6", "\u03bf\u03cd\u03bb\u03c6\u03b3\u03ba\u03b1\u03bd\u03b3\u03ba", "\u03bc\u03ac\u03be\u03b9\u03bc\u03b9\u03bb\u03b9\u03b1\u03bd", "\u03bb\u03bf\u03cd\u03bd\u03c4\u03b2\u03b9\u03c7", "\u03c6\u03c1\u03ad\u03bd\u03c4\u03b5\u03c1\u03b9\u03ba", "\u03bc\u03ad\u03c1\u03b9", "\u03b5\u03bb\u03b9\u03b6\u03ac\u03bc\u03c0\u03b5\u03b8", "\u03c3\u03ac\u03c1\u03b1", "\u03bc\u03ac\u03c1\u03b3\u03ba\u03b1\u03c1\u03b5\u03c4", "\u03ba\u03ac\u03c4\u03b5\u03c1\u03b9\u03bd", "\u03ac\u03bd\u03bd\u03b9", "\u03ac\u03bb\u03bb\u03b9\u03c2", "\u03b5\u03af\u03bb\u03b9\u03bd", "\u03b2\u03b9\u03ba\u03c4\u03ce\u03c1\u03b9\u03b1", "\u03c3\u03bf\u03c6\u03af\u03b1", "\u03b9\u03c3\u03ac\u03bc\u03c0\u03b5\u03bb\u03b1", "\u03c4\u03c3\u03ac\u03c1\u03bb\u03bf\u03c4", "\u03ad\u03bc\u03bc\u03b1", "\u03bf\u03bb\u03af\u03b2\u03b9\u03b1", "\u03b1\u03bc\u03ad\u03bb\u03b9\u03b1", "\u03ba\u03bb\u03ac\u03c1\u03b1", "\u03b3\u03ba\u03c1\u03b5\u03ca\u03c2", "\u03c1\u03cc\u03bf\u03c5\u03b6", "\u03bb\u03ac\u03b9\u03bb\u03b9", "\u03bb\u03bf\u03cd\u03c3\u03b9", "\u03ad\u03bc\u03b9\u03bb\u03b9", "\u03c7\u03ad\u03bb\u03b5\u03bd", "\u03b5\u03c1\u03af\u03c3\u03b1", "\u03bc\u03c0\u03ad\u03c1\u03b9"];
+  var normName = function(x){ return String(x).toLowerCase().replace(/\u0390/g, '\u03ca'); };
+  var _regSets = null;
+  function regSets(){
+    if(_regSets){ return _regSets; }
+    var mk = function(arr){ var s={}; for(var i=0;i<arr.length;i++){ s[normName(arr[i])]=1; } return s; };
+    var greek = GNAMES.concat(GSURNAMES, BLOG_STYLE.namesF);
+    var western = NAMES_EXTRA_W.concat(NAMES_EXTRA_W_L, NAMES_EXTRA_W_EL,
+      NAME_POOLS.firstW.map(function(p){return p[1];}),
+      NAME_POOLS.lastW.map(function(p){return p[1];}));
+    var invented = NAME_POOLS.inventF.concat(NAME_POOLS.inventL)
+      .reduce(function(a,p){ a.push(p[0], p[1]); return a; }, [])
+      .concat(NAMEDATA.fantasy.first.map(function(p){return p[0];}), NAMEDATA.fantasy.first.map(function(p){return p[1];}),
+              NAMEDATA.fantasy.last.map(function(p){return p[0];}), NAMEDATA.fantasy.last.map(function(p){return p[1];}));
+    _regSets = { greek: mk(greek), western: mk(western), invented: mk(invented) };
+    return _regSets;
+  }
+  var RARE_BIGRAMS = /(?:θρ|ρθ|νθ|λθ|ρχ|ξθ|ζθ|ψθ|θλ|νλ|ρλ|ξλ|ζλ|ψλ|λχ|χλ)/;
+  var GREEK_ENDING = /(?:ης|ος|ας|α|η|ου)$/;
+  function registerOf(text){
+    var t = String(text||"").trim();
+    if(!t){ return ""; }
+    var tokens = t.split(/[\s,;·|]+/).filter(Boolean);
+    var sets = regSets();
+    var votes = { greek:0, western:0, invented:0 };
+    for(var i=0;i<tokens.length;i++){
+      var raw = tokens[i].replace(/^[«»"''()\[\]\-.,:;!?]+|[«»"''()\[\]\-.,:;!?]+$/g, "");
+      if(raw.length < 2 || !/[\u0370-\u03ffA-Za-z]/.test(raw)){ continue; }
+      var low = normName(raw);
+      if(sets.greek[low]){ votes.greek++; continue; }
+      if(sets.western[low]){ votes.western++; continue; }
+      if(sets.invented[low]){ votes.invented++; continue; }
+      var isGreek = /[\u0370-\u03ff]/.test(raw);
+      if(!isGreek){ votes.western++; continue; }
+      if(RARE_BIGRAMS.test(low)){ votes.invented++; continue; }
+      if(GREEK_ENDING.test(low)){ votes.greek++; continue; }
+      // unknown greek-script name without a greek ending: no vote (avoids false anchors)
+    }
+    var best = "", bv = 0;
+    ["invented","western","greek"].forEach(function(k){ if(votes[k] > bv){ bv = votes[k]; best = k; } });
+    return best;
+  }
+  function heroNamePart(){ var h = (S.hero||"").trim(); return h ? h.split(/,|·/)[0].trim() : ""; }
+  function antagonistNamePart(){ var a = (S.antagonist||"").trim(); return a ? a.split(/,|·/)[0].trim() : ""; }
+  function registerFromUser(){
+    var r = registerOf(heroNamePart()); if(r){ return r; }
+    return registerOf(antagonistNamePart());
+  }
+  function planPlaces(){
+    var texts = [S.glossary, S.world, S.bible, S.premise].map(function(x){ return x||""; }).join("\n");
+    if(!texts.trim()){ return []; }
+    var sets = regSets();
+    var out = [], seen = {};
+    var runs = texts.replace(/\n/g," ").match(/[Α-ΩA-Z][\u0370-\u03ffA-Za-z\-']{1,}(?:\s+[Α-ΩA-Z][\u0370-\u03ffA-Za-z\-']{1,}){0,2}/g) || [];
+    runs.forEach(function(r){
+      var words = r.split(/\s+/);
+      if(PLACE_STOP[words[0]]){ return; }
+      var trimmed = false;
+      for(var i=words.length-1;i>=0;i--){
+        var w = String(words[i]).toLowerCase();
+        // a stopword or a known person-name inside a phrase: drop it; a phrase reduced
+        // to a single leftover word is ambiguous -> discard the whole run
+        if(PLACE_STOP[words[i]] || sets.greek[w] || sets.western[w] || sets.invented[w]){
+          words.splice(i,1); trimmed = true;
+        }
+      }
+      if(trimmed && words.length < 2){ return; }
+      if(!words.length){ return; }
+      var name = words.join(" ");
+      var key = name.toLowerCase();
+      if(!seen[key] && name.length >= 2){ seen[key] = 1; out.push(name); }
+    });
+    return out;
+  }
+  function regLabel(EN, reg){
+    if(reg === "greek"){ return EN ? "everyday Greek names" : "καθημερινά ελληνικά ονόματα"; }
+    if(reg === "western"){ return EN ? "Western names" : "δυτικά ονόματα"; }
+    if(reg === "invented"){ return EN ? "invented names, same style" : "εφευρημένα ονόματα, στο ίδιο στυλ"; }
+    return EN ? "the world's register" : "το ύφος του κόσμου";
+  }
+  function regContra(EN, reg){
+    if(reg === "greek"){ return "Leopold/Jack"; }
+    if(reg === "western"){ return "Δημήτρης/Ελένη"; }
+    if(reg === "invented"){ return EN ? "real-world or everyday Greek names" : "αληθινοί ή καθημερινά ελληνικά ονόματα"; }
+    return EN ? "a foreign register" : "αλλόκοτο ύφος";
+  }
+  function namingAnchorLine(EN){
+    var names = [];
+    var hn = heroNamePart(); if(hn){ names.push(hn); }
+    var an = antagonistNamePart(); if(an && names.indexOf(an) === -1){ names.push(an); }
+    var places = planPlaces();
+    if(!names.length && !places.length){ return ""; }
+    var reg = registerFromUser();
+    var L = "";
+    if(names.length){
+      var nl = "«" + names.join("» «") + "»";
+      var rl = regLabel(EN,reg), cl = regContra(EN,reg);
+      var tpl = EN ? ANCHOR_EN : ANCHOR_EL;
+      L = tpl.split("{NAMES}").join(nl).split("{REG}").join(rl).split("{CONTRA}").join(cl);
+    }
+    if(places.length){
+      var list = places.slice(0,4).join(", ") + (places.length > 4 ? "…" : "");
+      L += (EN ? ANCHOR_PL_EN : ANCHOR_PL_EL).replace("{LIST}", list);
+    }
+    return L;
+  }
+  function namingCanonBlock(EN){
+    var L = [];
+    var names = [];
+    var hn = heroNamePart(); if(hn){ names.push(hn); }
+    var an = antagonistNamePart(); if(an && names.indexOf(an) === -1){ names.push(an); }
+    var places = planPlaces();
+    if(!names.length && !places.length){ return L; }
+    L.push(EN ? CANON_HDR_EN : CANON_HDR_EL);
+    if(names.length){
+      var nl = "«" + names.join("» «") + "»";
+      L.push((EN ? CANON_NAMES_EN : CANON_NAMES_EL).replace("{NAMES}", nl));
+    }
+    if(places.length){
+      var list = places.slice(0,6).join(" · ") + (places.length > 6 ? "…" : "");
+      L.push((EN ? CANON_PL_EN : CANON_PL_EL).replace("{LIST}", list));
+    }
+    return L;
+  }
+
 
   /* ---- suggestion pools: [el, en] ---- */
   var SUG = {
@@ -1909,6 +2603,26 @@
       ["Ηλίας Νέγρης, 27, χαρτογράφος· εμπιστεύεται μόνο χάρτες.","Ilias Negris, 27, cartographer; trusts only maps."],
       ["Φαίδρα, 19, μάγισσα· μιλά στους ανέμους.","Phaedra, 19, witch; speaks to the winds."],
       ["Δρ. Όμηρος Φωκάς, 63, συνταξιούχος γιατρός· έμαθε την αλήθεια και δεν την είπε.","Dr. Homer Fokas, 63, retired doctor; learned the truth and kept it."]
+    ],
+    charsWestern: [
+      ["\u039b\u03b5\u03bf\u03c0\u03cc\u03bb\u03bd\u03c4 \u03a7\u03ac\u03c1\u03c4\u03bc\u03b1\u03bd, 52, \u03b1\u03c1\u03c7\u03b5\u03b9\u03bf\u03c6\u03cd\u03bb\u03b1\u03ba\u03b1\u03c2\u00b7 \u03ba\u03c1\u03b1\u03c4\u03ac \u03c4\u03b1 \u03c0\u03ac\u03bd\u03c4\u03b1, \u03b1\u03ba\u03cc\u03bc\u03b1 \u03ba\u03b1\u03b9 \u03c4\u03b1 \u03c8\u03ad\u03bc\u03bc\u03b1\u03c4\u03b1.", "Leopold Hartmann, 52, archivist; keeps everything, even the lies."],
+      ["\u039c\u03ac\u03c1\u03b3\u03ba\u03b1\u03c1\u03b5\u03c4 \u039c\u03c0\u03c1\u03bf\u03c5\u03ba, 44, \u03bd\u03bf\u03c3\u03bf\u03ba\u03cc\u03bc\u03b1 \u03bd\u03c5\u03c7\u03c4\u03b5\u03c1\u03b9\u03bd\u03ae\u03c2 \u03b2\u03ac\u03c1\u03b4\u03b9\u03b1\u03c2\u00b7 \u03b1\u03ba\u03bf\u03cd\u03b5\u03b9 \u03ba\u03b1\u03bb\u03cd\u03c4\u03b5\u03c1\u03b1 \u03b1\u03c0' \u03cc,\u03c4\u03b9 \u03bc\u03b9\u03bb\u03ac.", "Margaret Brook, 44, night nurse; listens better than she speaks."],
+      ["\u03a4\u03b6\u03ad\u03b9\u03bc\u03c2 \u038c\u03c3\u03b2\u03b1\u03bb\u03c4, 61, \u03c3\u03c5\u03bd\u03c4\u03b1\u03be\u03b9\u03bf\u03cd\u03c7\u03bf\u03c2 \u03c0\u03bb\u03bf\u03b9\u03ac\u03c1\u03b9\u03bf\u03c2\u00b7 \u03bc\u03b5\u03c4\u03c1\u03ac \u03b1\u03ba\u03cc\u03bc\u03b1 \u03c4\u03b9\u03c2 \u03b4\u03b9\u03ad\u03bb\u03b5\u03c5\u03c3\u03b5\u03b9\u03c2.", "James Oswalt, 61, retired ferryman; still counts the crossings."],
+      ["\u0388\u03bb\u03b5\u03bd \u039a\u03c1\u03ac\u03bc\u03b5\u03c1, 29, \u03bc\u03b5\u03c4\u03b1\u03c6\u03c1\u03ac\u03c3\u03c4\u03c1\u03b9\u03b1\u00b7 \u03b1\u03bb\u03bb\u03ac\u03b6\u03b5\u03b9 \u03b3\u03bb\u03ce\u03c3\u03c3\u03b1 \u03b3\u03b9\u03b1 \u03bd\u03b1 \u03be\u03b5\u03c6\u03b5\u03cd\u03b3\u03b5\u03b9 \u03b1\u03c0\u03cc \u03c4\u03bf\u03c5\u03c2 \u03b1\u03bd\u03b8\u03c1\u03ce\u03c0\u03bf\u03c5\u03c2.", "Helen Kramer, 29, translator; switches languages to escape people."],
+      ["\u0391\u03bd\u03c4\u03cc\u03bd \u039a\u03b1\u03bb\u03b2\u03ad\u03c1\u03c4, 37, \u03c1\u03bf\u03bb\u03bf\u03b3\u03b9\u03bf\u03cd\u03c7\u03bf\u03c2\u00b7 \u03c0\u03b5\u03c1\u03bd\u03ac \u03ce\u03c1\u03b5\u03c2 \u03c0\u03bf\u03c5 \u03b4\u03b5\u03bd \u03be\u03b1\u03bd\u03b1\u03b3\u03c5\u03c1\u03bd\u03bf\u03cd\u03bd.", "Anton Calvert, 37, clockmaker; winds hours that never come back."],
+      ["\u03a1\u03cc\u03c3\u03b1 \u039c\u03c0\u03ad\u03b9\u03ba\u03bf\u03bd, 55, \u03bc\u03b9\u03c3\u03b8\u03bf\u03b4\u03cc\u03c4\u03c1\u03b9\u03b1\u00b7 \u03b8\u03c5\u03bc\u03ac\u03c4\u03b1\u03b9 \u03c4\u03bf \u03bc\u03c5\u03c3\u03c4\u03b9\u03ba\u03cc \u03ba\u03ac\u03b8\u03b5 \u03b5\u03bd\u03bf\u03af\u03ba\u03b9\u03bf\u03c5.", "Rosa Bacon, 55, landlady; remembers every tenant's secret."],
+      ["\u03a3\u03c4\u03af\u03b2\u03b5\u03bd \u039c\u03ac\u03c1\u03bb\u03bf\u03bf\u03c5, 48, \u03bb\u03b1\u03c7\u03c4\u03b1\u03c1\u03ac\u03c2\u00b7 \u03b3\u03c1\u03ac\u03c6\u03b5\u03b9 \u03c4\u03b1 \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1 \u03c0\u03bf\u03bb\u03cd \u03c0\u03c1\u03bf\u03c3\u03b5\u03ba\u03c4\u03b9\u03ba\u03ac.", "Stephen Marlow, 48, gravedigger; carves names too carefully."],
+      ["\u0392\u03b9\u03bb\u03b5\u03bb\u03bc\u03af\u03bd\u03b7 \u0386\u03c3\u03bb\u03b5\u03ca, 33, \u03c4\u03b5\u03bb\u03b5\u03b3\u03c1\u03b1\u03c6\u03af\u03c3\u03c4\u03c1\u03b9\u03b1\u00b7 \u03c3\u03c4\u03ad\u03bb\u03bd\u03b5\u03b9 \u03bc\u03b7\u03bd\u03cd\u03bc\u03b1\u03c4\u03b1 \u03c0\u03bf\u03c5 \u03b4\u03b5\u03bd \u03c4\u03bf\u03bb\u03bc\u03ac \u03bd\u03b1 \u03c0\u03b5\u03b9.", "Wilhelmina Ashley, 33, telegraph operator; sends messages she can't say."]
+    ],
+    charsInvented: [
+      ["\u039c\u03bf\u03c1\u03b1\u0390\u03bd\u03b1 \u03c4\u03b7\u03c2 \u03a3\u03af\u03bb\u03b1\u03c1\u03b1\u03c2, 40, \u03c6\u03c5\u03bb\u03b1\u03ba\u03af\u03c3\u03c4\u03c1\u03b9\u03b1 \u03c0\u03b1\u03bb\u03b1\u03c4\u03b9\u03ce\u03bd\u00b7 \u03b1\u03ba\u03bf\u03cd\u03b5\u03b9 \u03c4\u03bf \u03b2\u03b9\u03b2\u03bb\u03b9\u03ac\u03c1\u03b9\u03bf \u03c4\u03b7\u03c2 \u03b8\u03ac\u03bb\u03b1\u03c3\u03c3\u03b1\u03c2.", "Moraina of Silara, 40, keeper of tides; hears the sea's ledger."],
+      ["\u03a6\u03b5\u03c1\u03cc\u03bd \u0394\u03c1\u03ac\u03b3\u03ba\u03bf\u03b2\u03b5\u03bb, 58, \u03c6\u03cd\u03bb\u03b1\u03ba\u03b1\u03c2 \u03ba\u03bb\u03af\u03b2\u03b1\u03bd\u03bf\u03c5\u00b7 \u03b4\u03b5\u03bd \u03b5\u03bc\u03c0\u03b9\u03c3\u03c4\u03b5\u03cd\u03b5\u03c4\u03b1\u03b9 \u03c6\u03bb\u03cc\u03b3\u03b1 \u03c0\u03bf\u03c5 \u03b4\u03b5\u03bd \u03ad\u03c7\u03b5\u03b9 \u03bf\u03bd\u03bf\u03bc\u03ac\u03c3\u03b5\u03b9.", "Feron Dragobel, 58, forge-warden; trusts no flame he hasn't named."],
+      ["\u039d\u03c5\u03bc\u03b5\u03bb\u03af\u03c2, 26, \u03b1\u03c3\u03c4\u03c1\u03bf\u03b3\u03c1\u03ac\u03c6\u03bf\u03c2\u00b7 \u03b3\u03c1\u03ac\u03c6\u03b5\u03b9 \u03bc\u03ad\u03bb\u03bb\u03bf\u03bd\u03c4\u03b1 \u03c0\u03bf\u03c5 \u03bc\u03b5\u03c4\u03ac \u03c3\u03b2\u03ae\u03bd\u03b5\u03b9.", "Nymelis, 26, star-scribe; writes futures she then erases."],
+      ["\u0398\u03b1\u03bd\u03c4\u03ad\u03c1\u03b9\u03bb \u039f\u03c3\u03c4\u03c1\u03b9\u03ac\u03bd, 44, \u03ba\u03b7\u03b4\u03b5\u03bc\u03cc\u03bd\u03b1\u03c2 \u03b3\u03ad\u03c6\u03c5\u03c1\u03b1\u03c2\u00b7 \u03c7\u03c1\u03b5\u03ce\u03bd\u03b5\u03b9 \u03bc\u03b5 \u03b1\u03bd\u03b1\u03bc\u03bd\u03ae\u03c3\u03b5\u03b9\u03c2, \u03cc\u03c7\u03b9 \u03bc\u03b5 \u03bd\u03bf\u03bc\u03af\u03c3\u03bc\u03b1\u03c4\u03b1.", "Thandiril Ostrian, 44, bridge-keeper; charges in memories, not coins."],
+      ["\u0392\u03b5\u03bb\u03b9\u03ac\u03bd\u03b8\u03b1, 63, \u03c4\u03c1\u03b1\u03b3\u03bf\u03c5\u03b4\u03af\u03c3\u03c4\u03c1\u03b9\u03b1 \u03c4\u03ac\u03c6\u03c9\u03bd\u00b7 \u03b8\u03ac\u03b2\u03b5\u03b9 \u03c4\u03c1\u03b1\u03b3\u03bf\u03cd\u03b4\u03b9\u03b1 \u03bc\u03b5 \u03c4\u03bf\u03c5\u03c2 \u03bd\u03b5\u03ba\u03c1\u03bf\u03cd\u03c2.", "Velianda, 63, grave-singer; buries songs with the dead."],
+      ["\u0391\u03ad\u03c1\u03bf\u03bd \u03a3\u03b9\u03bb\u03b2\u03ac\u03c1\u03b5, 31, \u03b1\u03b3\u03b3\u03b5\u03bb\u03b9\u03bf\u03c6\u03cc\u03c1\u03bf\u03c2 \u03b1\u03bd\u03ad\u03bc\u03c9\u03bd\u00b7 \u03c7\u03ac\u03bd\u03b5\u03b9 \u03bb\u03ad\u03be\u03b5\u03b9\u03c2 \u03b4\u03c1\u03cc\u03bc\u03bf.", "Aeron Silvare, 31, wind-messenger; loses words on the way."],
+      ["\u039f\u03c1\u03af\u03bd\u03b8\u03b1\u03c2 \u03c4\u03bf\u03c5 \u0398\u03cc\u03c1\u03bd\u03c7\u03b1\u03bb, 50, \u03b1\u03bd\u03b1\u03b3\u03bd\u03ce\u03c2 \u03c3\u03c4\u03ac\u03c7\u03c4\u03b7\u03c2\u00b7 \u03ba\u03b1\u03af\u03b5\u03b9 \u03b5\u03c1\u03c9\u03c4\u03ae\u03bc\u03b1\u03c4\u03b1 \u03c3\u03b5 \u03b1\u03c0\u03b1\u03bd\u03c4\u03ae\u03c3\u03b5\u03b9\u03c2.", "Orynthas of Thornhal, 50, ash-reader; burns questions into answers."],
+      ["\u039b\u03c5\u03c3\u03b9\u03ac\u03bd\u03c4\u03b1, 22, \u03c6\u03c5\u03bb\u03ac\u03c1\u03c7\u03b9\u03c3\u03c3\u03b1 \u03b8\u03c5\u03c1\u03ce\u03bd\u00b7 \u03b1\u03bd\u03bf\u03af\u03b3\u03b5\u03b9 \u03bc\u03cc\u03bd\u03bf \u03c3\u03b5 \u03bf\u03bd\u03cc\u03bc\u03b1\u03c4\u03b1.", "Lysianta, 22, door-watcher; opens only for names."]
     ]
   };
 
@@ -1933,6 +2647,12 @@
     lblHero:["Πρωταγωνιστής / -ές","Protagonist(s)"],
     lblCharSug:["Προτάσεις χαρακτήρων","Character suggestions"],
     lblWorld:["Κόσμος / Σκηνικό","World / Setting"],
+    lblDramQ:["Δραματική ερώτηση (ο κινητήρας)","Dramatic question (the engine)"],
+    lblMustInclude:["Να υπάρχει οπωσδήποτε","Must include"],
+    lblMustAvoid:["Ποτέ να μην κάνει / να μην υπάρχει","Must never do"],
+    lblComps:["Παρόμοια έργα (πνεύμα, όχι απομίμηση)","Comparable titles (spirit, not imitation)"],
+    lblStrength:["Δύναμη της παραγγελίας","Commission strength"],
+    btnStagePack:["📦 Πακέτο σκαλιών","📦 Stage pack"],
     lblThemes:["Θέματα (πολλαπλά)","Themes (multiple)"],
     lblStruct:["Δομή / Κεφάλαια (προαιρετικό)","Structure / Chapters (optional)"],
     lblExtra:["Επιπλέον οδηγίες (προαιρετικό)","Extra instructions (optional)"],
@@ -2066,7 +2786,7 @@
 
     btnSync:["🔗 Κοινή χρήση βιβλίου με σύνδεσμο","🔗 Share book via link"],
     btnNames:["🏷 Ονόματα &amp; τόποι — prompt ΑΙ","🏷 Names &amp; places — AI prompt"],
-    nameHint:["🏷 φτιάχνει ένα προσηλωμένο prompt (πειθαρχία ονομασίας ανά είδος + το ύφος του κόσμου) για το ΑΙ σας — 3 πρόσωπα, 3 τόποι, 1 αντικείμενο + γλωσσάρι· επικολλήστε την απάντηση και «⤵ Φόρτωση» γεμίζει το brief. 🎲 Τοπικό ρολόι = η offline εναλλακτική.","🏷 builds a crafted prompt (genre-aware naming discipline + the world's register) for your AI — 3 people, 3 places, 1 object + glossary; paste the answer back and ⤵ Load fills the brief. 🎲 Local roll = the offline fallback."],
+    nameHint:["🏷 φτιάχνει ένα προσηλωμένο prompt (πειθαρχία ονομασίας ανά είδος + το ύφος του κόσμου) για το ΑΙ σας — 3 πρόσωπα, 3 τόποι, 1 αντικείμενο + γλωσσάρι· επικολλήστε την απάντηση και «⤵ Φόρτωση» γεμίζει το brief. 🎲 Τοπικό ρολόι = η offline εναλλακτική — ακολουθεί πρώτα τα ονόματα/τόπους που έχετε ήδη ορίσει (κανόνας), μετά το είδος.","🏷 builds a crafted prompt (genre-aware naming discipline + the world's register) for your AI — 3 people, 3 places, 1 object + glossary; paste the answer back and ⤵ Load fills the brief. 🎲 Local roll = the offline fallback — it follows the names & places you have already dictated (canon), then the genre."],
     btnNamesLoad:["⤵ Φόρτωση στο brief","⤵ Load into brief"],
     btnNamesLocal:["🎲 Τοπικό ρολόι (offline)","🎲 Local roll (offline)"],
     lblNamesAns:["Απάντηση του ΑΙ (ονόματα &amp; τόποι) — επικολλήστε εδώ, μετά «⤵ Φόρτωση»","AI's answer (names &amp; places) — paste here, then ⤵ Load"],
@@ -2082,7 +2802,7 @@
     lblIntentSetting:["Πού;","Where?"],
     lblIntentExtra:["Στοιχεία που θέλεις μέσα (προαιρετικό)","Elements you want in it (optional)"],
     btnIntentBuild:["🧠 Χτίσε το brief μου","🧠 Build my brief"],
-    btnIntentRandom:["🎲 Έκπληξέ με","🎲 Surprise me"],
+    btnIntentRandom:["🎲 Έκπληξε με","🎲 Surprise me"],
     btnIntentCopy:["⧉ Αντιγραφή σύνοψης","⧉ Copy summary"],
     syncHint:["Συγχρονισμός μέσω συνδέσμου: κωδικοποιεί όλο το βιβλίο σε ένα URL — ανοίξτε το σε άλλη συσκευή για να φορτωθεί. Χωρίς server, εντελώς ιδιωτικό. Πολύ μεγάλα βιβλία (όριο URL) → χρησιμοποιήστε 💾 Αποθήκευση βιβλίου (.json).","Link-based sync: encodes the whole book into a shareable URL — open it on another device to load it. No server, fully private. Very large books (URL limit) → use 💾 Save book (.json)."],
     lblChTitle:["Τίτλος κεφαλαίου (προαιρετικό)","Chapter title (optional)"],
@@ -2127,9 +2847,10 @@
   };
   var PH = {
     inTitle:["π.χ. «Η Γέφυρα των Ψιθύρων»","e.g. “The Bridge of Whispers”"],
-    inPremise:["Σε μία πρόταση έως λίγες γραμμές: τι συμβαίνει, τι κινδυνεύει, τι αλλάζει…","One sentence to a few lines: what happens, what's at stake, what changes…"],
+    inPremise:["ποιος τι θέλει, γιατί δεν μπορεί να το πάρει, τι θα το κοστίσει, και γιατί απόψε…","who wants what, why they can't have it, what it will cost, and why tonight…"],
+    inDramQ:["θα κάψει τον χάρτη πριν χτιστέι η πόλη;","will she burn the map before the city is built?"],
     inHero:["όνομα, ηλικία, ιδιότητα, βασικό χαρακτηριστικό","name, age, profession, defining trait"],
-    inWorld:["τόπος, εποχή, κανόνες του κόσμου, ατμόσφαιρα","place, era, rules of the world, atmosphere"],
+    inWorld:["νόμοι, τιμές, απαγορεύσεις, η μία ιστορική πληγή που δεν έχει κλείσει…","laws, prices, taboos, the one historical wound still open…"],
     inStruct:["π.χ. 3 μέρη, χρονικό, δύο γραμμές χρόνου…","e.g. 3 acts, chronological, two timelines…"],
     inExtra:["ό,τι άλλο θέλετε να προσέξει ο συγγραφέας-ΑΙ…","anything else you want the AI writer to keep in mind…"],
     inSeed:["επικολλήστε εδώ ολόκληρο το ημιτελές κείμενό σας — όσο και αν είναι…","paste your whole unfinished story here — however long…"],
@@ -2144,8 +2865,10 @@
     inContNote:["προαιρετικά: τι θέλετε να συμβεί στο επόμενο κεφάλαιο","optional: what should happen in the next chapter"],
     inAntagonist:["ποιος ή τι εμποδίζει τον ήρωα…","who or what stands in the hero's way…"],
     inCharDesire:["τι θέλει ο ήρωας","what the hero wants"],
+    inCharNeed:["τι θα την/τον αναγκάσει να γίνει — η εσωτερική ανάγκη","what the book will force them to become — the need"],
     inCharFear:["τι φοβάται","what he fears"],
     inCharWound:["η πληγή του (παρελθόν)","the wound (past)"],
+    inCharLie:["«αν είμαι χρήσιμος, δεν με απορρίπτουν»","“if I am useful, I cannot be left”"],
     inCharArc:["το τόξο του (πώς αλλάζει)","the arc (how he changes)"],
     inCharVoice:["η φωνή του (πώς μιλά, ιδιαιτερότητες)","the voice (how he speaks, verbal tics)"],
     inCharSecret:["το μυστικό του","the secret"],
@@ -2155,6 +2878,9 @@
     inBible:["π.χ. Η γέφυρα χτίστηκε το 1932 · η Καλλιόπη πέθανε τρία χρόνια πριν · ο δήμαρχος ξέρει το μυστικό","e.g. The bridge was built in 1932 · Kalliopi died three years ago · the mayor knows the secret"],
     inReview:["επικολλήστε εδώ το προσχέδιο που παρήγαγε το ΑΙ…","paste the draft the AI produced here…"],
     inInspo:["π.χ. το τραγούδι, ο πίνακας ή η ταινία που γέννησε την ιστορία…","e.g. the song, painting or film that sparked the story…"],
+    inMustInclude:["ένα σκάφος · ένα βιβλίο-λογαριασμών · ένα γεύμα που πάει στραβά","a boat · a ledger · a meal that goes wrong"],
+    inMustAvoid:["εκλεκτός · παρεξήγηση που τη λύνει ένα μήνυμα · χαριτωμένο ΑΙ","chosen one · a misunderstanding a text would fix · cute AI"],
+    inComps:["πνεύμα, όχι απομίμηση","spirit, not imitation"],
     inVoiceSample:["π.χ. δύο-τρεις παράγραφοι από ένα δικό σας κείμενο…","e.g. two or three paragraphs of your own prose…"]
   };;
   var BODIES = {
@@ -2302,8 +3028,8 @@
   var S0 = {
     format:"novel", title:"", words:0, genre:"", pov:"pov1", tone:"mid", pacing:"medium", ending:"", tense:"past", theme:"parchment", themeSet:false,
     authors:["king"], themes:[],
-    premise:"", hero:"", antagonist:"", charDesire:"", charFear:"", charWound:"", charArc:"", charVoice:"", charSecret:"",
-    world:"", struct:"", extra:"", glossary:"", bible:"", inspo:"",
+    premise:"", hero:"", antagonist:"", charDesire:"", charFear:"", charWound:"", charArc:"", charVoice:"", charSecret:"", charNeed:"", charLie:"",
+    world:"", struct:"", extra:"", glossary:"", bible:"", inspo:"", dramQ:"", comps:"", mustInclude:"", mustAvoid:"",
     plan:true, alt:true, clich:true, pro:false, epi:false,
     greek:true, proof:true, voices:true, antiLLM:true, myStyle:false,
     writingMode:"fresh", voiceSample:"", reviewCritique:false,
@@ -2517,8 +3243,8 @@
     var inputs = document.querySelectorAll ? document.querySelectorAll("input,select,textarea").length : -1;
     var cards = document.querySelectorAll ? document.querySelectorAll(".card").length : -1;
     var chapters = (S.chapters||[]).length;
-    var msg = (S.lang==="en" ? "v27 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
-                             : "v27 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
+    var msg = (S.lang==="en" ? "v28 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
+                             : "v28 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
   }
 
@@ -3054,6 +3780,8 @@
     P.push(EN
       ? "- Ancient history: 3 events that shaped this place, each with a name and a scar still visible. - Places: 5 named locations (" + placeRule + ") with one evocative line each. - Institutions: 3 (a guild, a church/cult, an archive). - Rules: the logic of the strange (how the bridge whispers, what the machine costs). - The unspoken: one secret everyone in this world knows but never says. - Naming: follow the book's genre — character names must match the world's naming discipline, never mixing it with the other register."
       : "- Αρχαία ιστορία: 3 γεγονότα που διαμόρφωσαν τον τόπο, καθένα με όνομα και σημάδι ορατό ακόμα. - Τόποι: 5 ονομασμένα μέρη (" + placeRule + ") με μία υποβλητική γραμμή το καθένα. - Θεσμοί: 3 (μια συντεχνία, μια εκκλησία/λατρεία, ένα αρχείο). - Κανόνες: η λογική του παράξενου (πώς ψιθυρίζει η γέφυρα, τι κοστίζει η μηχανή). - Το ανείπωτο: ένα μυστικό που όλοι ξέρουν αλλά κανείς δεν λέει. - Ονομασία: βάλε τη γλώσσα του είδους του βιβλίου — τα ονόματα των χαρακτήρων να ταιριάζουν στην πειθαρχία ονομασίας του κόσμου, χωρίς μίγμα με το άλλο ύφος.");
+    var pp = planPlaces();
+    if(pp.length){ P.push(EN ? "- Dictated places (canon): " + pp.slice(0,6).join(" · ") + (pp.length>6?"…":"") + " — new places must stay in this world (same region, era, naming style)." : MYTH_PL_EL.replace("{LIST}", pp.slice(0,6).join(" · ") + (pp.length>6?"…":""))); }
     P.push("");
     P.push(EN ? "Write in the deliverable language, matching the established voice. Plain list, one line per item, no fluff." : "Γράψε στη γλώσσα του έργου, ταιριάζοντας την εδραιωμένη φωνή. Απλή λίστα, μία γραμμή το καθένα, χωρίς φλυαρία.");
     return P.join("\n");
@@ -3333,7 +4061,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v27.0";
+    $("pillVer").textContent = "v28.0";
   }
 
   function applyStatic(){
@@ -3532,7 +4260,12 @@
   /* suggestion pools: sparked (AI-generated, stored in S) or the built-in seeds (offline default) */
   function sugPool(kind){
     var st = S["sug"+kind];
-    return (st && st.length) ? st : (kind==="Titles" ? SUG.titles : kind==="Stories" ? SUG.stories : SUG.chars);
+    if(st && st.length){ return st; }
+    if(kind==="Titles"){ return SUG.titles; }
+    if(kind==="Stories"){ return SUG.stories; }
+    // character suggestions follow the register of the name the author dictated
+    var reg = registerFromUser();
+    return reg==="western" ? SUG.charsWestern : (reg==="invented" ? SUG.charsInvented : SUG.chars);
   }
   function sugPoolText(pool){ return pool.map(function(p){ return p[1] || p[0]; }); }
   function renderTitleSug(){
@@ -3540,7 +4273,7 @@
     sugPool("Titles").forEach(function(t){ sugChip(el, t, function(v){ S.title = v; $("inTitle").value = v; render(); }); });
     var rand = $("btnRandTitle");
     rand.textContent = S.lang==="en" ? "🎲 Random title" : "🎲 Τυχαίος τίτλος";
-    var sp = $("btnSparkTitles"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh titles via your AI" : "✨ Σπírito για νέους τίτλους μέσω του ΑΙ σας"; }
+    var sp = $("btnSparkTitles"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh titles via your AI" : "✨ Σπίρτο για νέους τίτλους μέσω του ΑΙ σας"; }
     rand.onclick = function(){
       var pool = sugPool("Titles");
       var t = pool[Math.floor(Math.random()*pool.length)];
@@ -3552,12 +4285,12 @@
   function renderStorySug(){
     var el = $("storySug"); el.innerHTML = "";
     sugPool("Stories").forEach(function(st){ sugChip(el, st, function(v){ S.premise = v; $("inPremise").value = v; render(); }); });
-    var sp = $("btnSparkStories"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh story loglines via your AI" : "✨ Σπírito για νέες υποθέσεις μέσω του ΑΙ σας"; }
+    var sp = $("btnSparkStories"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh story loglines via your AI" : "✨ Σπίρτο για νέες υποθέσεις μέσω του ΑΙ σας"; }
   }
   function renderCharSug(){
     var el = $("charSug"); el.innerHTML = "";
     sugPool("Chars").forEach(function(ch){ sugChip(el, ch, function(v){ S.hero = v; $("inHero").value = v; render(); }); });
-    var sp = $("btnSparkChars"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh characters via your AI" : "✨ Σπírito για νέους χαρακτήρες μέσω του ΑΙ σας"; }
+    var sp = $("btnSparkChars"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh characters via your AI" : "✨ Σπίρτο για νέους χαρακτήρες μέσω του ΑΙ σας"; }
   }
 
   /* levels + rulebox + savings */
@@ -3672,7 +4405,7 @@
     }
     out.push(S.lang==="en"
       ? "Never mention the protocol itself — just apply it."
-      : "Ποτέ μην αναφέρεις το ίδιο το πρωτόκολλο — απλώς εφάρμοσέ το.");
+      : "Ποτέ μην αναφέρεις το ίδιο το πρωτόκολλο — απλώς εφάρμοσε το.");
     return out;
   }
 
@@ -3750,8 +4483,10 @@
     /* the work */
     P.push(EN ? "## THE WORK" : "## ΤΟ ΕΡΓΟ");
     if(S.premise.trim()){ P.push((EN?"**Premise:** ":"**Υπόθεση:** ")+S.premise.trim()); }
+    if((S.dramQ||"").trim()){ P.push((EN?"**Dramatic question (the engine):** ":"**Δραματική ερώτηση (ο κινητήρας):** ")+S.dramQ.trim()); }
     if((S.inspo||"").trim()){ P.push(EN ? "**Inspiration:** "+S.inspo.trim()+" — let its mood guide the atmosphere." : "**Έμπνευση:** "+S.inspo.trim()+" — άφησε τη διάθεσή της να καθοδηγήσει την ατμόσφαιρα."); }
     if(S.hero.trim()){ P.push((EN?"**Protagonist(s):** ":"**Πρωταγωνιστής/-ές:** ")+S.hero.trim()); }
+    var namingAnchor = namingAnchorLine(EN); if(namingAnchor){ P.push(namingAnchor); }
     if((S.voiceSample||"").trim()){
       P.push(EN ? "**Author voice to match:** "+S.voiceSample.trim() : "**Φωνή συγγραφέα που πρέπει να ταιριάξεις:** "+S.voiceSample.trim());
       P.push(EN ? "Study this sample's rhythm, diction, sentence lengths and imagery — the prose must sound like this author." : "Μελέτησε τον ρυθμό, το λεξιλόγιο, το μήκος των προτάσεων και τις εικόνες του δείγματος — η πρόζα πρέπει να ακούγεται σαν αυτόν τον συγγραφέα.");
@@ -3761,12 +4496,25 @@
     if(S.extra.trim()){ P.push((EN?"**Extra instructions:** ":"**Επιπλέον οδηγίες:** ")+S.extra.trim()); }
     P.push("");
 
+    /* craft locks — constraints (must include / must never / comps) */
+    var hasMI=(S.mustInclude||"").trim(), hasMA=(S.mustAvoid||"").trim(), hasComp=(S.comps||"").trim();
+    if(hasMI||hasMA||hasComp){
+      P.push(EN ? "## CONSTRAINTS — CRAFT LOCKS" : "## ΠΕΡΙΟΡΙΣΜΟΙ — ΣΦΡΑΓΙΔΕΣ ΤΕΧΝΟΤΡΟΠΙΑΣ");
+      if(hasMI){ P.push((EN ? "- Must include (concrete, on the page): " : "- Να υπάρχει οπωσδήποτε (συγκεκριμένα, στη σελίδα): ") + hasMI); }
+      if(hasMA){ P.push((EN ? "- Must never do / must never appear (the trap named, the ban named): " : "- ΠΟΤΕ να μην κάνει / να μην υπάρχει (η παγίδα ονομασμένη, η απαγόρευση ονομασμένη): ") + hasMA); }
+      if(hasComp){ P.push((EN ? "- Comps (spirit, not imitation — calibrate craft, never content): " : "- Παρόμοια έργα (πνεύμα, όχι απομίμηση — ρύθμιση τεχνοτροπίας, ποτέ περιεχόμενο): ") + hasComp); }
+      if(hasComp){ P.push(EN ? "- From the comps: match the CRAFT only. No characters, settings, plots or names from them may appear." : "- Από τα παρόμοια: ταίριασε μόνο τη ΤΕΧΝΟΤΡΟΠΙΑ. Κανένα πρόσωπο, σκηνικό, πλοκή ή όνομα από αυτά δεν επιτρέπεται να εμφανιστεί."); }
+      P.push("");
+    }
+
     /* character sheet */
     var cs = [
       ["antagonist", EN?"**Antagonist / Obstacle:** ":"**Ανταγωνιστής / Εμπόδιο:** "],
       ["charDesire", EN?"**What the hero wants:** ":"**Τι θέλει ο ήρωας:** "],
+      ["charNeed", EN?"**The need (what the book will force them to become):** ":"**Η ανάγκη (τι θα την/τον αναγκάσει να γίνει):** "],
       ["charFear", EN?"**What he fears:** ":"**Τι φοβάται:** "],
       ["charWound", EN?"**The wound:** ":"**Η πληγή:** "],
+      ["charLie", EN?"**The lie they believe:** ":"**Η ψευδής πίστη:** "],
       ["charArc", EN?"**The arc:** ":"**Το τόξο:** "],
       ["charVoice", EN?"**The voice:** ":"**Η φωνή:** "],
       ["charSecret", EN?"**The secret:** ":"**Το μυστικό:** "]
@@ -3782,7 +4530,7 @@
       P.push(EN ? "## CHARACTER BACKGROUND" : "## ΥΠΟΒΑΘΡΟ ΧΑΡΑΚΤΗΡΑ");
       P.push(EN
         ? "Give the protagonist a solid background, consistent with the sheet and the story: (1) origin & family (where from, what they carry), (2) the day that changed everything (one concrete scene), (3) what they do for a living and why, (4) a habit or object they can't let go, (5) what they'd never do — and one situation that might make them. Weave it in through action and memory, not exposition."
-        : "Δώσε στον πρωταγωνιστή ένα στέρεο υπόβαθρο, συνεπές με την καρτέλα και την ιστορία: (1) καταγωγή & οικογένεια (από πού, τι κουβαλά), (2) η μέρα που άλλαξε τα πάντα (μία συγκεκριμένη σκηνή), (3) τι κάνει για να ζήσει και γιατί, (4) μια συνήθεια ή αντικείμενο που δεν αφήνει, (5) τι δεν θα έκανε ποτέ — και μία περίσταση που θα μπορούσε να τον/την κάνει. Ύφανέ το μέσα από δράση και μνήμη, όχι μέσα από εξήγηση.");
+        : "Δώσε στον πρωταγωνιστή ένα στέρεο υπόβαθρο, συνεπές με την καρτέλα και την ιστορία: (1) καταγωγή & οικογένεια (από πού, τι κουβαλά), (2) η μέρα που άλλαξε τα πάντα (μία συγκεκριμένη σκηνή), (3) τι κάνει για να ζήσει και γιατί, (4) μια συνήθεια ή αντικείμενο που δεν αφήνει, (5) τι δεν θα έκανε ποτέ — και μία περίσταση που θα μπορούσε να τον/την κάνει. Ύφανε το μέσα από δράση και μνήμη, όχι μέσα από εξήγηση.");
       P.push("");
     }
 
@@ -3838,7 +4586,7 @@
     /* signature techniques — the author's methods, gated to genres where they fit */
     var CRAFT_GENRES = { horror:1, gothic:1, cosmic:1, darkfantasy:1, magreal:1, noir:1, mystery:1, thriller:1 };
     if(CRAFT_GENRES[S.genre]){
-      P.push(EN ? "## SIGNATURE TECHNIQUES (the author's methods — apply when they fit)" : "## ΤΕΧΝΙΚΕΣ ΣΗΜΑΤΟΣ (μέθοδοι του συγγραφέα — εφάρμοσέ τις όταν ταιριάζουν)");
+      P.push(EN ? "## SIGNATURE TECHNIQUES (the author's methods — apply when they fit)" : "## ΤΕΧΝΙΚΕΣ ΣΗΜΑΤΟΣ (μέθοδοι του συγγραφέα — εφάρμοσε τις όταν ταιριάζουν)");
       P.push(EN
         ? "- The mundane is the threshold: the wrong thing lives INSIDE the everyday (a basement, a carport, a house full of radios) — never in a separate “haunted place”."
         : "- Το συνηθισμένο είναι το κατώφλι: το λάθος ζει ΜΕΣΑ στο καθημερινό (ένα ημιυπόγειο, ένα υπόστεγο, ένα σπίτι γεμάτο ραδιόφωνα) — ποτέ σε ξεχωριστό «μαγεμένο μέρος».");
@@ -3886,7 +4634,7 @@
         P.push(EN
           ? "- Consistency: keep a private glossary of names, places and terms; use the identical spelling every time; keep tense, person and POV consistent within each scene; never contradict earlier chapters or the plot plan."
           : "- Συνέπεια: κράτα ιδιωτικό γλωσσάρι με ονόματα, τόπους και όρους· χρησιμοποίησε πάντα την ίδια ορθογραφία· κράτα σταθερό χρόνο, πρόσωπο και POV μέσα σε κάθε σκηνή· μην αντιφάσκεις ποτέ με προηγούμενα κεφάλαια ή με το σχέδιο πλοκής.");
-        if((S.glossary||"").trim()){ P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησέ τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+"."); }
+        if((S.glossary||"").trim()){ P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησε τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+"."); }
         P.push(EN ? "- Dialogue must be natural spoken English for the character's region, class and era." : "- Ο διάλογος πρέπει να είναι φυσικός προφορικός λόγος της περιοχής, της τάξης και της εποχής του χαρακτήρα.");
       } else {
         P.push(EN ? "## GREEK LANGUAGE GUARD" : "## ΦΡΟΥΡΟΣ ΕΛΛΗΝΙΚΗΣ ΓΛΩΣΣΑΣ");
@@ -3912,7 +4660,7 @@
           ? "- Consistency: keep a private glossary of names, places and terms; use the identical spelling every time; keep tense, person and POV consistent within each scene; never contradict earlier chapters or the plot plan."
           : "- Συνέπεια: κράτα ιδιωτικό γλωσσάρι με ονόματα, τόπους και όρους· χρησιμοποίησε πάντα την ίδια ορθογραφία· κράτα σταθερό χρόνο, πρόσωπο και POV μέσα σε κάθε σκηνή· μην αντιφάσκεις ποτέ με προηγούμενα κεφάλαια ή με το σχέδιο πλοκής.");
         if((S.glossary||"").trim()){
-          P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησέ τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+".");
+          P.push(EN ? "- Fixed spellings — use exactly these, every time: "+S.glossary.trim()+"." : "- Σταθερές ορθογραφίες — χρησιμοποίησε τις ακριβώς έτσι, πάντα: "+S.glossary.trim()+".");
         }
         P.push(EN
           ? "- Dialogue must be natural spoken Greek for the character's region, class and era — never bookish translationese."
@@ -3999,7 +4747,7 @@
     P.push(EN ? "## SELF-CONTAINMENT" : "## ΑΥΤΟΔΥΝΑΜΙΑ");
     P.push(EN
       ? "This brief is complete and self-contained. Never refuse, never stop because files or earlier chapters are missing, never ask me for “Chapter 1 facts” — generate everything from this brief. If anything is ambiguous, invent it consistently with the brief and flag it in one caveman line."
-      : "Αυτό το brief είναι πλήρες και αυτοδύναμο. Ποτέ μην αρνηθείς, μην σταματήσεις επειδή λείπουν αρχεία ή προηγούμενα κεφάλαια, μην μου ζητήσεις «γεγονότα του Κεφαλαίου 1» — δημιούργησε τα πάντα από αυτό το brief. Αν κάτι είναι ασαφές, επινόησέ το συνεπώς με το brief και σημείωσέ το σε μία σπηλαιώδη γραμμή.");
+      : "Αυτό το brief είναι πλήρες και αυτοδύναμο. Ποτέ μην αρνηθείς, μην σταματήσεις επειδή λείπουν αρχεία ή προηγούμενα κεφάλαια, μην μου ζητήσεις «γεγονότα του Κεφαλαίου 1» — δημιούργησε τα πάντα από αυτό το brief. Αν κάτι είναι ασαφές, επινόησε το συνεπώς με το brief και σημείωσε το σε μία σπηλαιώδη γραμμή.");
     P.push("");
     P.push(EN ? "## FIRST STEP" : "## ΠΡΩΤΟ ΒΗΜΑ");
     if(S.mode === "files"){
@@ -4024,7 +4772,7 @@
         : "Έπειτα απάντησε σπηλαιωδώς: περίληψη 1 γραμμής, οι διαδρομές των αρχείων, τι ακολουθεί. Για κάθε επόμενο κεφάλαιο διάβασε πρώτα `chapters/ch-0N-1.md` και `plot-plan.md`, μετά γράψε `chapters/ch-0N.md`.");
       P.push(EN
         ? "If a file is missing (deleted or moved), regenerate it from this brief — never refuse."
-        : "Αν λείπει αρχείο (διαγράφηκε ή μετακινήθηκε), αναδημιούργησέ το από το brief — ποτέ μην αρνηθείς.");
+        : "Αν λείπει αρχείο (διαγράφηκε ή μετακινήθηκε), αναδημιούργησε το από το brief — ποτέ μην αρνηθείς.");
       P.push("");
       P.push(EN
         ? "After each chapter: 1 caveman-line recap + what's next. Wait for instructions."
@@ -4098,7 +4846,7 @@
         : "Διάβασε πρώτα `plot-plan.md` και `chapters/ch-"+z(prev)+".md`. Μετά γράψε `chapters/ch-"+z(n)+".md` — Κεφάλαιο **"+n+"**, ~"+wpc+" λέξεις, "+dlFullLit()+".");
       P.push(EN
         ? "If the files are missing, regenerate them from this prompt and the recap — never refuse."
-        : "Αν λείπουν τα αρχεία, αναδημιούργησέ τα από αυτό το prompt και την περίληψη — ποτέ μην αρνηθείς.");
+        : "Αν λείπουν τα αρχεία, αναδημιούργησε τα από αυτό το prompt και την περίληψη — ποτέ μην αρνηθείς.");
     } else {
       P.push(EN ? "Chapter **"+n+"**, ~"+wpc+" words, in "+dlFullLit()+". Tense: "+tenseLabel(S.tense)+"." : "Κεφάλαιο **"+n+"**, ~"+wpc+" λέξεις, σε "+dlFullLit()+". Χρόνος: "+tenseLabel(S.tense)+".");
       P.push(EN
@@ -4575,12 +5323,12 @@
       P.push(EN ? "## INDEPENDENT REVIEWER" : "## ΑΝΕΞΑΡΤΗΤΟΣ ΔΙΟΡΘΩΤΗΣ");
       P.push(EN
         ? "You did NOT write this draft. Review it as an outside editor who has never seen it — no benefit of the doubt, no loyalty to the author's choices. Your only allegiance is the reader and the canon. Be specific, quote evidence, propose fixes."
-        : "ΕΣΥ ΔΕΝ έγραψες αυτό το προσχέδιο. Εξέτασέ το ως εξωτερικός επιμελητής που δεν το έχει ξαναδεί — χωρίς ελαφρυντικά, χωρίς αφοσίωση στις επιλογές του συγγραφέα. Η μόνη σου υποχρέωση είναι ο αναγνώστης και το canon. Να είσαι συγκεκριμένος, να παραθέτεις τεκμήρια, να προτείνεις διορθώσεις.");
+        : "ΕΣΥ ΔΕΝ έγραψες αυτό το προσχέδιο. Εξέτασε το ως εξωτερικός επιμελητής που δεν το έχει ξαναδεί — χωρίς ελαφρυντικά, χωρίς αφοσίωση στις επιλογές του συγγραφέα. Η μόνη σου υποχρέωση είναι ο αναγνώστης και το canon. Να είσαι συγκεκριμένος, να παραθέτεις τεκμήρια, να προτείνεις διορθώσεις.");
       P.push("");
       P.push(EN ? "## HUMAN CHECKLIST (for the author, after the AI review)" : "## ΛΙΣΤΑ ΕΛΕΓΧΟΥ ΑΝΘΡΩΠΟΥ (για τον συγγραφέα, μετά την κριτική του ΑΙ)");
       P.push(EN
         ? "End with a short checklist the human should verify by hand: (1) names & spellings consistent with the glossary; (2) timeline & facts match the story bible; (3) every POV/tense switch is intentional; (4) dialogue sounds like the character, not the author; (5) any scene that felt off — mark it for a human rewrite. One line each."
-        : "Κλείσε με μια σύντομη λίστα που πρέπει να ελέγξει ο άνθρωπος στο χέρι: (1) ονόματα & ορθογραφίες σύμφωνα με το γλωσσάρι· (2) χρονολόγιο & γεγονότα σύμφωνα με το story bible· (3) κάθε εναλλαγή POV/χρόνου είναι σκόπιμη· (4) ο διάλογος ακούγεται σαν τον χαρακτήρα, όχι σαν τον συγγραφέα· (5) όποια σκηνή «δεν στέκει» — σημείωσέ την για ανθρώπινη επανεγγραφή. Μία γραμμή η καθεμία.");
+        : "Κλείσε με μια σύντομη λίστα που πρέπει να ελέγξει ο άνθρωπος στο χέρι: (1) ονόματα & ορθογραφίες σύμφωνα με το γλωσσάρι· (2) χρονολόγιο & γεγονότα σύμφωνα με το story bible· (3) κάθε εναλλαγή POV/χρόνου είναι σκόπιμη· (4) ο διάλογος ακούγεται σαν τον χαρακτήρα, όχι σαν τον συγγραφέα· (5) όποια σκηνή «δεν στέκει» — σημείωσε την για ανθρώπινη επανεγγραφή. Μία γραμμή η καθεμία.");
       P.push("");
     }
     if(S.reviewCritique){
@@ -4601,8 +5349,182 @@
   }
 
   /* ============================================================
-     OUTPUT + actions
+  /* ============================================================
+     STAGE PACK — self-contained stage prompts (Ignis -> Lux ->
+     Anima -> Voces -> Prima). Each stage embeds the canon facts
+     so it is self-contained: paste one at a time, in order.
      ============================================================ */
+  function stageCanon(EN){
+    var L = [];
+    var f = FORMATS[S.format];
+    var ch = chCount(S.words);
+    L.push(EN ? "**The commission (canon — treat as locked):**" : "**Η παραγγελία (canon — θεωρείται κλειδωμένη):**");
+    if((S.title||"").trim()){ L.push(EN ? "- Title: " + S.title.trim() : "- Τίτλος: " + S.title.trim()); }
+    L.push(EN ? "- Work: " + f.labelEn + " (~" + Number(S.words).toLocaleString("en-US") + " words, " + ch + " chapters)" : "- Έργο: " + f.label + " (~" + Number(S.words).toLocaleString("el-GR") + " λέξεις, " + ch + " κεφάλαια)");
+    if(S.genre){ L.push(EN ? "- Genre: " + genreLabel(S.genre) : "- Είδος: " + genreLabel(S.genre)); }
+    if((S.premise||"").trim()){ L.push(EN ? "- Premise: " + S.premise.trim() : "- Υπόθεση: " + S.premise.trim()); }
+    if((S.dramQ||"").trim()){ L.push(EN ? "- Dramatic question: " + S.dramQ.trim() : "- Δραματική ερώτηση: " + S.dramQ.trim()); }
+    if((S.hero||"").trim()){ L.push(EN ? "- Protagonist: " + S.hero.trim() : "- Πρωταγωνιστής: " + S.hero.trim()); }
+    if((S.antagonist||"").trim()){ L.push(EN ? "- Antagonist: " + S.antagonist.trim() : "- Ανταγωνιστής: " + S.antagonist.trim()); }
+    if((S.world||"").trim()){ L.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim()); }
+    if(S.themes.length){ L.push(EN ? "- Themes: " + themeLabels().join(", ") : "- Θέματα: " + themeLabels().join(", ")); }
+    if((S.mustInclude||"").trim()){ L.push(EN ? "- Must include: " + S.mustInclude.trim() : "- Να υπάρχει οπωσδήποτε: " + S.mustInclude.trim()); }
+    if((S.mustAvoid||"").trim()){ L.push(EN ? "- Must never do: " + S.mustAvoid.trim() : "- Πότε να μην κάνει: " + S.mustAvoid.trim()); }
+    if((S.glossary||"").trim()){ L.push(EN ? "- Glossary (fixed spellings): " + S.glossary.trim() : "- Γλωσσάρι (σταθερές ορθογραφίες): " + S.glossary.trim()); }
+    if((S.bible||"").trim()){ L.push(EN ? "- Story bible (locked): " + S.bible.trim() : "- Story bible (κλειδωμένο): " + S.bible.trim()); }
+    return L;
+  }
+  function buildStagePack(){
+    var EN = S.lang === "en";
+    var f = FORMATS[S.format];
+    var wpc = wpcFor();
+    var L = [];
+    L.push("# " + titleOrFallback() + " — " + (EN?"Stage Pack":"Πακέτο Σκαλιών"));
+    L.push("");
+    L.push(EN ? "_A self-contained set of five stage prompts. Paste each stage, in order, into your AI. Each stage embeds the canon facts so it is self-contained — you do not need to re-paste earlier stages._"
+             : "_Ένα αυτοτελές σετ πέντε prompt-σκαλιών. Επικολλήστε κάθε σκαλί, με τη σειρά, στο ΑΙ σας. Κάθε σκαλί περιέχει τα κανονικά (canon) στοιχεία ώστε να είναι αυτοτελές — δεν χρειάζεται να ξαναεπικολλήσετε προηγούμενα σκαλιά._");
+    L.push("");
+    L.push("---");
+    L.push(EN ? "## STAGE 1 — IGNIS · The commission" : "## ΣΚΑΛΙ 1 — IGNIS · Η παραγγελία");
+    L.push("");
+    L.push(EN ? "You are an accomplished literary author and ghostwriter. You are commissioned to write **" + f.labelEn + "** titled **" + titleOrFallback() + "** (~" + Number(S.words).toLocaleString("en-US") + " words). Lock the commission before any prose is written."
+             : "Είσαι καταξιωμένος λογοτέχνης και ghostwriter. Σου ανατίθεται η συγγραφή **" + f.label + "** με τίτλο **" + titleOrFallback() + "** (~" + Number(S.words).toLocaleString("el-GR") + " λέξεις). Κλείδωσε την παραγγελία πριν γραφτεί πρόζα.");
+    L.push("");
+    L = L.concat(stageCanon(EN));
+    L.push("");
+    L.push(EN ? "**YOUR TASK THIS STAGE:** Lock the commission. Sharpen the premise, the dramatic question, the protagonist (want / need / wound / the lie they believe), the antagonist, the world, and the constraints. Do NOT write prose. Output a LOCKED COMMISSION (200–400 words) that every later stage will treat as canon."
+             : "**ΤΟ ΕΡΓΑΖΟΜΕΝΟ ΤΟΥ ΣΚΑΛΙΟΥ:** Κλείδωσε την παραγγελία. Οξύνε την υπόθεση, τη δραματική ερώτηση, τον πρωταγωνιστή (επιθυμία / ανάγκη / πληγή / η ψευδής πίστη), τον ανταγωνιστή, τον κόσμο και τους περιορισμούς. ΜΗΝ γράψεις πρόζα. Παραδώσε μια ΚΛΕΙΔΩΜΕΝΗ ΠΑΡΑΓΓΕΛΙΑ (200–400 λέξεις) που κάθε επόμενο σκαλί θα θεωρήσει canon.");
+    L.push("");
+    L.push("---");
+    L.push(EN ? "## STAGE 2 — LUX · The world" : "## ΣΚΑΛΙ 2 — LUX · Ο κόσμος");
+    L.push("");
+    L.push(EN ? "You are the worldbuilder for this book. Expand the world from the commission below." : "Είσαι ο κοσμοπλάστης για αυτό το βιβλίο. Επέκτεινε τον κόσμο από την παραγγελία παρακάτω.");
+    L.push("");
+    L = L.concat(stageCanon(EN));
+    L.push("");
+    L.push(EN ? "**YOUR TASK THIS STAGE:** Build the WORLD BIBLE. Expand: geography and scale, the rules/laws that hold (and the one historical wound still open), costs and prices, the institutions that enforce the rules, the one thing that must NEVER be explained. Do NOT write prose. Output a WORLD BIBLE (300–600 words)."
+             : "**ΤΟ ΕΡΓΑΖΟΜΕΝΟ ΤΟΥ ΣΚΑΛΙΟΥ:** Φτιάξε το ΚΟΣΜΟΒΙΒΛΙΟ. Επέκτεινε: γεωγραφία και κλίμακα, τους κανόνες/νόμους που ισχύουν (και τη μία ιστορική πληγή που δεν έχει κλείσει), το τίμημα και τις τιμές, τους θεσμούς που επιβάλλουν τους κανόνες, το ένα πράγμα που δεν πρέπει ΠΟΤΕ να εξηγηθεί. ΜΗΝ γράψεις πρόζα. Παραδώσε ένα ΚΟΣΜΟΒΙΒΛΙΟ (300–600 λέξεις).");
+    L.push("");
+    L.push("---");
+    L.push(EN ? "## STAGE 3 — ANIMA · The souls" : "## ΣΚΑΛΙ 3 — ANIMA · Οι ψυχές");
+    L.push("");
+    L.push(EN ? "You are the character designer for this book. Build the souls from the commission below." : "Είσαι ο σχεδιαστής χαρακτήρων για αυτό το βιβλίο. Φτιάξε τις ψυχές από την παραγγελία παρακάτω.");
+    L.push("");
+    L = L.concat(stageCanon(EN));
+    L.push("");
+    L.push(EN ? "**YOUR TASK THIS STAGE:** Build the CHARACTER BIBLE. For the protagonist and the antagonist, and 3–5 supporting souls, each with: want (external), need (internal), wound, the lie they believe, voice, and one secret. Do NOT write prose. Output a CHARACTER BIBLE (400–700 words)."
+             : "**ΤΟ ΕΡΓΑΖΟΜΕΝΟ ΤΟΥ ΣΚΑΛΙΟΥ:** Φτιάξε το ΚΑΡΤΕΛΑ ΧΑΡΑΚΤΗΡΩΝ. Για τον πρωταγωνιστή και τον ανταγωνιστή, και 3–5 δευτερεύουσες ψυχές, η καθεμία με: επιθυμία (εξωτερική), ανάγκη (εσωτερική), πληγή, τη ψευδή πίστη, τη φωνή, και ένα μυστικό. ΜΗΝ γράψεις πρόζα. Παραδώσε ένα ΚΑΡΤΕΛΑ ΧΑΡΑΚΤΗΡΩΝ (400–700 λέξεις).");
+    L.push("");
+    L.push("---");
+    L.push(EN ? "## STAGE 4 — VOCES · The voice" : "## ΣΚΑΛΙ 4 — VOCES · Η φωνή");
+    L.push("");
+    L.push(EN ? "You are the voice director for this book. Lock the voice from the commission below." : "Είσαι ο διευθυντής φωνής για αυτό το βιβλίο. Κλείδωσε τη φωνή από την παραγγελία παρακάτω.");
+    if((S.voiceSample||"").trim()){
+      L.push("");
+      L.push(EN ? "The author's voice sample (the target voice — match its rhythm, diction, sentence rhythm, and one verbal tic):"
+               : "Το δείγμα φωνής του συγγραφέα (η φωνή-στόχος — ταιριάξε τον ρυθμό, το λεξιλόγιο, τον ρυθμό πρότασης, και το ένα λεκτικό tic):");
+      L.push("> " + S.voiceSample.trim());
+      L.push("");
+    }
+    L.push("");
+    L = L.concat(stageCanon(EN));
+    L.push("");
+    L.push(EN ? "**YOUR TASK THIS STAGE:** Lock the VOICE. For each main character, 3–4 lines of PURE dialogue (no tags, no narration). Then lock the narrative voice: register, sentence rhythm, the one verbal tic. If the author's voice sample is above, the narrative voice must match it. Do NOT write a chapter. Output the VOICE LOCK (200–400 words)."
+             : "**ΤΟ ΕΡΓΑΖΟΜΕΝΟ ΤΟΥ ΣΚΑΛΙΟΥ:** Κλείδωσε τη ΦΩΝΗ. Για κάθε κεντρικό χαρακτήρα, 3–4 γραμμές ΚΑΘΑΡΟΥ διαλόγου (χωρίς tags, χωρίς αφήγηση). Μετά κλείδωσε τη φωνή της αφήγησης: ύφος, ρυθμός πρότασης, το ένα λεκτικό tic. Αν το δείγμα φωνής του συγγραφέα είναι παραπάνω, η φωνή της αφήγησης πρέπει να το ταιριάζει. ΜΗΝ γράψεις κεφάλαιο. Παραδώσε το ΚΛΕΙΔΩΜΑ ΦΩΝΗΣ (200–400 λέξεις).");
+    L.push("");
+    L.push("---");
+    L.push(EN ? "## STAGE 5 — PRIMA · Chapter 1" : "## ΣΚΑΛΙ 5 — PRIMA · Κεφάλαιο 1");
+    L.push("");
+    L.push(EN ? "You are the author. Write Chapter 1 from the commission below, the world bible, the character bible, and the voice lock." : "Είσαι ο συγγραφέας. Γράψε το Κεφάλαιο 1 από την παραγγελία παρακάτω, το κοσμοβιβλίο, το καρτέλα χαρακτήρων, και το κλείδωμα φωνής.");
+    L.push("");
+    L = L.concat(stageCanon(EN));
+    L.push("");
+    L.push(EN ? "**YOUR TASK THIS STAGE:** Write Chapter 1 — ~" + wpc + " words, " + tenseLabel(S.tense) + ", " + (S.pov ? POVS[S.pov].en : "") + ", " + (S.tone ? toneLabel(S.tone) : "") + ". Follow the commission, the world bible, the character bible, and the voice lock. Apply the caveman protocol to your comments; deliver ONLY the chapter prose."
+             : "**ΤΟ ΕΡΓΑΖΟΜΕΝΟ ΤΟΥ ΣΚΑΛΙΟΥ:** Γράψε το Κεφάλαιο 1 — ~" + wpc + " λέξεις, " + tenseLabel(S.tense) + ", " + (S.pov ? POVS[S.pov].el : "") + ", " + (S.tone ? toneLabel(S.tone) : "") + ". Ακολούθησε την παραγγελία, το κοσμοβιβλίο, το καρτέλα χαρακτήρων, και το κλείδωμα φωνής. Εφάρμοσε το σπηλαιώδες πρωτόκολλο στα σχόλιά σου· παράδωσε ΜΟΝΟ την πρόζα του κεφαλαίου.");
+    L.push("");
+    return L.join("\n");
+  }
+  function stagePackFname(){
+    var base = ((S.title||"").trim() || "book").replace(/[^\w\u0370-\u03FF]+/g,"-").replace(/^-+|-+$/g,"");
+    return base + "-stage-pack.md";
+  }
+  function exportStagePack(){
+    var EN = S.lang === "en";
+    var txt = buildStagePack();
+    downloadBlob(txt, stagePackFname(), "text/markdown;charset=utf-8");
+    toast(EN ? "Stage pack exported 📦" : "Εξήχθη το πακέτο σκαλιών 📦");
+  }
+  /* ============================================================
+     COMMISSION STRENGTH — a craft rubric, not a field count.
+     Scores the commission against craft beats and shows the
+     top gaps as clickable diagnostics that focus the field.
+     ============================================================ */
+  function renderStrength(){
+    var box = $("strengthBox");
+    if(!box || !box.style){ return; }
+    var EN = S.lang === "en";
+    var has = function(v){ return !!(v||"").trim(); };
+    var score = 0;
+    var diag = []; // [fieldId, ptsLost, msg]
+    if(has(S.title)){ score += 8; } else { diag.push(["inTitle", 8, EN?"no working title yet":"δεν υπάρχει ακόμα τίτλος"]); }
+    var pl = (S.premise||"").trim().length;
+    if(pl >= 60){ score += 20; }
+    else if(pl >= 20){ score += 10; diag.push(["inPremise", 10, EN?"premise is thin — who wants what, what stops them, what it costs":"η υπόθεση είναι αδύναμη — ποιος τι θέλει, τι τον εμποδίζει, τι κοστίζει"]); }
+    else if(pl > 0){ diag.push(["inPremise", 20, EN?"premise is a fragment — one breath: person, contradiction, stakes":"η υπόθεση είναι θραύσμα — μία ανάσα: πρόσωπο, αντίθεση, διακυβέματα"]); }
+    else { diag.push(["inPremise", 20, EN?"no premise yet":"δεν υπάρχει υπόθεση"]); }
+    if(has(S.hero)){ score += 10; } else { diag.push(["inHero", 10, EN?"no protagonist":"δεν υπάρχει πρωταγωνιστής"]); }
+    if(has(S.antagonist)){ score += 10; } else { diag.push(["inAntagonist", 10, EN?"no antagonist / opposing force":"δεν υπάρχει αντίπαλος / αντίδραση"]); }
+    if(has(S.dramQ)){ score += 8; } else { diag.push(["inDramQ", 8, EN?"add the dramatic question — the book's engine in one line":"προσθέστε τη δραματική ερώτηση — ο κινητήρας του βιβλίου σε μία γραμμή"]); }
+    var wl = (S.world||"").trim().length;
+    if(wl >= 40){ score += 10; }
+    else if(wl > 0){ score += 5; diag.push(["inWorld", 5, EN?"world is thin — laws, costs, the one open wound":"ο κόσμος είναι αδύναμος — νόμοι, τίμημα, η μία ανοιχτή πληγή"]); }
+    else { diag.push(["inWorld", 10, EN?"no world / setting":"δεν υπάρχει κόσμος / σκηνικό"]); }
+    var depth = (has(S.charNeed)?1:0) + (has(S.charWound)?1:0) + (has(S.charLie)?1:0);
+    if(depth >= 2){ score += 8; }
+    else if(depth === 1){ score += 4; diag.push(["inCharNeed", 4, EN?"character depth — add the need & the lie they believe":"βάθος χαρακτήρα — προσθέστε την ανάγκη & τη ψευδή πίστη"]); }
+    else { diag.push(["inCharNeed", 8, EN?"character depth — want alone isn't a character: add need, wound, the lie":"βάθος χαρακτήρα — η επιθυμία μόνη δεν κάνει χαρακτήρα: προσθέστε ανάγκη, πληγή, τη ψευδή πίστη"]); }
+    if(S.authors.length || S.myStyle || has(S.voiceSample)){ score += 8; }
+    else { diag.push(["inVoiceSample", 8, EN?"no voice anchor — pick a master, your profile, or paste a sample":"δεν υπάρχει αγκύρωση φωνής — επιλέξτε δάσκαλο, το προφίλ σας, ή επικολλήστε δείγμα"]); }
+    var mi = has(S.mustInclude)?4:0, ma = has(S.mustAvoid)?4:0;
+    score += mi + ma;
+    if(!mi){ diag.push(["inMustInclude", 4, EN?"no “must include” — anchor at least one concrete image":"δεν υπάρχει «να υπάρχει οπωσδήποτε» — αγκυρώστε τουλάχιστον μία εικόνα"]); }
+    if(!ma){ diag.push(["inMustAvoid", 4, EN?"no “must never do” — name the trap, the ban":"δεν υπάρχει «ποτέ να μην κάνει» — ονομάστε τη παγίδα, την απαγόρευση"]); }
+    var comp = has(S.comps)?2:0;
+    score += comp;
+    if(!comp){ diag.push(["inComps", 2, EN?"no comparable titles — name 1–2 works to calibrate craft (spirit, not imitation)":"δεν υπάρχουν παρόμοια έργα — ονομάστε 1–2 για τη ρύθμιση της τεχνοτροπίας (πνεύμα, οχι απομίμηση)"]); }
+    if(has(S.glossary)){ score += 8; } else { diag.push(["inGlossary", 8, EN?"no glossary — fixed spellings protect names across chapters":"δεν υπάρχει γλωσσάρι — οι σταθερές ορθογραφίες προστατεύουν τα ονόματα"]); }
+    var tier;
+    if(score >= 90){ tier = EN?"Commission-grade":"Επίπεδο παραγγελίας"; }
+    else if(score >= 70){ tier = EN?"Strong":"Ισχυρή"; }
+    else if(score >= 40){ tier = EN?"Working":"Εργαζόμενη"; }
+    else { tier = EN?"Thin":"Αδύναμη"; }
+    var bar = $("strengthBar"); if(bar){ bar.style.width = score + "%"; }
+    var lbl = $("strengthLbl"); if(lbl){ lbl.textContent = score + "% · " + tier; }
+    var diagEl = $("strengthDiag");
+    if(diagEl){
+      if(score >= 100){
+        diagEl.innerHTML = '<span class="strength-diag ok">✓ ' + (EN?"Commission-grade — every craft field is set.":"Επίπεδο παραγγελίας — κάθε τεχνικό πεδίο είναι ορισμένο.") + "</span>";
+      } else if(diag.length){
+        diag.sort(function(a,b){ return b[1]-a[1]; });
+        var top = diag.slice(0,3);
+        var html = "";
+        top.forEach(function(d){
+          html += '<button type="button" class="strength-diag" data-focus="' + d[0] + '">◆ ' + d[2] + ' <span class="pts">(+'+d[1]+')</span></button>';
+        });
+        diagEl.innerHTML = html;
+        var btns = diagEl.querySelectorAll ? diagEl.querySelectorAll("button") : [];
+        Array.prototype.forEach.call(btns, function(b){
+          b.addEventListener("click", function(){
+            var t = $(b.getAttribute("data-focus"));
+            if(t && t.focus){ try{ t.focus(); t.scrollIntoView({behavior:"smooth", block:"center"}); }catch(e){} }
+          });
+        });
+      } else {
+        diagEl.innerHTML = "";
+      }
+    }
+  }
+
   function render(){
     $("promptOut").value = buildPrompt();
     var words = $("promptOut").value.trim().split(/\s+/).length;
@@ -4613,6 +5535,8 @@
       : "~"+words.toLocaleString(loc)+" λέξεις · ~"+tokens.toLocaleString(loc)+" tokens (εκτίμ.)");
     var fresh = !(S.title||"").trim() && !(S.premise||"").trim() && !(S.hero||"").trim();
     $("noteArea").style.display = fresh ? "block" : "none";
+    renderStrength();
+    renderCharSug();
   }
 
   function toast(msg){
@@ -4998,22 +5922,22 @@
   function sparkNamingRule(EN, profileId){
     if(!profileId){
       return EN
-        ? "The genre decides the naming: if you choose a fantasy genre (fantasy / darkfantasy / mythic / fairytale) → EVERY name must be invented, original and internally consistent, as if from the world's own language — NEVER real-world names (no Athens, no real Greek villages or streets, no everyday Greek first names like Δημήτρης, Ελένη, Αντώνης…). If you choose a realistic Greek genre (horror, noir, mystery, literary, social, historical, gothic, thriller, magreal) → common everyday Greek names and real Greek places (Athens, a small town, an island, a specific village), the world of the blog «My little stories». If you choose sci-fi / post-apocalyptic / dystopian / cosmic horror → everyday and invented names may mix; places may be real, ruined or far-future. Whatever the genre, keep all names internally consistent."
-        : "Το είδος καθορίζει την ονομασία: αν διαλέξεις είδος φαντασίας (fantasy / darkfantasy / mythic / fairytale) → ΚΑΘΕ όνομα πρέπει να είναι εφευρημένο, πρωτότυπο και εσωτερικά συνεπές, σαν να προέρχεται από τη γλώσσα του ίδιου του κόσμου — ΠΟΤΕ αληθινοί όροι (χωρίς Αθήνα, χωρίς αληθινά ελληνικά χωριά ή δρόμους, χωρίς καθημερινά ονόματα όπως Δημήτρης, Ελένη, Αντώνης…). Αν διαλέξεις ρεαλιστικό ελληνικό είδος (horror, noir, mystery, literary, social, historical, gothic, thriller, magreal) → κοινά καθημερινά ελληνικά ονόματα και αληθινοί ελληνικοί τόποι (Αθήνα, κωμόπολη, νησί, συγκεκριμένο χωριό), ο κόσμος του blog «My little stories». Αν διαλέξεις sci-fi / post-apocalyptic / dystopian / cosmic horror → καθημερινά και εφευρημένα ονόματα μπορούν να αναμειχθούν· οι τόποι μπορούν να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Όποιο κι αν είναι το είδος, κράτα όλα τα ονόματα εσωτερικά συνεπή.";
+        ? CLAUSE_EN + "The genre decides the naming: if you choose a fantasy genre (fantasy / darkfantasy / mythic / fairytale) → EVERY name must be invented, original and internally consistent, as if from the world's own language — NEVER real-world names (no Athens, no real Greek villages or streets, no everyday Greek first names like Δημήτρης, Ελένη, Αντώνης…). If you choose a realistic Greek genre (horror, noir, mystery, literary, social, historical, gothic, thriller, magreal) → common everyday Greek names and real Greek places (Athens, a small town, an island, a specific village), the world of the blog «My little stories». If you choose sci-fi / post-apocalyptic / dystopian / cosmic horror → everyday and invented names may mix; places may be real, ruined or far-future. Whatever the genre, keep all names internally consistent."
+        : CLAUSE_EL + "Το είδος καθορίζει την ονομασία: αν διαλέξεις είδος φαντασίας (fantasy / darkfantasy / mythic / fairytale) → ΚΑΘΕ όνομα πρέπει να είναι εφευρημένο, πρωτότυπο και εσωτερικά συνεπές, σαν να προέρχεται από τη γλώσσα του ίδιου του κόσμου — ΠΟΤΕ αληθινοί όροι (χωρίς Αθήνα, χωρίς αληθινά ελληνικά χωριά ή δρόμους, χωρίς καθημερινά ονόματα όπως Δημήτρης, Ελένη, Αντώνης…). Αν διαλέξεις ρεαλιστικό ελληνικό είδος (horror, noir, mystery, literary, social, historical, gothic, thriller, magreal) → κοινά καθημερινά ελληνικά ονόματα και αληθινοί ελληνικοί τόποι (Αθήνα, κωμόπολη, νησί, συγκεκριμένο χωριό), ο κόσμος του blog «My little stories». Αν διαλέξεις sci-fi / post-apocalyptic / dystopian / cosmic horror → καθημερινά και εφευρημένα ονόματα μπορούν να αναμειχθούν· οι τόποι μπορούν να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Όποιο κι αν είναι το είδος, κράτα όλα τα ονόματα εσωτερικά συνεπή.";
     }
     if(profileId === "fantasy"){
       return EN
-        ? "This is a FANTASY world: EVERY name — people, places, objects, houses, clans — must be INVENTED, original and internally consistent, as if spoken in the world's own language. NEVER real-world names: no Athens, no real Greek villages, streets or islands, no everyday Greek first names (Δημήτρης, Ελένη, Αντώνης…), no real countries or cities."
-        : "Αυτός είναι ένας ΚΟΣΜΟΣ ΦΑΝΤΑΣΙΑΣ: ΚΑΘΕ όνομα — άνθρωποι, τόποι, αντικείμενα, σπίτια, φυλές — πρέπει να είναι ΕΦΕΥΡΗΜΕΝΟ, πρωτότυπο και εσωτερικά συνεπές, σαν να λέγεται στη γλώσσα του ίδιου του κόσμου. ΠΟΤΕ αληθινοί όροι: χωρίς Αθήνα, χωρίς αληθινά ελληνικά χωριά, δρόμους ή νησιά, χωρίς καθημερινά ελληνικά ονόματα (Δημήτρης, Ελένη, Αντώνης…), χωρίς αληθινές χώρες ή πόλεις.";
+        ? CLAUSE_EN + "This is a FANTASY world: EVERY name — people, places, objects, houses, clans — must be INVENTED, original and internally consistent, as if spoken in the world's own language. NEVER real-world names: no Athens, no real Greek villages, streets or islands, no everyday Greek first names (Δημήτρης, Ελένη, Αντώνης…), no real countries or cities."
+        : CLAUSE_EL + "Αυτός είναι ένας ΚΟΣΜΟΣ ΦΑΝΤΑΣΙΑΣ: ΚΑΘΕ όνομα — άνθρωποι, τόποι, αντικείμενα, σπίτια, φυλές — πρέπει να είναι ΕΦΕΥΡΗΜΕΝΟ, πρωτότυπο και εσωτερικά συνεπές, σαν να λέγεται στη γλώσσα του ίδιου του κόσμου. ΠΟΤΕ αληθινοί όροι: χωρίς Αθήνα, χωρίς αληθινά ελληνικά χωριά, δρόμους ή νησιά, χωρίς καθημερινά ελληνικά ονόματα (Δημήτρης, Ελένη, Αντώνης…), χωρίς αληθινές χώρες ή πόλεις.";
     }
     if(profileId === "greek"){
       return EN
-        ? "This is the REAL, everyday world of Greece: character names must be common, everyday Greek names, and places must be real Greek places (Athens, a small town, an island, a specific village). The world must feel like the actual Greece of the blog «My little stories» — no invented fantasy names."
-        : "Αυτός είναι ο ΠΡΑΓΜΑΤΙΚΟΣ, καθημερινός κόσμος της Ελλάδας: τα ονόματα των χαρακτήρων πρέπει να είναι κοινά, καθημερινά ελληνικά ονόματα, και οι τόποι αληθινοί ελληνικοί (Αθήνα, κωμόπολη, νησί, συγκεκριμένο χωριό). Ο κόσμος πρέπει να μυρίζει την πραγματική Ελλάδα του blog «My little stories» — χωρίς εφευρημένα ονόματα φαντασίας.";
+        ? CLAUSE_EN + "This is the REAL, everyday world of Greece: character names must be common, everyday Greek names, and places must be real Greek places (Athens, a small town, an island, a specific village). The world must feel like the actual Greece of the blog «My little stories» — no invented fantasy names."
+        : CLAUSE_EL + "Αυτός είναι ο ΠΡΑΓΜΑΤΙΚΟΣ, καθημερινός κόσμος της Ελλάδας: τα ονόματα των χαρακτήρων πρέπει να είναι κοινά, καθημερινά ελληνικά ονόματα, και οι τόποι αληθινοί ελληνικοί (Αθήνα, κωμόπολη, νησί, συγκεκριμένο χωριό). Ο κόσμος πρέπει να μυρίζει την πραγματική Ελλάδα του blog «My little stories» — χωρίς εφευρημένα ονόματα φαντασίας.";
     }
     return EN
-      ? "Far-future / broken-world setting: names may mix everyday and invented; places may be real, ruined or far-future. Whatever you invent, keep it internally consistent."
-      : "Κόσμος στο μακρινό μέλλον / σπασμένος κόσμος: τα ονόματα μπορούν να αναμείξουν καθημερινά με εφευρημένα· οι τόποι μπορεί να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Ό,τι εφεύρεις, κράτα το εσωτερικά συνεπές.";
+      ? CLAUSE_EN + "Far-future / broken-world setting: names may mix everyday and invented; places may be real, ruined or far-future. Whatever you invent, keep it internally consistent."
+      : CLAUSE_EL + "Κόσμος στο μακρινό μέλλον / σπασμένος κόσμος: τα ονόματα μπορούν να αναμείξουν καθημερινά με εφευρημένα· οι τόποι μπορεί να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Ό,τι εφεύρεις, κράτα το εσωτερικά συνεπές.";
   }
   /* ============================================================
      SPARK v3 — segment sparks: the same technique for every
@@ -5031,6 +5955,7 @@
     if(S.premise && S.premise.trim()) L.push(EN ? "- Premise (stay consistent with it): " + S.premise.trim()
                                                  : "- Υπόθεση (βάλε σε συνέπεια μαζί της): " + S.premise.trim());
     if(S.world && S.world.trim()) L.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim());
+    if(S.hero && S.hero.trim()) L.push(EN ? "- Protagonist (already fixed — keep the naming register consistent with it): " + S.hero.trim() : "- Πρωταγωνιστής (ήδη σταθερός — κράτα συνεπή την ονομασία μαζί του): " + S.hero.trim());
     var masters = (S.authors && S.authors.length) ? S.authors : [];
     if(masters.length){
       var list = masters.map(function(k){ return AUTHORS[k] ? ((EN?AUTHORS[k].nameEn:AUTHORS[k].name) + (EN?" (\u201c":" («") + (EN?AUTHORS[k].tagEn:AUTHORS[k].tag) + (EN?"\u201d)":"»")) : k; }).join("; ");
@@ -5093,7 +6018,7 @@
     genuinenessBlock(EN, sugPoolText(sugPool("Stories"))).forEach(function(l){ P.push(l); });
     P.push("");
     P.push(EN ? "## THE JOB" : "## Η ΕΡΓΑΣΙΑ");
-    P.push(EN ? "Generate 3 NEW story loglines (2\u20134 sentences each)." : "Φτιάξε 3 ΝΕΕΣ υποθέσεις (λόγκλάιν), 2\u20134 προτάσεις η καθεμία.");
+    P.push(EN ? "Generate 3 NEW story loglines (2\u20134 sentences each)." : "Φτιάξε 3 ΝΕΕΣ υποθέσεις (λογκλάιν), 2\u20134 προτάσεις η καθεμία.");
     P.push(EN ? "- People first: a concrete person with a flaw that is a door — never \u201ca certain someone\u201d."
              : "- Ο άνθρωπος πρώτα: ένα συγκεκριμένο πρόσωπο με μια αδυναμία που είναι πόρτα — ποτέ «κάποιος».");
     P.push(EN ? "- The mundane as threshold: the wrong thing enters through the everyday (the bus, the ticket, the lemonade, the machine that keeps running)."
@@ -5118,6 +6043,7 @@
     sparkContextLines(EN).forEach(function(l){ P.push(l); });
     P.push("");
     P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(EN ? DEFAULT_EN : DEFAULT_EL);
     P.push(sparkNamingRule(EN, profileId));
     P.push(EN ? "- Every name must carry class and a history, as if it had a family before the first page."
              : "- Κάθε όνομα πρέπει να κουβαλά τάξη και ιστορία, σαν να είχε οικογένεια πριν από τη πρώτη σελίδα.");
@@ -5159,8 +6085,8 @@
     P.push(EN ? "# SPARK — ONE fresh story idea (not from any list)" : "# ΣΠΙΡΤΟ — ΜΙΑ φρέσκια ιδέα ιστορίας (όχι από καμία λίστα)");
     P.push("");
     P.push(EN
-      ? "You are a creative co-conspirator for a new book. Generate ONE original story spark for:"
-      : "Είσαι συνεκνοστής για ένα νέο βιβλίο. Δημιούργησε ΜΙΑ πρωτότυπη σπίθα ιδέας για:");
+      ? "You are a creative collaborator for a new book. Generate ONE original story spark for:"
+      : "Είσαι δημιουργικός συνεργάτης για ένα νέο βιβλίο. Δημιούργησε ΜΙΑ πρωτότυπη σπίθα ιδέας για:");
     P.push(EN ? "- Format: **" + f.labelEn + "** (~" + Number(S.words).toLocaleString(loc) + " words)"
              : "- Μορφή: **" + f.label + "** (~" + Number(S.words).toLocaleString(loc) + " λέξεις)");
     P.push(EN ? "- Genre: **" + genreLine + "**" : "- Είδος: **" + genreLine + "**");
@@ -5192,6 +6118,7 @@
       : "- Αν υπάρχει ένα πράγμα/οντότητα: δεν ξέρει — ΘΥΜΑΤΑΙ. Και δεν καταστρέφεται ποτέ.");
     P.push("");
     P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(EN ? DEFAULT_EN : DEFAULT_EL);
     P.push(sparkNamingRule(EN, profileId));
     P.push(EN
       ? "- The GLOSSARY must list 4–8 exact spellings (people + places + key objects) so the whole book stays consistent."
@@ -5228,7 +6155,7 @@
                   stories: S.lang==="en" ? "Stories spark prompt ready" : "Το prompt σπίρτου ιστοριών έτοιμο",
                   chars: S.lang==="en" ? "Characters spark prompt ready" : "Το prompt σπίρτου χαρακτήρων έτοιμο" };
     toast(names[S.sparkTarget] + (S.lang==="en" ? " — send it to your AI, paste the answer back, then «⤵ Load» ✨"
-                                               : " — στείλτέ το στο ΑΙ σας, επικολλήστε την απάντηση, μετά «⤵ Load» ✨"));
+                                               : " — στείλτε το στο ΑΙ σας, επικολλήστε την απάντηση, μετά «⤵ Load» ✨"));
   }
   /* generic labeled-answer parser (EN+EL labels; block labels collect lines until the next label) */
   function parseLabeled(txt, pairs, blockIdx){
@@ -5293,12 +6220,14 @@
       ? "Invent the named cast and the named places of the book. People first, the world second — the names must smell of the world, not of a dictionary."
       : "Επινόησε το ονομασμένο καστ και τους ονομασμένους τόπους του βιβλίου. Ο άνθρωπος πρώτα, ο κόσμος δεύτερα — τα ονόματα πρέπει να μυρίζουν τον κόσμο, όχι το λεξικό.");
     P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
-    P.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose a fitting world and state it)") + "." : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ένα ταιριαστό κόσμο και δήλωσέ το)") + ".");
+    P.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose a fitting world and state it)") + "." : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ένα ταιριαστό κόσμο και δήλωσε το)") + ".");
     if(S.premise && S.premise.trim()){ P.push(EN ? "- Premise: " + S.premise.trim() : "- Υπόθεση: " + S.premise.trim()); }
     if(S.world && S.world.trim()){ P.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim()); }
     if(S.hero && S.hero.trim()){ P.push(EN ? "- Protagonist (already set — stay consistent with it): " + S.hero.trim() : "- Πρωταγωνιστής (ήδη σταθερός — βάλε σε συνέπεια μαζί του): " + S.hero.trim()); }
+    namingCanonBlock(EN).forEach(function(l){ P.push(l); });
     P.push("");
     P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(EN ? DEFAULT_EN : DEFAULT_EL);
     P.push(sparkNamingRule(EN, profileId));
     P.push(EN
       ? "- Every name carries language and history: same world, same register, same era — the reader must hear them and feel the world."
@@ -5340,23 +6269,43 @@
   }
   function genNames(){
     var out = $("blogOut"); if(out){ out.textContent = buildNamesPrompt(); }
-    toast(S.lang==="en" ? "Names & places prompt ready — send it to your AI, paste the answer back 🏷" : "Το prompt ονομάτων & τόπων είναι έτοιμο — στείλτέ το στο ΑΙ, επικολλήστε την απάντηση 🏷");
+    toast(S.lang==="en" ? "Names & places prompt ready — send it to your AI, paste the answer back 🏷" : "Το prompt ονομάτων & τόπων είναι έτοιμο — στείλτε το στο ΑΙ, επικολλήστε την απάντηση 🏷");
   }
   function genNamesLocal(){
     var EN = S.lang === "en";
     var pv = function(p){ return EN ? p[1] : p[0]; };
-    var np = namedPick(S.genre); // offline fallback: follows the selected genre
-    var person = (EN ? np.last[1] + ", " + np.first[1] : np.first[0] + " " + np.last[0]);
+    var reg = registerFromUser(); // anchor: the names the author dictated beat the genre default
+    var genreProf = namingProfileFor(S.genre);
+    var personProf = (reg==="western" ? "other" : reg==="invented" ? "fantasy" : reg==="greek" ? "greek" : "")
+                     || genreProf || ["fantasy","other","greek"][Math.floor(Math.random()*3)];
+    var placeProf = genreProf || personProf;
+    var P = NAMEDATA[personProf];
+    if(personProf === "other" && !P.first){ P.first = NAME_POOLS.firstW.concat(NAME_POOLS.inventF); P.last = NAME_POOLS.lastW.concat(NAME_POOLS.inventL); }
+    if(personProf === "greek" && !P.first){ P.first = NAME_POOLS.firstG; P.last = NAME_POOLS.lastG; }
+    var ri = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
+    var person = (EN ? ri(P.last)[1] + ", " + ri(P.first)[1] : ri(P.first)[0] + " " + ri(P.last)[0]);
+    var reason = reg
+      ? (EN ? " — matching your dictated names: «" + heroNamePart() + "»" : " — " + REASON_EL_ANCHOR + heroNamePart() + "»")
+      : (S.genre ? (EN ? " — because genre is " : " — επειδή είδος είναι ") + genreLabel(S.genre)
+                 : (EN ? " (no genre set — rolled freely)" : " (χωρίς είδος — ελεύθερο ρολόι)"));
+    var plan = planPlaces();
+    var placeVal, placeLabel;
+    if(plan.length){
+      placeVal = ri(plan);
+      placeLabel = EN ? "PLACE (canon — from your plan): " : PLACE_CANON_EL;
+    } else {
+      placeVal = pv(ri(NAMEDATA[placeProf].places));
+      placeLabel = EN ? "PLACE: " : "ΤΟΠΟΣ: ";
+    }
     var lines = [
-      (EN ? "🏷 LOCAL ROLL (offline): " : "🏷 ΤΟΠΙΚΟ ΡΟΛΟΙ (offline): ") + pv(NAMEDATA[np.profile].label)
-        + (S.genre ? (EN ? " — because genre is " : " — επειδή είδος είναι ") + genreLabel(S.genre)
-                   : (EN ? " (no genre set — rolled freely)" : " (χωρίς είδος — ελεύθερο ρολόι)")),
+      (EN ? "🏷 LOCAL ROLL (offline): " : "🏷 ΤΟΠΙΚΟ ΡΟΛΟΙ (offline): ") + pv(NAMEDATA[personProf].label) + reason,
       (EN ? "👤 PERSON: " : "👤 Πρόσωπο: ") + person,
-      (EN ? "🏞 PLACE: " : "🏞 Τόπος: ") + pv(np.place),
-      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + pv(np.obj)
+      "🏞 " + placeLabel + placeVal,
+      (EN ? "🔮 OBJECT: " : "🔮 Αντικείμενο: ") + pv(ri(P.objects))
     ];
     var out = $("blogOut"); if(out){ out.textContent = lines.join("\n"); }
-    toast(EN ? "Local roll — the offline fallback (no AI needed)" : "Τοπικό ρολόι — η offline εναλλακτική (χωρίς ΑΙ)");
+    toast(EN ? "Local roll — the offline fallback (follows your dictated names & places, then the genre)"
+             : "Τοπικό ρολόι — η offline εναλλακτική (ακολουθεί τα ορισμένα σας ονόματα & τόπους, μετά το είδος)");
   }
   function loadNames(){
     var EN = S.lang === "en";
@@ -5405,14 +6354,16 @@
       ? "Build the protagonist and the antagonist the way the author builds people: a human first — a flaw that is a door, an everyday life the reader can smell."
       : "Φτιάξε τον πρωταγωνιστή και τον ανταγωνιστή όπως ο συγγραφέας φτιάχνει ανθρώπους: άνθρωπος πρώτα — μια αδυναμία που είναι πόρτα, μια καθημερινή ζωή που μυρίζεται ο αναγνώστης.");
     P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
-    P.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose a fitting world and state it)") + "." : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ένα ταιριαστό κόσμο και δήλωσέ το)") + ".");
+    P.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose a fitting world and state it)") + "." : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ένα ταιριαστό κόσμο και δήλωσε το)") + ".");
     if(S.premise && S.premise.trim()){ P.push(EN ? "- Premise: " + S.premise.trim() : "- Υπόθεση: " + S.premise.trim()); }
     if(S.world && S.world.trim()){ P.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim()); }
     P.push(EN
       ? "- The character must FIT this story — same era, same register, same world. If the premise already has a name, stay consistent with it."
       : "- Ο χαρακτήρας ΠΡΕΠΕΙ να ταιριάζει σ' αυτή την ιστορία — ίδια εποχή, ίδιο ύφος, ίδιος κόσμος. Αν η υπόθεση έχει ήδη όνομα, βάλε σε συνέπεια μαζί του.");
+    namingCanonBlock(EN).forEach(function(l){ P.push(l); });
     P.push("");
     P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(EN ? DEFAULT_EN : DEFAULT_EL);
     P.push(sparkNamingRule(EN, profileId));
     P.push(EN
       ? "- Write all names in the book's language: " + (dlEn() ? "the book is in English → Latin script." : "the book is in Modern Greek → Greek script.")
@@ -5445,7 +6396,7 @@
   }
   function genChar(){
     $("charOut").value = buildCharPrompt();
-    toast(S.lang==="en" ? "Character prompt ready — send it to your AI, paste the answer back 🧬" : "Το prompt χαρακτήρα είναι έτοιμο — στείλτέ το στο ΑΙ, επικολλήστε την απάντηση 🧬");
+    toast(S.lang==="en" ? "Character prompt ready — send it to your AI, paste the answer back 🧬" : "Το prompt χαρακτήρα είναι έτοιμο — στείλτε το στο ΑΙ, επικολλήστε την απάντηση 🧬");
   }
   function loadChar(){
     var EN = S.lang === "en";
@@ -5714,14 +6665,20 @@
     $("inAltEvery").value = S.altEvery || 1;
     $("ckStyle").checked = S.myStyle;
     $("inPremise").value = S.premise;
+    $("inDramQ").value = S.dramQ || "";
+    $("inMustInclude").value = S.mustInclude || "";
+    $("inMustAvoid").value = S.mustAvoid || "";
+    $("inComps").value = S.comps || "";
     $("inSparkAns").value = S.sparkAns || "";
     $("inNamesAns").value = S.namesAns || "";
     $("inCharAns").value = S.charAns || "";
     $("inHero").value = S.hero;
     $("inAntagonist").value = S.antagonist;
     $("inCharDesire").value = S.charDesire;
+    $("inCharNeed").value = S.charNeed || "";
     $("inCharFear").value = S.charFear;
     $("inCharWound").value = S.charWound;
+    $("inCharLie").value = S.charLie || "";
     $("inCharArc").value = S.charArc;
     $("inCharVoice").value = S.charVoice;
     $("inCharSecret").value = S.charSecret;
@@ -5880,6 +6837,13 @@
     $("ckStyle").addEventListener("change", function(){ S.myStyle = this.checked; render(); });
     $("btnPreset").addEventListener("click", loadProfile);
     $("inPremise").addEventListener("input", function(){ S.premise = this.value; render(); });
+    $("inDramQ").addEventListener("input", function(){ S.dramQ = this.value; render(); });
+    $("inMustInclude").addEventListener("input", function(){ S.mustInclude = this.value; render(); });
+    $("inMustAvoid").addEventListener("input", function(){ S.mustAvoid = this.value; render(); });
+    $("inComps").addEventListener("input", function(){ S.comps = this.value; render(); });
+    $("inCharNeed").addEventListener("input", function(){ S.charNeed = this.value; render(); });
+    $("inCharLie").addEventListener("input", function(){ S.charLie = this.value; render(); });
+    $("btnStagePack").addEventListener("click", exportStagePack);
     $("inHero").addEventListener("input", function(){ S.hero = this.value; render(); });
     $("inAntagonist").addEventListener("input", function(){ S.antagonist = this.value; render(); });
     $("inCharDesire").addEventListener("input", function(){ S.charDesire = this.value; render(); });
@@ -6081,7 +7045,7 @@
       }
       $("extOut").value = buildExtension();
       addUsage(($("extOut").value||"").trim().split(/\s+/).length);
-      toast(S.lang==="en" ? "Novel-extension prompt generated ⚡" : "Πrompt επέκτασης σε μυθιστόρημα δημιουργήθηκε ⚡");
+      toast(S.lang==="en" ? "Novel-extension prompt generated ⚡" : "Prompt επέκτασης σε μυθιστόρημα δημιουργήθηκε ⚡");
     });
     $("btnExtCopy").addEventListener("click", function(){
       copyText($("extOut").value, S.lang==="en" ? "Extension prompt copied" : "Αντιγράφηκε");
