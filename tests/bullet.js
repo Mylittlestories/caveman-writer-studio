@@ -104,7 +104,7 @@ function boot(overrides) {
   const missing = [...refs].filter(r => !ids.has(r));
   chk('structure', 'all $() refs have matching id', missing.length === 0);
   if (missing.length) out.push('      missing: ' + missing.join(', '));
-  chk('structure', 'version v26.0 present', HTML.includes('v26.0'));
+  chk('structure', 'version v27.0 present', HTML.includes('v27.0'));
   chk('structure', '6 tool tabs', (HTML.match(/id="tab-(\w+)"/g)||[]).length === 6);
   chk('structure', '19 masters', (HTML.match(/nameEn:"/g)||[]).length === 19);
   chk('structure', 'og meta present', HTML.includes('og:image'));
@@ -257,6 +257,21 @@ function boot(overrides) {
   chk('functional', 'spark load sets glossary + hook', (els['inGlossary']._val||'').includes('Eldara') && (els['inExtra']._val||'').includes('ink dried before she did'));
   chk('functional', 'spark load maps tone/pacing/ending', els['inTone']._val==='high' && els['inPacing']._val==='medium' && els['inEnding']._val==='bittersweet');
   chk('functional', 'spark load maps themes', (els['themeChips']._html||'').includes('Fate'));
+  // spark v3: segment sparks (titles / stories / chars) — genuine + morphology-matched
+  els['btnSparkTitles'].click();
+  const titlesPrompt = els['sparkOut']._val || '';
+  chk('functional', 'segment spark: titles prompt (6 labels + GENUINE block)',
+      (titlesPrompt.match(/TITLE [1-6]:/g) || []).length === 6 && titlesPrompt.indexOf('GENUINE') !== -1);
+  els['inSparkAns']._val = 'TITLE 1: The Machine That Remembers\nTITLE 2: Stergiopoulos Ticket';
+  els['inSparkAns'].dispatch('input');
+  els['btnSparkLoad'].click();
+  chk('functional', 'segment spark: fresh titles load into the chip pool',
+      (els['titleSug']._html||'').indexOf('The Machine That Remembers') !== -1);
+  els['btnSparkChars'].click();
+  chk('functional', 'segment spark: fantasy char prompt enforces invented names',
+      (els['sparkOut']._val||'').indexOf('NEVER real-world names') !== -1);
+  els['inSparkAns']._val = '';
+  els['inSparkAns'].dispatch('input');
 
   // genre-aware naming — offline local roll (chip): fantasy → invented only (no Athens, no everyday Greek)
   els['btnNamesLocal'].click();
@@ -361,7 +376,7 @@ function boot(overrides) {
 
   // usage
   els['btnCopy'].click();
-  chk('functional', 'usage increments on copy', !(els['usageTxt'].textContent||'').includes('0 tokens'));
+  chk('functional', 'usage increments on copy', !/~0 tokens/.test(els['usageTxt'].textContent||'') && (els['usageTxt'].textContent||'').indexOf('tokens') !== -1);
   els['btnUsageReset'].click();
   chk('functional', 'usage reset', (els['usageTxt'].textContent||'').includes('0 tokens'));
 
@@ -464,7 +479,7 @@ function boot(overrides) {
 {
   const b = boot();
   ['pillVer','promptOut','inPremise','btnPreset','btnDemo'].forEach(i => b.doc.getElementById(i));
-  chk('regression', 'pill shows v26.0', (b.els['pillVer'].textContent||'').includes('v26.0'));
+  chk('regression', 'pill shows v27.0', (b.els['pillVer'].textContent||'').includes('v27.0'));
   chk('regression', '19 masters still render', true);
   chk('regression', 'profile preset still works', true);
   chk('regression', 'demo still works', true);

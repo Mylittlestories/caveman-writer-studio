@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caveman Writer Studio — v26.0</title>
+<title>Caveman Writer Studio — v27.0</title>
 <meta name="description" content="Why use many tokens when few do trick 🪨 — a single-file, offline, bilingual (EN/ΕΛ) writing studio that turns a spark into a full novel with your voice, flawless Greek, and a token-lean AI protocol. 19 masters, proofreading gate, manuscript tracker.">
 <meta name="author" content="George Derventlis (Γιώργος Δερβεντλής)">
 <meta name="theme-color" content="#f2e9d6">
@@ -495,6 +495,8 @@
   ::selection{ background:var(--focus); }
   /* de-cluttered header: the duplicate pills hide (their controls stay) */
   #pillSkill,#pillTheme,#pillLang{ display:none; }
+  /* segment spark chips (✨ next to the suggestion labels) */
+  .sparkchip{ padding:1px 7px; font-size:11px; min-height:18px; line-height:1.2; }
 
 </style>
 </head>
@@ -509,7 +511,7 @@
   <span id="savedInd" style="font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;margin-left:auto"></span>
   <div class="head-meta">
     <span class="pill" id="pillSkill">Skill: <b>caveman v2.2</b></span>
-    <span class="pill" id="pillVer">v26.0</span>
+    <span class="pill" id="pillVer">v27.0</span>
     <span class="pill" id="pillTheme">Night</span>
     <span class="hdrseg" id="themeSeg"></span>
     <span class="pill" id="pillLang">EN</span>
@@ -531,7 +533,7 @@
       <div class="field" style="margin-top:13px">
         <label class="lbl" id="lblTitle" for="inTitle">Title</label>
         <input type="text" id="inTitle" maxlength="90">
-        <div class="suglabel" id="lblTitleSug">Title suggestions</div>
+        <div style="display:flex;align-items:baseline;gap:6px"><div class="suglabel" id="lblTitleSug" style="margin:0">Title suggestions</div><button type="button" class="chip sparkchip" id="btnSparkTitles" title="✨ Spark fresh titles via your AI">✨</button></div>
         <div class="chips" id="titleSug"></div>
         <div style="margin-top:7px"><button type="button" class="chip" id="btnRandTitle">🎲 Random title</button></div>
       </div>
@@ -653,7 +655,7 @@
       <div class="field">
         <label class="lbl" id="lblPremise" for="inPremise">Premise / Logline</label>
         <textarea id="inPremise"></textarea>
-        <div class="suglabel" id="lblStorySug">Story suggestions</div>
+          <div style="display:flex;align-items:baseline;gap:6px"><div class="suglabel" id="lblStorySug" style="margin:0">Story suggestions</div><button type="button" class="chip sparkchip" id="btnSparkStories" title="✨ Spark fresh story loglines via your AI">✨</button></div>
         <div class="chips" id="storySug"></div>
       </div>
       <div class="field">
@@ -663,7 +665,7 @@
       <div class="field">
         <label class="lbl" id="lblHero" for="inHero">Protagonist(s)</label>
         <input type="text" id="inHero">
-        <div class="suglabel" id="lblCharSug">Character suggestions</div>
+        <div style="display:flex;align-items:baseline;gap:6px"><div class="suglabel" id="lblCharSug" style="margin:0">Character suggestions</div><button type="button" class="chip sparkchip" id="btnSparkChars" title="✨ Spark fresh characters via your AI">✨</button></div>
         <div class="chips" id="charSug"></div>
       </div>
       <div class="field">
@@ -1962,7 +1964,7 @@
     btnSparkCopy:["⧉ Αντιγραφή","⧉ Copy"],
     btnSparkLoad:["⤵ Φόρτωση της απάντησης στο brief","⤵ Load AI's answer into brief"],
     lblSparkAns:["Απάντηση του ΑΙ — επικολλήστε όλη της, μετά «⤵ Φόρτωση»","AI's answer — paste it all, then «⤵ Load»"],
-    sparkAnsHint:["Το prompt ζητάει από το ΑΙ σταθερές ετικέτες (ΕΙΔΟΣ/ΤΙΤΛΟΣ/ΥΠΟΘΕΣΗ/ΗΡΩΑΣ/ΑΝΤΑΓΩΝΙΣΤΗΣ/ΚΟΣΜΟΣ/ΘΕΜΑΤΑ/ΤΟΝΟΣ/ΡΥΘΜΟΣ/ΤΕΛΟΣ/ΓΛΩΣΣΑΡΙΟ/ΑΓΚΙΣΤΡΙ). Η «Φόρτωση» διαβάζει την απάντηση και γεμίζει την κάρτα — ονόματα &amp; τόποι ακολουθούν την πειθαρχία ονομασίας του είδους, όχι μια έτοιμη λίστα.","The prompt asks the AI for fixed labels (GENRE/TITLE/PREMISE/HERO/ANTAGONIST/WORLD/THEMES/TONE/PACING/ENDING/GLOSSARY/HOOK). «Load» reads the answer and fills this card — names &amp; places follow the genre's naming discipline, not a ready-made list."],
+    sparkAnsHint:["Το prompt ζητάει από το ΑΙ σταθερές ετικέτες. Η «⤵ Φόρτωση» αναγνωρίζει μόνη της το είδος της απάντησης — ΙΔΕΑ (ΥΠΟΘΕΣΗ/ΗΡΩΑΣ/…), ΤΙΤΛΟΙ (ΤΙΤΛΟΣ 1–6), ΙΣΤΟΡΙΕΣ (ΙΣΤΟΡΙΑ 1–3) ή ΧΑΡΑΚΤΗΡΕΣ (ΧΑΡΑΚΤΗΡΑΣ 1–3) — και γεμίζει το αντίστοιχο τμήμα: η ιδέα γεμίζει την κάρτα, οι προτάσεις αντικαθιστούν τις αντίστοιχες λίστες ✨. Τα ονόματα &amp; τόποι ακολουθούν την πειθαρχία ονομασίας του είδους, όχι μια έτοιμη λίστα.","The prompt asks the AI for fixed labels. «⤵ Load» detects the answer type on its own — IDEA (PREMISE/HERO/…), TITLES (TITLE 1–6), STORIES (STORY 1–3) or CHARACTERS (CHAR 1–3) — and fills the matching part: the idea fills the card, the suggestions replace the matching list ✨. Names &amp; places follow the genre's naming discipline, not a ready-made list."],
     t6:["Πώς δουλεύει το σπηλαιώδες πρωτόκολλο","How the caveman protocol works"],
     t7:["Ενισχυτής επόμενου κεφαλαίου","Next-chapter booster"],
     h7:["Αφού το ΑΙ τελειώσει ένα κεφάλαιο, βάλτε εδώ μια περίληψη 1 γραμμής και πάρτε καθαρό prompt συνέχειας — με το πρωτόκολλο μέσα.","After the AI finishes a chapter, drop a one-line recap here and get a clean continuation prompt — protocol included."],
@@ -2311,6 +2313,7 @@
     storyState:"", bunnyIdeas:[], bunnyIn:"", activeTab:"scene", lore:"",
     intentGenre:"cosmic", intentMood:"dread", intentSetting:"far", intentExtra:"",
     sparkAns:"", namesAns:"", charAns:"",
+    sugTitles:null, sugStories:null, sugChars:null, sparkTarget:"idea",
     chapters:[], curCh:0, density:"standard", model:"sonnet", usageTokens:0,
     weekly:2, chWeek:0, weekStart:"", blogOn:false,
     statuses:{}, chGoals:{}, chSearch:"",
@@ -2514,8 +2517,8 @@
     var inputs = document.querySelectorAll ? document.querySelectorAll("input,select,textarea").length : -1;
     var cards = document.querySelectorAll ? document.querySelectorAll(".card").length : -1;
     var chapters = (S.chapters||[]).length;
-    var msg = (S.lang==="en" ? "v26 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
-                             : "v26 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
+    var msg = (S.lang==="en" ? "v27 · "+cards+" cards · "+inputs+" controls · "+ids+" ids · "+chapters+" chapters · usage ~"+ (S.usageTokens||0).toLocaleString("en-US")+" tokens — OK"
+                             : "v27 · "+cards+" κάρτες · "+inputs+" στοιχεία · "+ids+" ids · "+chapters+" κεφάλαια · χρήση ~"+ (S.usageTokens||0).toLocaleString("el-GR")+" tokens — OK");
     toast(msg);
   }
 
@@ -3330,7 +3333,7 @@
       el.appendChild(b);
     });
     $("pillLang").textContent = S.lang === "en" ? "EN" : "ΕΛ";
-    $("pillVer").textContent = "v26.0";
+    $("pillVer").textContent = "v27.0";
   }
 
   function applyStatic(){
@@ -3526,13 +3529,21 @@
     c.onclick = function(){ fn(S.lang==="en" ? pair[1] : pair[0]); };
     container.appendChild(c);
   }
+  /* suggestion pools: sparked (AI-generated, stored in S) or the built-in seeds (offline default) */
+  function sugPool(kind){
+    var st = S["sug"+kind];
+    return (st && st.length) ? st : (kind==="Titles" ? SUG.titles : kind==="Stories" ? SUG.stories : SUG.chars);
+  }
+  function sugPoolText(pool){ return pool.map(function(p){ return p[1] || p[0]; }); }
   function renderTitleSug(){
     var el = $("titleSug"); el.innerHTML = "";
-    SUG.titles.forEach(function(t){ sugChip(el, t, function(v){ S.title = v; $("inTitle").value = v; render(); }); });
+    sugPool("Titles").forEach(function(t){ sugChip(el, t, function(v){ S.title = v; $("inTitle").value = v; render(); }); });
     var rand = $("btnRandTitle");
     rand.textContent = S.lang==="en" ? "🎲 Random title" : "🎲 Τυχαίος τίτλος";
+    var sp = $("btnSparkTitles"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh titles via your AI" : "✨ Σπírito για νέους τίτλους μέσω του ΑΙ σας"; }
     rand.onclick = function(){
-      var t = SUG.titles[Math.floor(Math.random()*SUG.titles.length)];
+      var pool = sugPool("Titles");
+      var t = pool[Math.floor(Math.random()*pool.length)];
       S.title = S.lang==="en"?t[1]:t[0];
       $("inTitle").value = S.title; render();
       toast(S.lang==="en" ? "Random title: “"+S.title+"”" : "Τυχαίος τίτλος: «"+S.title+"»");
@@ -3540,11 +3551,13 @@
   }
   function renderStorySug(){
     var el = $("storySug"); el.innerHTML = "";
-    SUG.stories.forEach(function(st){ sugChip(el, st, function(v){ S.premise = v; $("inPremise").value = v; render(); }); });
+    sugPool("Stories").forEach(function(st){ sugChip(el, st, function(v){ S.premise = v; $("inPremise").value = v; render(); }); });
+    var sp = $("btnSparkStories"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh story loglines via your AI" : "✨ Σπírito για νέες υποθέσεις μέσω του ΑΙ σας"; }
   }
   function renderCharSug(){
     var el = $("charSug"); el.innerHTML = "";
-    SUG.chars.forEach(function(ch){ sugChip(el, ch, function(v){ S.hero = v; $("inHero").value = v; render(); }); });
+    sugPool("Chars").forEach(function(ch){ sugChip(el, ch, function(v){ S.hero = v; $("inHero").value = v; render(); }); });
+    var sp = $("btnSparkChars"); if(sp){ sp.title = S.lang==="en" ? "✨ Spark fresh characters via your AI" : "✨ Σπírito για νέους χαρακτήρες μέσω του ΑΙ σας"; }
   }
 
   /* levels + rulebox + savings */
@@ -5002,7 +5015,134 @@
       ? "Far-future / broken-world setting: names may mix everyday and invented; places may be real, ruined or far-future. Whatever you invent, keep it internally consistent."
       : "Κόσμος στο μακρινό μέλλον / σπασμένος κόσμος: τα ονόματα μπορούν να αναμείξουν καθημερινά με εφευρημένα· οι τόποι μπορεί να είναι αληθινοί, ερειπωμένοι ή μακρινού μέλλοντος. Ό,τι εφεύρεις, κράτα το εσωτερικά συνεπές.";
   }
-  function buildSpark(){
+  /* ============================================================
+     SPARK v3 — segment sparks: the same technique for every
+     suggestion segment (titles / stories / characters).
+     The prompts are GENUINE (never reuse existing suggestions or
+     famous works) and morphology-matched (the blog's DNA, or the
+     selected masters' rhythm — King, Tolkien, Herbert, Lovecraft).
+     ============================================================ */
+  function sparkContextLines(EN){
+    var L = [];
+    L.push(EN ? "- Genre: " + (S.genre ? genreLabel(S.genre) : "(none — choose what fits the suggestions)")
+             : "- Είδος: " + (S.genre ? genreLabel(S.genre) : "(καμία — διάλεξε ό,τι ταιριάζει στις προτάσεις)"));
+    L.push(EN ? "- Book language: " + (dlEn() ? "English — write ALL suggestions in English" : "Modern Greek — write ALL suggestions in Modern Greek")
+             : "- Γλώσσα βιβλίου: " + (dlEn() ? "αγγλικά — γράψε ΟΛΕΣ τις προτάσεις στα αγγλικά" : "ελληνικά — γράψε ΟΛΕΣ τις προτάσεις στα ελληνικά"));
+    if(S.premise && S.premise.trim()) L.push(EN ? "- Premise (stay consistent with it): " + S.premise.trim()
+                                                 : "- Υπόθεση (βάλε σε συνέπεια μαζί της): " + S.premise.trim());
+    if(S.world && S.world.trim()) L.push(EN ? "- World: " + S.world.trim() : "- Κόσμος: " + S.world.trim());
+    var masters = (S.authors && S.authors.length) ? S.authors : [];
+    if(masters.length){
+      var list = masters.map(function(k){ return AUTHORS[k] ? ((EN?AUTHORS[k].nameEn:AUTHORS[k].name) + (EN?" (\u201c":" («") + (EN?AUTHORS[k].tagEn:AUTHORS[k].tag) + (EN?"\u201d)":"»")) : k; }).join("; ");
+      L.push(EN ? "- Voice/morphology: in the spirit of these masters — " + list
+               : "- Φωνή/μορφολογία: στο πνεύμα αυτών των δασκάλων — " + list);
+    } else {
+      L.push(EN ? "- Voice/morphology: the blog «My little stories» — people first (a flaw that is a door), the mundane as threshold, the bodily detail, the dated document, the one-line cover-up, the image that reframes"
+               : "- Φωνή/μορφολογία: το blog «My little stories» — ο άνθρωπος πρώτα (η αδυναμία που είναι πόρτα), το συνηθισμένο ως κατώφλι, η σωματική λεπτομέρεια, το έγγραφο με ημερομηνία, η κάλυψη σε μία γραμμή, η εικόνα που αναδιατυπώνει");
+    }
+    return L;
+  }
+  function genuinenessBlock(EN, existing){
+    var L = [EN ? "## GENUINE (non-negotiable)" : "## ΓΕΝΥΙΝΟ (μη διαπραγματεύσιμο)"];
+    L.push(EN ? "- Never reuse any of these existing suggestions: " + (existing.length ? existing.join(" | ") : "(none)")
+             : "- Ποτέ μην επαναχρησιμοποιείς καμία από αυτές τις υπάρχουσες προτάσεις: " + (existing.length ? existing.join(" | ") : "(καμία)"));
+    L.push(EN ? "- Never reuse famous titles/stories/characters from published works — generate NEW ones, as if the author were inventing them tonight."
+             : "- Ποτέ μην επαναχρησιμοποιείς διάσημους τίτλους/ιστορίες/χαρακτήρες από δημοσιευμένα έργα — επινόησε ΝΕΑ, σαν να τα εφεύρε ο συγγραφέας απόψε.");
+    L.push(EN ? "- Every suggestion must be one the author would actually want to publish — specific, not generic."
+             : "- Κάθε πρόταση πρέπει να είναι μία που ο συγγραφέας θα ήθελε πραγματικά να δημοσιεύσει — συγκεκριμένη, όχι γενική.");
+    return L;
+  }
+  function numberedLabels(enName, elName, count){
+    var L = [];
+    for(var i = 1; i <= count; i++){ L.push([enName + " " + i, elName + " " + i]); }
+    return L;
+  }
+  function buildSparkTitles(){
+    var EN = S.lang === "en";
+    var P = [];
+    P.push(EN ? "# SPARK — TITLES for " + titleOrFallback() : "# ΣΠΙΡΤΟ — ΤΙΤΛΟΙ για " + titleOrFallback());
+    P.push("");
+    P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
+    sparkContextLines(EN).forEach(function(l){ P.push(l); });
+    P.push("");
+    genuinenessBlock(EN, sugPoolText(sugPool("Titles"))).forEach(function(l){ P.push(l); });
+    P.push("");
+    P.push(EN ? "## THE JOB" : "## Η ΕΡΓΑΣΙΑ");
+    P.push(EN ? "Generate 6 NEW titles." : "Φτιάξε 6 ΝΕΟΥΣ τίτλους.");
+    P.push(EN ? "- A title is a concrete image, not an abstraction: a noun + its detail (the object, the place, the mark)."
+             : "- Ο τίτλος είναι συγκεκριμένη εικόνα, όχι αφαίρεση: ουσιαστικό + η λεπτομέρειά του (το αντικείμενο, ο τόπος, το σημάδι).");
+    P.push(EN ? "- The \u201cThe X of the Y\u201d pattern is welcome but not required; 2\u20135 words are welcome too."
+             : "- Το πρότυπο «Το X του Y» είναι ευπρόσδεκτο αλλά δεν επιβάλλεται· καλώς ήρθαν και τα 2\u20135 λόγια.");
+    P.push(EN ? "- Tension inside: something in the title is off / waiting / missing."
+             : "- Ενταση μέσα: κάτι στον τίτλο είναι στραβά / περιμένει / λείπει.");
+    P.push(EN ? "- Take the rhythm of the selected voice's titles (e.g. Lovecraft: \u201cThe X that Ys\u201d · Tolkien: weight and meaning · King: short, domestic, concrete · Herbert: technical, conceptual)."
+             : "- Πάρε τον ρυθμό των τίτλων της επιλεγμένης φωνής (π.χ. Λάβκραφτ: «Το X που Y» · Τόλκιν: βάρος και νόημα · Κινγκ: κοντός, οικιακός, συγκεκριμένος · Χέρμπερτ: τεχνικός, εννοιολογικός).");
+    P.push("");
+    P.push(EN ? "## OUTPUT — exactly 6 lines, one per label, no other numbering, no commentary:" : "## ΕΞΟΔΟΣ — ακριβώς 6 γραμμές, μία ανά ετικέτα, χωρίς άλλη αρίθμηση, χωρίς σχόλια:");
+    for(var i = 1; i <= 6; i++){ P.push((EN ? "TITLE " : "ΤΙΤΛΟΣ ") + i + ":"); }
+    return P.join("\n");
+  }
+  function buildSparkStories(){
+    var EN = S.lang === "en";
+    var P = [];
+    P.push(EN ? "# SPARK — STORY LOGLINES for " + titleOrFallback() : "# ΣΠΙΡΤΟ — ΥΠΟΘΕΣΕΙΣ για " + titleOrFallback());
+    P.push("");
+    P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
+    sparkContextLines(EN).forEach(function(l){ P.push(l); });
+    P.push("");
+    genuinenessBlock(EN, sugPoolText(sugPool("Stories"))).forEach(function(l){ P.push(l); });
+    P.push("");
+    P.push(EN ? "## THE JOB" : "## Η ΕΡΓΑΣΙΑ");
+    P.push(EN ? "Generate 3 NEW story loglines (2\u20134 sentences each)." : "Φτιάξε 3 ΝΕΕΣ υποθέσεις (λόγκλάιν), 2\u20134 προτάσεις η καθεμία.");
+    P.push(EN ? "- People first: a concrete person with a flaw that is a door — never \u201ca certain someone\u201d."
+             : "- Ο άνθρωπος πρώτα: ένα συγκεκριμένο πρόσωπο με μια αδυναμία που είναι πόρτα — ποτέ «κάποιος».");
+    P.push(EN ? "- The mundane as threshold: the wrong thing enters through the everyday (the bus, the ticket, the lemonade, the machine that keeps running)."
+             : "- Το συνηθισμένο ως κατώφλι: το λάθος μπαίνει μέσα από το καθημερινό (το λεωφορείο, το δελτίο, η λεμονάδα, η μηχανή που συνεχίζει να τρέχει).");
+    P.push(EN ? "- Each logline answers: who + what + why now + what it costs." : "- Κάθε υπόθεση απαντά: ποιος + τι + γιατί τώρα + τι κοστίζει.");
+    P.push(EN ? "- A theme tension inside each: two values pulling apart." : "- Ένα θεματικό τέντωμα σε καθεμία: δύο αξίες που τραβάνε αντίθετα.");
+    P.push(EN ? "- An image core: one image the reader will not forget." : "- Ένα οπτικό κέντρο: μία εικόνα που ο αναγνώστης δεν θα ξεχάσει.");
+    P.push(EN ? "- For horror/weird genres: a hint of a dated document and a one-line cover-up."
+             : "- Για τρόμο/παράξενα είδη: μια ένδειξη εγγράφου με ημερομηνία και μια κάλυψη σε μία γραμμή.");
+    P.push("");
+    P.push(EN ? "## OUTPUT — exactly 3 blocks, one per label (each logline may span 2\u20134 lines), no other numbering, no commentary:" : "## ΕΞΟΔΟΣ — ακριβώς 3 μπλοκ, ένα ανά ετικέτα (κάθε υπόθεση μπορεί να πιάνει 2\u20134 γραμμές), χωρίς άλλη αρίθμηση, χωρίς σχόλια:");
+    for(var i = 1; i <= 3; i++){ P.push((EN ? "STORY " : "ΙΣΤΟΡΙΑ ") + i + ":"); }
+    return P.join("\n");
+  }
+  function buildSparkChars(){
+    var EN = S.lang === "en";
+    var profileId = namingProfileFor(S.genre || "");
+    var P = [];
+    P.push(EN ? "# SPARK — CHARACTERS for " + titleOrFallback() : "# ΣΠΙΡΤΟ — ΧΑΡΑΚΤΗΡΕΣ για " + titleOrFallback());
+    P.push("");
+    P.push(EN ? "## CONTEXT" : "## ΠΛΑΙΣΙΟ");
+    sparkContextLines(EN).forEach(function(l){ P.push(l); });
+    P.push("");
+    P.push(EN ? "## NAMING DISCIPLINE (non-negotiable)" : "## ΠΕΙΘΑΡΧΙΑ ΟΝΟΜΑΣΙΩΝ (μη διαπραγματεύσιμη)");
+    P.push(sparkNamingRule(EN, profileId));
+    P.push(EN ? "- Every name must carry class and a history, as if it had a family before the first page."
+             : "- Κάθε όνομα πρέπει να κουβαλά τάξη και ιστορία, σαν να είχε οικογένεια πριν από τη πρώτη σελίδα.");
+    P.push("");
+    genuinenessBlock(EN, sugPoolText(sugPool("Chars"))).forEach(function(l){ P.push(l); });
+    P.push("");
+    P.push(EN ? "## THE JOB" : "## Η ΕΡΓΑΣΙΑ");
+    P.push(EN ? "Generate 3 NEW characters: name, age, occupation, and one line with a bodily detail or habit." : "Φτιάξε 3 ΝΕΟΥΣ χαρακτήρες: όνομα, ηλικία, επάγγελμα, και μία γραμμή με σωματική λεπτομέρεια ή συνήθεια.");
+    P.push(EN ? "- People first: the flaw is a door; the occupation carries a class." : "- Ο άνθρωπος πρώτα: η αδυναμία είναι πόρτα· το επάγγελμα κουβαλά μια τάξη.");
+    P.push(EN ? "- Three different registers (old/young, clipped/island-dialect) — the trio should not sound like clones."
+             : "- Τρεις διαφορετικές εμβέλειες (γέρος/νέος, κοφτός/νησιώτικος) — το τρίο να μην ακούγεται σαν κλώνοι.");
+    P.push(EN ? "- The line must have a bodily detail (a hand, a scar, an object, a rhythm) — the reader should SEE the person."
+             : "- Η γραμμή πρέπει να έχει σωματική λεπτομέρεια (ένα χέρι, μια ουλή, ένα αντικείμενο, έναν ρυθμό) — ο αναγνώστης πρέπει να ΔΕΙ το πρόσωπο.");
+    P.push("");
+    P.push(EN ? "## OUTPUT — exactly 3 lines, one per label, no other numbering, no commentary:" : "## ΕΞΟΔΟΣ — ακριβώς 3 γραμμές, μία ανά ετικέτα, χωρίς άλλη αρίθμηση, χωρίς σχόλια:");
+    for(var i = 1; i <= 3; i++){ P.push((EN ? "CHAR " : "ΧΑΡΑΚΤΗΡΑΣ ") + i + ":"); }
+    return P.join("\n");
+  }
+  function buildSpark(target){
+    if(target === "titles") return buildSparkTitles();
+    if(target === "stories") return buildSparkStories();
+    if(target === "chars") return buildSparkChars();
+    return buildSparkIdea();
+  }
+  function buildSparkIdea(){
     var EN = S.lang === "en";
     var f = FORMATS[S.format];
     var loc = EN ? "en-US" : "el-GR";
@@ -5078,14 +5218,17 @@
     P.push(L[11] + (EN ? ": (the ACTUAL first sentence of Chapter 1 — a concrete image or an exact time, real prose, never an abstract statement or a description)" : ": (την ΠΡΑΓΜΑΤΙΚΗ πρώτη πρόταση του Κεφαλαίου 1 — μια συγκεκριμένη εικόνα ή μια ακριβής ώρα, αληθινή πρόζα, ποτέ όχι μια αφηρημένη δήλωση ή περιγραφή)"));
     return P.join("\n");
   }
-  function sparkIdea(){
-    var EN = S.lang === "en";
-    $("sparkOut").value = buildSpark();
+  function sparkIdea(target){
+    S.sparkTarget = target || "idea";
+    $("sparkOut").value = buildSpark(S.sparkTarget);
     var box = $("sparkBox");
     if(box && box.scrollIntoView){ box.scrollIntoView({behavior:"smooth", block:"nearest"}); }
-    toast(EN
-      ? "Spark prompt ready — send it to your AI, paste its answer back, then «⤵ Load» "
-      : "Το prompt σπϭρτος είναι έτοιμο — στείλτέ το στο ΑΙ σας, επικολλήστε την απάντησή του, μετά «⤵ Load» 🎲");
+    var names = { idea: S.lang==="en" ? "Spark prompt ready" : "Το prompt σπίρτου έτοιμο",
+                  titles: S.lang==="en" ? "Titles spark prompt ready" : "Το prompt σπίρτου τίτλων έτοιμο",
+                  stories: S.lang==="en" ? "Stories spark prompt ready" : "Το prompt σπίρτου ιστοριών έτοιμο",
+                  chars: S.lang==="en" ? "Characters spark prompt ready" : "Το prompt σπίρτου χαρακτήρων έτοιμο" };
+    toast(names[S.sparkTarget] + (S.lang==="en" ? " — send it to your AI, paste the answer back, then «⤵ Load» ✨"
+                                               : " — στείλτέ το στο ΑΙ σας, επικολλήστε την απάντηση, μετά «⤵ Load» ✨"));
   }
   /* generic labeled-answer parser (EN+EL labels; block labels collect lines until the next label) */
   function parseLabeled(txt, pairs, blockIdx){
@@ -5110,7 +5253,7 @@
           for(var k = li + 1; k < lines.length && !isLabelLine(lines[k]); k++){
             if(lines[k].trim()) parts.push(lines[k].trim());
           }
-          fields[idx] = parts.join(" · ").replace(/\*\*/g, "").trim();
+          fields[idx] = parts.join(" ").replace(/\*\*/g, "").replace(/\s+/g, " ").trim();
         } else {
           fields[idx] = m[1].replace(/^\*+|\*+$/g, "").trim();
         }
@@ -5332,11 +5475,62 @@
     return String(s).replace(/[άΆ]/g,"α").replace(/[έΈ]/g,"ε").replace(/[ήΉ]/g,"η")
                     .replace(/[ίΊ]/g,"ι").replace(/[όΌ]/g,"ο").replace(/[ύΎ]/g,"υ").replace(/[ώΏ]/g,"ω");
   }
+  function detectSparkTarget(txt){
+    var t = String(txt || "");
+    if(/TITLE [1-9]\b|ΤΙΤΛΟΣ [1-9]\b/.test(t)) return "titles";
+    if(/STORY [1-9]\b|ΙΣΤΟΡΙΑ [1-9]\b/.test(t)) return "stories";
+    if(/CHAR [1-9]\b|ΧΑΡΑΚΤΗΡΑΣ [1-9]\b/.test(t)) return "chars";
+    return "idea";
+  }
+  function loadSparkTitles(){
+    var EN = S.lang === "en";
+    var ans = (S.sparkAns || "").trim();
+    var labels = numberedLabels("TITLE", "ΤΙΤΛΟΣ", 6);
+    var f = parseLabeled(ans, labels);
+    var pool = [];
+    labels.forEach(function(p, i){ var v = (f[i]||"").trim(); if(v){ pool.push([v, v]); } });
+    if(!pool.length){ toast(EN ? "No titles found — check the labels (TITLE 1\u20266)" : "Δεν βρέθηκαν τίτλοι — ελέγξτε τις ετικέτες (ΤΙΤΛΟΣ 1\u20266)"); return; }
+    S.sugTitles = pool; S.sparkAns = ""; S.sparkTarget = "idea";
+    $("inSparkAns").value = "";
+    renderTitleSug();
+    toast(EN ? pool.length + " fresh titles loaded \u2728" : pool.length + " νέοι τίτλοι φορτώθηκαν \u2728");
+  }
+  function loadSparkStories(){
+    var EN = S.lang === "en";
+    var ans = (S.sparkAns || "").trim();
+    var labels = numberedLabels("STORY", "ΙΣΤΟΡΙΑ", 3);
+    var f = parseLabeled(ans, labels, [0,1,2]);
+    var pool = [];
+    labels.forEach(function(p, i){ var v = (f[i]||"").trim(); if(v){ var w = v.replace(/\s+/g," "); pool.push([w, w]); } });
+    if(!pool.length){ toast(EN ? "No loglines found — check the labels (STORY 1\u20263)" : "Δεν βρέθηκαν υποθέσεις — ελέγξτε τις ετικέτες (ΙΣΤΟΡΙΑ 1\u20263)"); return; }
+    S.sugStories = pool; S.sparkAns = ""; S.sparkTarget = "idea";
+    $("inSparkAns").value = "";
+    renderStorySug();
+    toast(EN ? pool.length + " fresh loglines loaded \u2728" : pool.length + " νέες υποθέσεις φορτώθηκαν \u2728");
+  }
+  function loadSparkChars(){
+    var EN = S.lang === "en";
+    var ans = (S.sparkAns || "").trim();
+    var labels = numberedLabels("CHAR", "ΧΑΡΑΚΤΗΡΑΣ", 3);
+    var f = parseLabeled(ans, labels, [0,1,2]);
+    var pool = [];
+    labels.forEach(function(p, i){ var v = (f[i]||"").trim(); if(v){ var w = v.replace(/\s+/g," "); pool.push([w, w]); } });
+    if(!pool.length){ toast(EN ? "No characters found — check the labels (CHAR 1\u20263)" : "Δεν βρέθηκαν χαρακτήρες — ελέγξτε τις ετικέτες (ΧΑΡΑΚΤΗΡΑΣ 1\u20263)"); return; }
+    S.sugChars = pool; S.sparkAns = ""; S.sparkTarget = "idea";
+    $("inSparkAns").value = "";
+    renderCharSug();
+    toast(EN ? pool.length + " fresh characters loaded \u2728" : pool.length + " νέοι χαρακτήρες φορτώθηκαν \u2728");
+  }
   function loadSpark(){
     var EN = S.lang === "en";
     var ans = (S.sparkAns || "").trim();
     if(!ans){ toast(EN ? "Paste the AI's answer first" : "Επικολλήστε πρώτα την απάντηση του ΑΙ"); return; }
+    var target = detectSparkTarget(ans);
+    if(target === "titles") return loadSparkTitles();
+    if(target === "stories") return loadSparkStories();
+    if(target === "chars") return loadSparkChars();
     var f = parseSparkAnswer(ans);
+
     var norm = function(v){ return greekBase(String(v || "")).toLowerCase(); };
     var got = 0;
     if(f[0]){
@@ -5816,6 +6010,9 @@
     $("btnDemo").addEventListener("click", loadDemo);
     $("btnReset").addEventListener("click", resetAll);
     $("btnDice").addEventListener("click", sparkIdea);
+    $("btnSparkTitles").addEventListener("click", function(){ sparkIdea("titles"); });
+    $("btnSparkStories").addEventListener("click", function(){ sparkIdea("stories"); });
+    $("btnSparkChars").addEventListener("click", function(){ sparkIdea("chars"); });
     $("btnCharGen").addEventListener("click", genChar);
     $("btnCharCopy").addEventListener("click", function(){
       copyText($("charOut").value, S.lang==="en" ? "Character prompt copied 🧬" : "Το prompt χαρακτήρα αντιγράφηκε 🧬");

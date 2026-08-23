@@ -49,7 +49,7 @@ What's the one thing your writing workflow is missing? I read every comment. �
 |---|---|---|
 | Repo live | ✅ | github.com/Mylittlestories/caveman-writer-studio |
 | Live site (Pages) | ✅ | mylittlestories.github.io/caveman-writer-studio — auto-deploys on push |
-| CI (92-check suite) | ✅ | .github/workflows/ci.yml — runs on every push; badge in README |
+| CI (95-check suite) | ✅ | .github/workflows/ci.yml — runs on every push; badge in README |
 | Releases | ✅ | v1.0.0 → v1.8.0 with `index.html` asset each; v24.0 renames the app file to `caveman-writer-studio.html` (`index.html` entry auto-opens it) |
 | Announcement issue (#1) + Discussion (Announcements) | ✅ | pinned + posted |
 | Profile README card | ✅ | featured on github.com/Mylittlestories |

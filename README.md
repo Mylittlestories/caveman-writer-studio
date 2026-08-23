@@ -10,14 +10,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v26.0-8a6d3b?style=flat-square" alt="v26.0"></a>
+  <a href="https://github.com/Mylittlestories/caveman-writer-studio"><img src="https://img.shields.io/badge/version-v27.0-8a6d3b?style=flat-square" alt="v27.0"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/stargazers"><img src="https://img.shields.io/github/stars/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Stars"></a>
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/issues"><img src="https://img.shields.io/github/issues/Mylittlestories/caveman-writer-studio?style=flat-square" alt="Issues"></a>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square" alt="Zero dependencies">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml/badge.svg" alt="Pages deploy"></a>
   <img src="https://img.shields.io/badge/build-single%20HTML-27ae60?style=flat-square" alt="Single HTML">
-  <img src="https://img.shields.io/badge/tests-92%20passed-8fbc8f?style=flat-square" alt="92 tests passing">
+  <img src="https://img.shields.io/badge/tests-95%20passed-8fbc8f?style=flat-square" alt="95 tests passing">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/ci.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/languages-EN%20%E2%80%A2%20%CE%95%CE%9B-e8b46a?style=flat-square" alt="Bilingual">
 </p>
@@ -52,7 +52,7 @@ It embeds the **caveman skill** (ultra-compressed AI commentary — ~65% fewer t
 ### The brief
 - **Format**: Novel · Novella · **Serial** (chapter-cliffhanger mode) · **Short story** (3–7 acts × ~1,200 — the standalone size you actually publish)
 - **19 inspiring masters** (multi-select, bilingual) + **🧠 My profile** (house style distilled from the author's own writing) + **author voice sample** (the AI matches *your* prose)
-- **🎲 Spark v2** — no more rolling among fixed ideas: one click builds a **crafted spark prompt for YOUR AI** (fresh original premise, hero, title, world, themes) with **genre-aware naming discipline** — fantasy worlds get invented names & places only, the real Greek world gets everyday names & real places. The prompt carries the author's craft (precise opening, “it must smell”, the thing that *remembers*). Paste the AI's structured answer back, **⤵ Load** fills the brief
+- **✨ Spark v3** — the spark technique for **every segment**: 🎲 for a fresh idea (premise, hero, title, world, themes) **and** ✨ next to *Title / Story / Character suggestions* — each builds a crafted prompt for YOUR AI, **genuine** (never reuses existing suggestions or famous works) and **morphology-matched** (the blog's DNA — people first, the mundane threshold, the thing that *remembers* — or the rhythm of the selected masters: King, Tolkien, Herbert, Lovecraft…). Paste the AI's answer back, **⤵ Load** detects the type on its own (IDEA / TITLES 1–6 / STORIES 1–3 / CHARACTERS 1–3) and fills the matching part
 - **🏷 Names & places v2 + 🧬 Character v2** — the same spark technique for cast and world: one click builds a crafted prompt (genre-aware naming discipline + the world's register + your craft) for your AI — 3 people, 3 places, 1 object + glossary (names), or the full character sheet with wound/arc/voice/secret + pure dialogue samples (character). Paste the answer back, **⤵ Load** fills the brief; **🎲 Local roll** remains as the offline fallback
 - **🖋 Signature techniques** — the blog's structural DNA, injected into every horror/weird brief: the mundane as threshold, dated found documents that prove (never explain), one-line institutional cover-up, the bodily price of knowledge, the entity that *remembers* (never destroyed), the sound motif that returns changed, the image-ending. Plus a precise first line and “the story must smell” in every genre
 - **✦ Demos** — two full briefs, one click: **Το Πάρκο που Θυμάται** (5-act serial, the sealed retro-liminal horror prompt) and **Η Γέφυρα των Ψιθύρων** (novella)
@@ -149,12 +149,13 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 
 ## ✅ Reliability
 - Resilience-hardened: a missing element can never crash the app (safe `$` stub), global error handler, autosave + quota fallback, guarded empty-state actions.
-- **Bulletproof test suite** — `tests/bullet.js` (92 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
+- **Bulletproof test suite** — `tests/bullet.js` (95 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
 - **CI (GitHub Actions)** — every push runs the suite automatically (see [.github/workflows/ci.yml](.github/workflows/ci.yml)); the badge above shows the latest result.
 
 ## 📦 Releases
 | Version | What's new |
 |---|---|
+| v27.0 | **Spark v3 — segment sparks**: ✨ next to Title / Story / Character suggestions builds genuine, morphology-matched AI prompts (never reuses existing suggestions or famous works; the blog's DNA or the selected masters' rhythm); ⤵ Load auto-detects the answer type and fills the matching segment
 | v26.0 | **Short story format** (3–7 acts × ~1,200 words — standalones) + **EPUB export** (dependency-free EPUB3, real e-book file) + **PDF export** (print-ready manuscript layout → Save as PDF) — the manuscript tab now ships a book to an editor
 | v25.0 | **UI: “stone & fire” identity + guided first view** (carved stone-tablet cards, ember buttons, tally-stick savings bar, de-cluttered header; deep-dive cards start collapsed so the 3-step loop leads) + **Names & places v2 + Character v2** — the spark technique for cast & world: crafted AI prompts (genre-aware naming + context + your craft), paste-back **⤵ Load** into the brief (places → world, cast → sheet, glossary merge, dialogue samples → extra); 🎲 local roll kept as offline fallback |
 | v24.0 | **Signature techniques** (the blog's structural DNA) in every horror/weird brief + precise first line & “the story must smell” in all genres; house style enriched with 5 new rules from the full blog read; **Spark v2 now carries the author's craft**; **two demos** (Το Πάρκο που Θυμάται — the sealed 5-act retro-liminal prompt — and Η Γέφυρα των Ψιθύρων) with a demo picker |
