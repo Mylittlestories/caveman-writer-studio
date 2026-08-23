@@ -88,7 +88,12 @@ function boot(overrides) {
 /* ============ ANGLE 2 · STRUCTURE ============ */
 {
   // tag balance (rough): count <div vs </div>, <details vs </details>, etc.
-  const pairs = [['<div','</div>'],['<details','</details>'],['<select','</select>'],['<textarea','</textarea>']];
+  const pairs = [['<div','</div>'],['<details','</details>'],['<select','</select>'],['<textarea','</textarea>'],
+    // <style> must balance too: an unclosed head <style> swallows the whole body
+    // in a real browser (raw-text element) and silently kills the app's scripts.
+    // (The count includes the EPUB/print <style> strings inside <script> — those
+    // are balanced with each other, so the check stays exact.)
+    ['<style','</style>'],['<script','</script>']];
   pairs.forEach(([a,b]) => {
     const ca = (HTML.match(new RegExp(a.replace('/','\\/'),'g'))||[]).length;
     const cb = (HTML.match(new RegExp(b.replace('/','\\/'),'g'))||[]).length;
