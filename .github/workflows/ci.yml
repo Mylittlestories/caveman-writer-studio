@@ -22,3 +22,7 @@ jobs:
           node --check /tmp/app.js
       - name: Run bulletproof test suite (98 checks · 5 angles)
         run: node tests/bullet.js
+      - name: Run v28 feature suite (64 checks)
+        run: node tests/v28smoke.js
+      - name: Run naming-canon suite (30 checks)
+        run: node tests/naming.js

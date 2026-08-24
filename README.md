@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square" alt="Zero dependencies">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/pages.yml/badge.svg" alt="Pages deploy"></a>
   <img src="https://img.shields.io/badge/build-single%20HTML-27ae60?style=flat-square" alt="Single HTML">
-  <img src="https://img.shields.io/badge/tests-95%20passed-8fbc8f?style=flat-square" alt="95 tests passing">
+  <img src="https://img.shields.io/badge/tests-192%20passed-8fbc8f?style=flat-square" alt="192 tests passing">
   <a href="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/ci.yml"><img src="https://github.com/Mylittlestories/caveman-writer-studio/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/languages-EN%20%E2%80%A2%20%CE%95%CE%9B-e8b46a?style=flat-square" alt="Bilingual">
 </p>
@@ -149,7 +149,7 @@ Everything is **local**: your brief, chapters, story state, bible, glossary and 
 
 ## ✅ Reliability
 - Resilience-hardened: a missing element can never crash the app (safe `$` stub), global error handler, autosave + quota fallback, guarded empty-state actions.
-- **Bulletproof test suite** — `tests/bullet.js` (98 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression. Run with `node tests/bullet.js`.
+- **Test suites** — `tests/bullet.js` (98 checks) across 5 angles: syntax, structure, functional, robustness (corrupt storage, quota, missing elements, special chars, huge text, tampered links), regression; `tests/v28smoke.js` (64 checks) for the v28 features (stage pack, strength meter, craft locks); `tests/naming.js` (30 checks) for the naming canon. **192 checks total.** Run any with `node tests/<suite>.js`.
 - **CI (GitHub Actions)** — every push runs the suite automatically (see [.github/workflows/ci.yml](.github/workflows/ci.yml)); the badge above shows the latest result.
 
 ## 📦 Releases
